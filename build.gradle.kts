@@ -30,7 +30,7 @@ dependencies {
     implementation("de.derioo.javautils:discord:2.7.0")
 
     /** JDA **/
-    implementation("net.dv8tion:JDA:5.0.0-beta.17")
+    implementation("net.dv8tion:JDA:5.0.0-beta.24")
 
     /** CommandFramework **/
     implementation("dev.rollczi:litecommands-jda:3.4.2")
