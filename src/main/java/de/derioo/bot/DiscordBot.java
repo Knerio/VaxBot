@@ -1,0 +1,115 @@
+package de.derioo.bot;
+
+import de.derioo.annotations.NeedsAdmin;
+import de.derioo.annotations.NeedsRole;
+import de.derioo.config.Config;
+import de.derioo.config.commands.ChannelSetCommand;
+import de.derioo.config.local.LocalConfig;
+import de.derioo.config.repository.ConfigRepo;
+import de.derioo.javautils.common.DateUtility;
+import de.derioo.module.predefined.TicketModule;
+import dev.rollczi.litecommands.jda.LiteJDAFactory;
+import dev.rollczi.litecommands.validator.ValidatorResult;
+import eu.koboo.en2do.MongoManager;
+import eu.koboo.en2do.repository.Repository;
+import lombok.Getter;
+import net.dv8tion.jda.api.*;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import org.jetbrains.annotations.NotNull;
+
+import java.awt.*;
+import java.util.*;
+
+import static net.dv8tion.jda.api.requests.GatewayIntent.*;
+
+public class DiscordBot {
+
+
+    @Getter
+    private final JDA jda;
+
+    private final LocalConfig config;
+    private final MongoManager mongoManager;
+
+    private final Map<Class<? extends Repository<?, ?>>, Repository<?, ?>> repositories = new HashMap<>();
+
+
+    public DiscordBot(@NotNull LocalConfig config, MongoManager mongoManager) throws InterruptedException {
+        this.config = config;
+        this.mongoManager = mongoManager;
+
+        this.jda = JDABuilder
+                .create(config.getToken(), EnumSet.of(GUILD_MEMBERS, GUILD_MESSAGES, GUILD_VOICE_STATES, GUILD_MODERATION, GUILD_MESSAGE_REACTIONS, MESSAGE_CONTENT, DIRECT_MESSAGES))
+                .setStatus(OnlineStatus.ONLINE)
+                .build();
+        jda.awaitReady();
+
+        this.repositories.put(ConfigRepo.class, this.mongoManager.create(ConfigRepo.class));
+        LiteJDAFactory.builder(jda)
+                .commands(new ChannelSetCommand(this))
+                .exceptionUnexpected((invocation, throwable, resultHandlerChain) -> {
+                    SlashCommandInteractionEvent event = invocation.context().get(SlashCommandInteractionEvent.class).get();
+                    String stacktrace = String.join("\n", Arrays.stream(throwable.getStackTrace()).map(StackTraceElement::toString).toList());
+                    event.getHook().sendMessageEmbeds(
+                                            Default.error(throwable)
+                                                    .setDescription(stacktrace)
+                                                    .build()
+                                    ).setEphemeral(true).queue();
+                })
+                .annotations(configuration -> {
+                    configuration.methodValidator(context -> {
+                        User sender = context.getInvocation().sender();
+                        Member member = context.getInvocation().context().get(SlashCommandInteractionEvent.class).get().getGuild().getMemberById(sender.getIdLong());
+
+                        if (!context.getMethod().isAnnotationPresent(NeedsRole.class)) return ValidatorResult.valid();
+                        NeedsRole annotation = context.getMethod().getAnnotation(NeedsRole.class);
+                        Map<String, Long> roles = Config.get((ConfigRepo) getRepo(ConfigRepo.class)).getRoles();
+                        if (!roles.containsKey(annotation.value().name())) return ValidatorResult.valid();
+
+                        if (context.getMethod().isAnnotationPresent(NeedsAdmin.class)) {
+                            if (!member.getPermissions().contains(Permission.ADMINISTRATOR)) return ValidatorResult.invalid("Dazu hast du keine Rechte!");
+                        }
+                        if (member.getPermissions().contains(Permission.ADMINISTRATOR)) return ValidatorResult.valid();
+
+                        for (Role role : member.getRoles()) {
+                            if (role.getIdLong() == roles.get(annotation.value().name())) return ValidatorResult.valid();
+                        }
+                        return ValidatorResult.invalid("Dazu hast du keine Rechte!");
+                    });
+                })
+                .build();
+
+        new TicketModule(this).start();
+    }
+
+    @SuppressWarnings("unchecked")
+    public <E, ID> Repository<E, ID> getRepo(Class<? extends Repository<E, ID>> repositoryClass) {
+        return (Repository<E, ID>) this.repositories.get(repositoryClass);
+    }
+
+
+    public static class Default {
+
+        public static @NotNull EmbedBuilder builder() {
+            return new EmbedBuilder().setFooter("Gesendet am " + DateUtility.DATE_FORMAT.format(new Date(Calendar.getInstance().getTimeInMillis())));
+        }
+
+        public static @NotNull EmbedBuilder changed() {
+            return builder()
+                    .setColor(Color.GREEN)
+                    .setTitle(":white_check_mark: Geändert");
+        }
+
+        public static @NotNull EmbedBuilder error(@NotNull Throwable throwable) {
+            return builder()
+                    .addField(new MessageEmbed.Field("Fehler", throwable.getClass().getName() + ":" + throwable.getMessage(), false))
+                    .setColor(Color.RED);
+        }
+
+    }
+
+}
