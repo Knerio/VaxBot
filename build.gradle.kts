@@ -26,8 +26,8 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.17.1")
 
     /** JavaUtils **/
-    implementation("de.derioo.javautils:common:2.7.0")
-    implementation("de.derioo.javautils:discord:2.7.0")
+    implementation("de.derioo.javautils:common:2.7.1")
+    implementation("de.derioo.javautils:discord:2.7.1")
 
     /** JDA **/
     implementation("net.dv8tion:JDA:5.0.0-beta.17")

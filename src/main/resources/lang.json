@@ -1,0 +1,41 @@
+{
+    "ticket": {
+        "ticket-creation-embed": {
+            "title": "Varilx Ticket-Support",
+            "description": "Hast du eine Frage oder brauchst du Hilfe auf Varilx?\nErstelle einfach ein Ticket, indem du auf den ✉\uFE0F Button klickst.\nSobald ein Teamler Zeit hat, wird er sich mit dir in Verbindung setzen.",
+            "color": -16711936,
+            "image": {
+                "url": "https://cdn.discordapp.com/attachments/1055223755909111808/1160507955507101736/Varilx_Tube-hosting_version.png?ex=6672a3c1&is=66715241&hm=0ec9638d44c4f0e647a5fffa65adc59df276889f633d93bad913abd8a3cd9cbc&"
+            },
+            "thumbnail": {
+                "url": "https://cdn.discordapp.com/attachments/1055223755909111808/1160508079419424840/Unbenanntdsadasd-2.png?ex=6672a3df&is=6671525f&hm=2445e0f94b87adf12646ada4056b657447bb2754b6140d8d48fcf875d31eba6b&"
+            },
+            "footer": {
+                "text": "Varilx Support Feature | Update 2023 ©",
+                "icon_url": "https://images-ext-1.discordapp.net/external/LktpFRthn3cIDRWwommzYNqZB06jV2p53hu5mhLLePI/https/cdn.discordapp.com/avatars/951126401707278356/77a5c6158d80a30ee99f3eca903a27f2.png"
+            },
+            "fields": [
+                {
+                    "name": "· Reaktionszeit",
+                    "value": "Die Teamler des Varilx-Supports sind keine Roboter, sondern freiwillige Helfer. Es kann etwas dauern, bis du eine Antwort erhältst, also habe bitte Geduld. Du wirst so schnell wie möglich eine Antwort erhalten!\nKein \"Hallo\"\nhttps://nohello.net/ ➡\uFE0F Schreibe mehr als nur \"Hallo\" oder \"Ich habe ein Problem\". Wir helfen dir gerne und wissen, dass du offensichtlich ein Problem oder eine Frage hast, wenn du ein Ticket öffnest!"
+                },
+                {
+                    "name": "· Informationen bereitstellen",
+                    "value": "Bitte gib uns eine detaillierte Beschreibung deines Problems! Wir benötigen möglicherweise einen Minecraft-Namen, eine Transaktions-ID, einen Screenshot oder einen Crash-Log. Wir müssen und möchten dein Problem verstehen, also hilf uns bitte dabei!"
+                },
+                {
+                    "name": "· Discord Voice Support",
+                    "value": "Wir bieten auch direkte Unterstützung über den Sprachkanal von Discord an. Um von unserem Sprachsupport zu profitieren, öffne einfach ein Ticket, beschreibe dein Problem und frage deinen Supporter nach einem Treffen!"
+                },
+                {
+                    "name": "· Hilf dir selbst\n",
+                    "value": "Du kannst auch unsere Support-Website (https://forum.varilx.de/forum/view/8-support/) überprüfen, um zu sehen, ob das Problem bereits beantwortet wurde, oder unsere Community um Hilfe bitten."
+                },
+                {
+                    "name": "· Unterstützte Sprachen",
+                    "value": "\uD83C\uDDEC\uD83C\uDDE7 Englisch\n\uD83C\uDDE9\uD83C\uDDEA Deutsch"
+                }
+            ]
+        }
+    }
+}

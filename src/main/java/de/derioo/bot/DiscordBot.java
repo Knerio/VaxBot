@@ -3,30 +3,37 @@ package de.derioo.bot;
 import de.derioo.annotations.NeedsAdmin;
 import de.derioo.annotations.NeedsRole;
 import de.derioo.config.Config;
+import de.derioo.config.ConfigData;
 import de.derioo.config.commands.ChannelSetCommand;
+import de.derioo.config.local.LangConfig;
 import de.derioo.config.local.LocalConfig;
 import de.derioo.config.repository.ConfigRepo;
 import de.derioo.javautils.common.DateUtility;
-import de.derioo.module.predefined.TicketModule;
+import de.derioo.javautils.common.StringUtility;
+import de.derioo.module.predefined.eightball.EightballCommand;
+import de.derioo.module.predefined.stafflist.StafflistModule;
+import de.derioo.module.predefined.stafflist.TeamCommand;
+import de.derioo.module.predefined.statuschanger.StatusChangerModule;
+import de.derioo.module.predefined.ticket.*;
 import dev.rollczi.litecommands.jda.LiteJDAFactory;
 import dev.rollczi.litecommands.validator.ValidatorResult;
 import eu.koboo.en2do.MongoManager;
 import eu.koboo.en2do.repository.Repository;
 import lombok.Getter;
 import net.dv8tion.jda.api.*;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static net.dv8tion.jda.api.requests.GatewayIntent.*;
 
-public class DiscordBot {
+public class DiscordBot extends ListenerAdapter {
 
 
     @Getter
@@ -34,31 +41,36 @@ public class DiscordBot {
 
     private final LocalConfig config;
     private final MongoManager mongoManager;
+    private final LangConfig langConfig;
 
     private final Map<Class<? extends Repository<?, ?>>, Repository<?, ?>> repositories = new HashMap<>();
 
 
-    public DiscordBot(@NotNull LocalConfig config, MongoManager mongoManager) throws InterruptedException {
+    public DiscordBot(@NotNull LocalConfig config, MongoManager mongoManager, LangConfig langConfig) throws InterruptedException {
+        this.langConfig = langConfig;
         this.config = config;
         this.mongoManager = mongoManager;
 
         this.jda = JDABuilder
                 .create(config.getToken(), EnumSet.of(GUILD_MEMBERS, GUILD_MESSAGES, GUILD_VOICE_STATES, GUILD_MODERATION, GUILD_MESSAGE_REACTIONS, MESSAGE_CONTENT, DIRECT_MESSAGES))
                 .setStatus(OnlineStatus.ONLINE)
+                .addEventListeners(this)
                 .build();
         jda.awaitReady();
 
         this.repositories.put(ConfigRepo.class, this.mongoManager.create(ConfigRepo.class));
+        this.repositories.put(TicketRepo.class, this.mongoManager.create(TicketRepo.class));
+
         LiteJDAFactory.builder(jda)
-                .commands(new ChannelSetCommand(this))
+                .commands(new ChannelSetCommand(this), new UnclaimCommand(this), new TicketCommand(this), new TeamCommand(this), new EightballCommand())
                 .exceptionUnexpected((invocation, throwable, resultHandlerChain) -> {
                     SlashCommandInteractionEvent event = invocation.context().get(SlashCommandInteractionEvent.class).get();
                     String stacktrace = String.join("\n", Arrays.stream(throwable.getStackTrace()).map(StackTraceElement::toString).toList());
                     event.getHook().sendMessageEmbeds(
-                                            Default.error(throwable)
-                                                    .setDescription(stacktrace)
-                                                    .build()
-                                    ).setEphemeral(true).queue();
+                            Default.error(throwable)
+                                    .setDescription(stacktrace)
+                                    .build()
+                    ).setEphemeral(true).queue();
                 })
                 .annotations(configuration -> {
                     configuration.methodValidator(context -> {
@@ -67,23 +79,38 @@ public class DiscordBot {
 
                         if (!context.getMethod().isAnnotationPresent(NeedsRole.class)) return ValidatorResult.valid();
                         NeedsRole annotation = context.getMethod().getAnnotation(NeedsRole.class);
-                        Map<String, Long> roles = Config.get((ConfigRepo) getRepo(ConfigRepo.class)).getRoles();
+                        Map<String, Long> roles = get(member.getGuild()).getRoles();
                         if (!roles.containsKey(annotation.value().name())) return ValidatorResult.valid();
 
                         if (context.getMethod().isAnnotationPresent(NeedsAdmin.class)) {
-                            if (!member.getPermissions().contains(Permission.ADMINISTRATOR)) return ValidatorResult.invalid("Dazu hast du keine Rechte!");
+                            if (!member.getPermissions().contains(Permission.ADMINISTRATOR))
+                                return ValidatorResult.invalid("Dazu hast du keine Rechte!");
                         }
                         if (member.getPermissions().contains(Permission.ADMINISTRATOR)) return ValidatorResult.valid();
 
                         for (Role role : member.getRoles()) {
-                            if (role.getIdLong() == roles.get(annotation.value().name())) return ValidatorResult.valid();
+                            if (role.getIdLong() == roles.get(annotation.value().name()))
+                                return ValidatorResult.valid();
                         }
                         return ValidatorResult.invalid("Dazu hast du keine Rechte!");
                     });
                 })
                 .build();
 
-        new TicketModule(this).start();
+
+        for (Guild guild : jda.getGuilds()) {
+            Config configurationObject = Config.get(getRepo(ConfigRepo.class));
+            configurationObject.getData().putIfAbsent(guild.getId(), ConfigData.defaultData(guild.getId()));
+            getRepo(ConfigRepo.class).save(configurationObject);
+        }
+
+        new StafflistModule(this).start();
+        new StatusChangerModule(this).start();
+        new TicketModule(this, langConfig).start();
+    }
+
+    public ConfigData get(Guild guild) {
+        return Config.get(getRepo(ConfigRepo.class)).get(guild);
     }
 
     @SuppressWarnings("unchecked")
@@ -94,8 +121,12 @@ public class DiscordBot {
 
     public static class Default {
 
-        public static @NotNull EmbedBuilder builder() {
+        public static EmbedBuilder setFooter(EmbedBuilder builder) {
             return new EmbedBuilder().setFooter("Gesendet am " + DateUtility.DATE_FORMAT.format(new Date(Calendar.getInstance().getTimeInMillis())));
+        }
+
+        public static @NotNull EmbedBuilder builder() {
+            return setFooter(new EmbedBuilder());
         }
 
         public static @NotNull EmbedBuilder changed() {
@@ -105,11 +136,33 @@ public class DiscordBot {
         }
 
         public static @NotNull EmbedBuilder error(@NotNull Throwable throwable) {
-            return builder()
-                    .addField(new MessageEmbed.Field("Fehler", throwable.getClass().getName() + ":" + throwable.getMessage(), false))
-                    .setColor(Color.RED);
+            return error(throwable, false);
+        }
+
+        public static @NotNull EmbedBuilder error(@NotNull Throwable throwable, boolean stacktrace) {
+            EmbedBuilder builder = builder()
+                    .setTitle("Es ist eine Fehler aufgetreten")
+                    .setColor(Color.RED)
+                    .addField(new MessageEmbed.Field("Fehler", throwable.getClass().getName() + ": " + throwable.getMessage(), false));
+            if (stacktrace) {
+                builder.addField(new MessageEmbed.Field("StackTrace", "```" +
+                        StringUtility.capAtNCharacters(Arrays.stream(throwable.getStackTrace())
+                                .map(StackTraceElement::toString).collect(Collectors.joining("\n")), 1018)
+                        + "```", false));
+                throwable.printStackTrace();
+            }
+            return builder;
+
+
         }
 
     }
 
+    @Override
+    public void onGuildJoin(GuildJoinEvent event) {
+        Guild guild = event.getGuild();
+        Config configurationObject = Config.get(getRepo(ConfigRepo.class));
+        configurationObject.getData().put(guild.getId(), ConfigData.defaultData(guild.getId()));
+        getRepo(ConfigRepo.class).save(configurationObject);
+    }
 }
