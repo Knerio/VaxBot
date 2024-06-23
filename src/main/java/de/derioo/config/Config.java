@@ -62,7 +62,7 @@ public class Config {
         public enum Role {
             TICKET_EDIT,
             TICKET_MANAGE,
-            REMOVE_USER_FROM_TICKET, TEAM_ADD, TEAM_ROLE, ADD_USER_TO_TICKET
+            REMOVE_USER_FROM_TICKET, TEAM_ADD, TEAM_ROLE, ADD_USER_TO_TICKET, GIVEAWAY_CREATE_ROLE, GIVEAWAY_PING_ROLE
         }
 
         public enum Data {

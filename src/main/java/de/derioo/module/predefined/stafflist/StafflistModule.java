@@ -36,12 +36,20 @@ public class StafflistModule extends Module {
                 List<Long> data = bot.get(guild).getData(Config.Id.Data.TEAM_ROLE.name(), List.class);
                 if (data == null) new ArrayList<>();
 
+                StringBuilder desc = new StringBuilder();
+
                 for (Long roleId : data) {
                     Role role = guild.getRoleById(roleId);
                     List<Member> members = guild.getMembersWithRoles(role);
-                    embed.addField(new MessageEmbed.Field("➥ " + role.getAsMention() + " (" + members.size() + ")",
-                            members.stream().map(IMentionable::getAsMention).collect(Collectors.joining(",")), false));
+                    desc
+                            .append("➥ ")
+                            .append(role.getAsMention())
+                            .append(" (")
+                            .append(members.size())
+                            .append(") \n")
+                            .append(members.stream().map(IMentionable::getAsMention).collect(Collectors.joining(",")));
                 }
+                embed.setDescription(desc.toString());
 
                 if (messages.isEmpty() || messages.getFirst().getAuthor().getIdLong() != bot.getJda().getSelfUser().getIdLong()) {
                     channel.sendMessageEmbeds(embed.build()).queue();
