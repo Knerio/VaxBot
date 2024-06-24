@@ -13,7 +13,7 @@ import java.util.Random;
 
 public class StatusChangerModule extends Module {
 
-    private static final List<String> statuses = new ArrayList<>(List.of("Bedrock & Java", "Varilx.de Botsystem", "Tube-Hosting.DE", "Developed by Dario :)"));
+    private static final List<String> statuses = new ArrayList<>(List.of("Bedrock & Java", "Varilx.de Botsystem", "Tube-Hosting.DE", "Developed by Dario :)", "https://github.com/Knerio"));
 
     private final DiscordBot bot;
 

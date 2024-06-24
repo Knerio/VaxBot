@@ -10,6 +10,7 @@ import de.derioo.config.local.LocalConfig;
 import de.derioo.config.repository.ConfigRepo;
 import de.derioo.javautils.common.DateUtility;
 import de.derioo.javautils.common.StringUtility;
+import de.derioo.module.predefined.clear.ClearCommand;
 import de.derioo.module.predefined.eightball.EightballCommand;
 import de.derioo.module.predefined.giveaway.GiveAwayModule;
 import de.derioo.module.predefined.giveaway.commands.GiveAwayCommand;
@@ -72,7 +73,7 @@ public class DiscordBot extends ListenerAdapter {
         giveAwayModule.start();
 
         LiteJDAFactory.builder(jda)
-                .commands(new GiveAwayCommand(this, giveAwayModule),new ChannelSetCommand(this), new UnclaimCommand(this), new TicketCommand(this), new TeamCommand(this), new EightballCommand())
+                .commands(new ClearCommand(),new GiveAwayCommand(this, giveAwayModule),new ChannelSetCommand(this), new UnclaimCommand(this), new TicketCommand(this), new TeamCommand(this), new EightballCommand())
                 .exceptionUnexpected((invocation, throwable, resultHandlerChain) -> {
                     SlashCommandInteractionEvent event = invocation.context().get(SlashCommandInteractionEvent.class).get();
                     String stacktrace = String.join("\n", Arrays.stream(throwable.getStackTrace()).map(StackTraceElement::toString).toList());

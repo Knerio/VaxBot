@@ -42,8 +42,6 @@ public class GiveAwayModule extends Module {
             if (System.currentTimeMillis() < giveAway.getDuration()) continue;
             Guild guild = Objects.requireNonNull(bot.getJda().getGuildById(giveAway.getGuildId()));
             TextChannel channel = Objects.requireNonNull(bot.getJda().getTextChannelById(giveAway.getChannelId()));
-            System.out.println(channel.getName());
-            System.out.println(channel.getHistoryAround(giveAway.getMessageId(), 5).complete().size());
             Message message = Objects.requireNonNull(channel.getHistoryAround(giveAway.getMessageId(), 2).complete().getMessageById(giveAway.getMessageId()));
 
             for (Long participant : new ArrayList<>(giveAway.getParticipants())) {
