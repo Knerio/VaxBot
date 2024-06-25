@@ -40,7 +40,7 @@ public class TeamCommand {
         TextChannel channel = guild.getTextChannelById(bot.get(guild).getChannels().get(Config.Id.Channel.PROMOTE_CHANNEL.name()));
         Role teamRole = guild.getRoleById(bot.get(guild).getRoles().get(Config.Id.Role.TEAM_ROLE.name()));
         channel.sendMessage(teamRole.getAsMention() +
-                        "\nTeam Neuzugang\n\n" +
+                        "\n**Team Neuzugang**\n\n" +
                         "Wir begrüßen " + user.getAsMention() + " im Bereich " + role.getAsMention() + "und wünschen eine lange und gute Zusammenarbeit!\n\n" +
                         "Mit freundlichen Grüßen,\n"
                         + bot.getJda().getSelfUser().getAsMention())
@@ -63,7 +63,7 @@ public class TeamCommand {
         TextChannel channel = guild.getTextChannelById(bot.get(guild).getChannels().get(Config.Id.Channel.PROMOTE_CHANNEL.name()));
         Role teamRole = guild.getRoleById(bot.get(guild).getRoles().get(Config.Id.Role.TEAM_ROLE.name()));
         channel.sendMessage(teamRole.getAsMention() +
-                        "\nTeam Uprank\n\n" +
+                        "\n**Team Uprank**\n\n" +
                         user.getAsMention() + "wurde auf " + role.getAsMention() + " befördert\n\n" +
                         "Mit freundlichen Grüßen,\n"
                         + bot.getJda().getSelfUser().getAsMention())
