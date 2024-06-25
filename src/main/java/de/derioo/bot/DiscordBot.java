@@ -24,6 +24,7 @@ import dev.rollczi.litecommands.validator.ValidatorResult;
 import eu.koboo.en2do.MongoManager;
 import eu.koboo.en2do.repository.Repository;
 import lombok.Getter;
+import lombok.extern.java.Log;
 import net.dv8tion.jda.api.*;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
@@ -33,10 +34,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 import static net.dv8tion.jda.api.requests.GatewayIntent.*;
 
+@Log
 public class DiscordBot extends ListenerAdapter {
 
 
@@ -158,7 +161,7 @@ public class DiscordBot extends ListenerAdapter {
                         StringUtility.capAtNCharacters(Arrays.stream(throwable.getStackTrace())
                                 .map(StackTraceElement::toString).collect(Collectors.joining("\n")), 1018)
                         + "```", false));
-                throwable.printStackTrace();
+                log.log(Level.SEVERE, "Es ist ein Fehler aufgetreten!", stacktrace);
             }
             return builder;
 
@@ -168,7 +171,7 @@ public class DiscordBot extends ListenerAdapter {
     }
 
     @Override
-    public void onGuildJoin(GuildJoinEvent event) {
+    public void onGuildJoin(@NotNull GuildJoinEvent event) {
         Guild guild = event.getGuild();
         Config configurationObject = Config.get(getRepo(ConfigRepo.class));
         configurationObject.getData().put(guild.getId(), ConfigData.defaultData(guild.getId()));

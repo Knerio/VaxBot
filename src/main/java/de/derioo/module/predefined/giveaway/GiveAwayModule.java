@@ -36,7 +36,7 @@ public class GiveAwayModule extends Module {
     }
 
     @Override
-    public void timer() throws Throwable {
+    public void timer() {
         Repository<GiveAway, ObjectId> repo = bot.getRepo(GiveawayRepo.class);
         for (GiveAway giveAway : repo.findAll()) {
             if (System.currentTimeMillis() < giveAway.getDuration()) continue;
@@ -75,6 +75,7 @@ public class GiveAwayModule extends Module {
 
     @ModuleListener
     public void onButton(@NotNull ButtonInteractionEvent event) {
+        if (event.getButton().getId() == null) return;
         if (!event.getButton().getId().equals("giveaway-participate")) return;
         for (GiveAway giveAway : bot.getRepo(GiveawayRepo.class).findAll()) {
             if (giveAway.getMessageId() != event.getMessageIdLong()) continue;

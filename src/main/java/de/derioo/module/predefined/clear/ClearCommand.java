@@ -1,5 +1,7 @@
 package de.derioo.module.predefined.clear;
 
+import de.derioo.annotations.NeedsRole;
+import de.derioo.config.Config;
 import dev.rollczi.litecommands.annotations.argument.Arg;
 import dev.rollczi.litecommands.annotations.command.Command;
 import dev.rollczi.litecommands.annotations.context.Context;
@@ -14,6 +16,7 @@ public class ClearCommand {
 
     @Execute
     @Description("Löscht die x neuen Nachrichten im aktuellen Channel")
+    @NeedsRole(Config.Id.Role.CLEAR)
     void executeClear(@Arg("menge") @Description("Wie viele Nachrichten sollen gelöscht werden?") int amount, @Context @NotNull SlashCommandInteractionEvent event) {
         if (amount <= 0) {
             event.reply("Bitte gib eine positive Zahl an.").setEphemeral(true).queue();

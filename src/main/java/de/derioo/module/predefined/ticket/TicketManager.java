@@ -3,17 +3,13 @@ package de.derioo.module.predefined.ticket;
 import de.derioo.bot.DiscordBot;
 import de.derioo.config.Config;
 import de.derioo.config.ConfigData;
-import de.derioo.utils.UserUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
 import org.bson.types.ObjectId;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +21,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 import static de.derioo.utils.UserUtils.getMention;
 import static net.dv8tion.jda.api.Permission.VIEW_CHANNEL;
@@ -41,7 +36,6 @@ public class TicketManager {
         this.bot = bot;
     }
 
-    @SuppressWarnings("unchecked")
     public Ticket createTicket(Guild guild, User user, ModalInteractionEvent event) {
         for (Ticket ticket : bot.getRepo(TicketRepo.class).findAll()) {
             if (ticket.getUserId().equals(user.getIdLong())) return null;
@@ -101,11 +95,6 @@ public class TicketManager {
     public Ticket claimTicket(@NotNull TextChannel channel, @NotNull ButtonInteractionEvent event) {
         Ticket ticket = bot.getRepo(TicketRepo.class).findFirstById(new ObjectId(List.of(channel.getName().split("-")).getLast()));
 
-        ConfigData configData = bot.get(event.getGuild());
-
-        List<Long> data = configData.getData(Config.Id.Data.TEAM_ROLE.name(), List.class);
-        if (data == null) data = new ArrayList<>();
-
         if (ticket.getUserId() == event.getUser().getIdLong()) {
             event.reply("Du darfst dieses Ticket nicht claimen").setEphemeral(true).queue();
             return null;
@@ -144,7 +133,7 @@ public class TicketManager {
         return ticket;
     }
 
-    public Ticket cancelTicketDeletion(@NotNull TextChannel channel, ButtonInteractionEvent event) {
+    public void cancelTicketDeletion(@NotNull TextChannel channel, ButtonInteractionEvent event) {
         Ticket ticket = bot.getRepo(TicketRepo.class).findFirstById(new ObjectId(List.of(channel.getName().split("-")).getLast()));
         for (ScheduledFuture<?> task : scheduledTasks.get(ticket.getId())) {
             task.cancel(false);
@@ -152,15 +141,14 @@ public class TicketManager {
         event.reply("Ticket schließen wurde abgebrochen").setEphemeral(true).queue();
         event.getMessage().delete().queue();
 
-        return ticket;
     }
 
-    public Ticket closeTicket(@NotNull TextChannel channel, ButtonInteractionEvent event) {
+    public void closeTicket(@NotNull TextChannel channel, ButtonInteractionEvent event) {
         Ticket ticket = bot.getRepo(TicketRepo.class).findFirstById(new ObjectId(List.of(channel.getName().split("-")).getLast()));
         scheduledTasks.putIfAbsent(ticket.getId(), new ArrayList<>());
         if (scheduledTasks.get(ticket.getId()).stream().anyMatch(scheduledFuture -> scheduledFuture.isCancelled() || scheduledFuture.isDone())) {
             event.reply("Das Ticket schließt schon!").setEphemeral(true).queue();
-            return null;
+            return;
         }
         AtomicReference<InteractionHook> current = new AtomicReference<>();
         EmbedBuilder builder = DiscordBot.Default.builder()
@@ -201,10 +189,9 @@ public class TicketManager {
         scheduledTasks.get(ticket.getId()).add(deleteTask);
 
 
-        return ticket;
     }
 
-    private String getTicketInformations(Ticket ticket, Guild guild) {
+    private @NotNull String getTicketInformations(Ticket ticket, Guild guild) {
         StringBuilder builder = new StringBuilder();
         for (Ticket.HistoryItem historyItem : ticket.getHistory()) {
             if (historyItem.getSenderId() == null) {
