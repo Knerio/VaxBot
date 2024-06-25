@@ -6,11 +6,11 @@ import org.jetbrains.annotations.NotNull;
 
 public class UserUtils {
 
-    public static String getMention(@NotNull User user) {
+    public static @NotNull String getMention(@NotNull User user) {
         return user.getAsMention() + "(@" + user.getEffectiveName() + ")";
     }
 
-    public static String getMention(@NotNull Member member) {
+    public static @NotNull String getMention(@NotNull Member member) {
         return getMention(member.getUser());
     }
 
