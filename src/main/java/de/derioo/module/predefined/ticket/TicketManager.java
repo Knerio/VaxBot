@@ -16,10 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static de.derioo.utils.UserUtils.getMention;
@@ -36,13 +33,14 @@ public class TicketManager {
         this.bot = bot;
     }
 
-    public Ticket createTicket(Guild guild, User user, ModalInteractionEvent event) {
+    public Ticket createTicket(Guild guild, User user, ModalInteractionEvent event, String type) {
         for (Ticket ticket : bot.getRepo(TicketRepo.class).findAll()) {
+            if (!Objects.equals(ticket.getType(), type)) continue;
             if (ticket.getUserId().equals(user.getIdLong())) return null;
         }
         ObjectId objectId = new ObjectId();
-        TextChannel ticketChannel = guild.createTextChannel(user.getName() + "-ticket-" + objectId, guild.getCategoryById(bot.get(guild).getChannels().get(Config.Id.Category.TICKET_CATEGORY.name()))).complete();
-        Long ticketSeeId = bot.get(guild).getRoles().get(Config.Id.Role.TICKET_EDIT.name());
+        TextChannel ticketChannel = guild.createTextChannel(user.getName() + "-" + type + "-" + objectId, guild.getCategoryById(bot.get(guild).getChannels().get(Config.Id.Category.TICKET_CATEGORY.name()))).complete();
+        Long ticketSeeId = bot.get(guild).getRoles().get(type.equals("bug") ? Config.Id.Role.BUG_REPORT_EDIT.name() : Config.Id.Role.TICKET_EDIT.name());
         Role roleById = guild.getRoleById(ticketSeeId);
         List<Member> membersWithRoles = guild.getMembersWithRoles(roleById);
         Member creator = guild.getMemberById(user.getIdLong());
@@ -70,7 +68,7 @@ public class TicketManager {
                                 https://forum.varilx.de/forum/view/8-support/"""
                         )
                         .addField(new MessageEmbed.Field("Ingame-Name", event.getValue("name").getAsString(), false))
-                        .addField(new MessageEmbed.Field("Beschreibung des Problems", event.getValue("issue").getAsString(), false))
+                        .addField(new MessageEmbed.Field("Beschreibung des " + (type.equals("bug") ? "Bugs" : "Problems"), event.getValue("issue").getAsString(), false))
 
                         .setColor(Color.GREEN)
                         .build())
@@ -79,6 +77,7 @@ public class TicketManager {
 
         return Ticket.builder()
                 .id(objectId)
+                .type(type)
                 .history(new ArrayList<>())
                 .guildId(guild.getIdLong())
                 .userId(user.getIdLong())
@@ -120,7 +119,7 @@ public class TicketManager {
         ).queue();
 
         Guild guild = event.getGuild();
-        Long ticketSeeId = bot.get(guild).getRoles().get(Config.Id.Role.TICKET_EDIT.name());
+        Long ticketSeeId = bot.get(guild).getRoles().get(ticket.getType().equals("bug") ? Config.Id.Role.BUG_REPORT_EDIT : Config.Id.Role.TICKET_EDIT.name());
         Role roleById = guild.getRoleById(ticketSeeId);
 
         channel.getManager()
@@ -135,8 +134,10 @@ public class TicketManager {
 
     public void cancelTicketDeletion(@NotNull TextChannel channel, ButtonInteractionEvent event) {
         Ticket ticket = bot.getRepo(TicketRepo.class).findFirstById(new ObjectId(List.of(channel.getName().split("-")).getLast()));
-        for (ScheduledFuture<?> task : scheduledTasks.get(ticket.getId())) {
-            task.cancel(false);
+        List<ScheduledFuture<?>> scheduledFutures = scheduledTasks.get(ticket.getId());
+        for (ScheduledFuture<?> task : new ArrayList<>(scheduledFutures)) {
+            task.cancel(true);
+            scheduledFutures.remove(task);
         }
         event.reply("Ticket schließen wurde abgebrochen").setEphemeral(true).queue();
         event.getMessage().delete().queue();
@@ -146,7 +147,7 @@ public class TicketManager {
     public void closeTicket(@NotNull TextChannel channel, ButtonInteractionEvent event) {
         Ticket ticket = bot.getRepo(TicketRepo.class).findFirstById(new ObjectId(List.of(channel.getName().split("-")).getLast()));
         scheduledTasks.putIfAbsent(ticket.getId(), new ArrayList<>());
-        if (scheduledTasks.get(ticket.getId()).stream().anyMatch(scheduledFuture -> scheduledFuture.isCancelled() || scheduledFuture.isDone())) {
+        if (!scheduledTasks.get(ticket.getId()).isEmpty()) {
             event.reply("Das Ticket schließt schon!").setEphemeral(true).queue();
             return;
         }
@@ -181,6 +182,7 @@ public class TicketManager {
                     .addField(new MessageEmbed.Field(":mountain_snow: Teilnehmer:", getSupporters(ticket, guild), true))
                     .build();
             logs.sendMessageEmbeds(embed).queue();
+            event.getJDA().getUserById(ticket.getUserId()).openPrivateChannel().queue(pc -> pc.sendMessageEmbeds(embed).queue());
             event.getUser().openPrivateChannel().queue(pc -> pc.sendMessageEmbeds(embed).queue());
             if (ticket.getClaimerId() != null)
                 guild.getMemberById(ticket.getClaimerId()).getUser().openPrivateChannel().queue(pc -> pc.sendMessageEmbeds(embed).queue());

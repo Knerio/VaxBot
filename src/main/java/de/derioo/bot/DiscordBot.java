@@ -15,10 +15,12 @@ import de.derioo.module.predefined.eightball.EightballCommand;
 import de.derioo.module.predefined.giveaway.GiveAwayModule;
 import de.derioo.module.predefined.giveaway.commands.GiveAwayCommand;
 import de.derioo.module.predefined.giveaway.db.GiveawayRepo;
+import de.derioo.module.predefined.moveall.MoveallCommand;
 import de.derioo.module.predefined.stafflist.StafflistModule;
 import de.derioo.module.predefined.stafflist.TeamCommand;
 import de.derioo.module.predefined.statuschanger.StatusChangerModule;
 import de.derioo.module.predefined.ticket.*;
+import de.derioo.module.predefined.userinfo.UserInfoCommand;
 import dev.rollczi.litecommands.jda.LiteJDAFactory;
 import dev.rollczi.litecommands.validator.ValidatorResult;
 import eu.koboo.en2do.MongoManager;
@@ -27,6 +29,7 @@ import lombok.Getter;
 import lombok.extern.java.Log;
 import net.dv8tion.jda.api.*;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -76,7 +79,7 @@ public class DiscordBot extends ListenerAdapter {
         giveAwayModule.start();
 
         LiteJDAFactory.builder(jda)
-                .commands(new ClearCommand(),new GiveAwayCommand(this, giveAwayModule),new ChannelSetCommand(this), new UnclaimCommand(this), new TicketCommand(this), new TeamCommand(this), new EightballCommand())
+                .commands(new ClearCommand(), new UserInfoCommand(), new MoveallCommand(), new GiveAwayCommand(this, giveAwayModule), new ChannelSetCommand(this), new UnclaimCommand(this), new TicketCommand(this), new TeamCommand(this), new EightballCommand())
                 .exceptionUnexpected((invocation, throwable, resultHandlerChain) -> {
                     SlashCommandInteractionEvent event = invocation.context().get(SlashCommandInteractionEvent.class).get();
                     String stacktrace = String.join("\n", Arrays.stream(throwable.getStackTrace()).map(StackTraceElement::toString).toList());
@@ -133,8 +136,16 @@ public class DiscordBot extends ListenerAdapter {
 
     public static class Default {
 
+        public static void replyError(SlashCommandInteractionEvent event, String msg) {
+            event.replyEmbeds(builder().setColor(Color.RED).setDescription(msg).build()).setEphemeral(true).queue();
+        }
+
+        public static void reply(SlashCommandInteractionEvent event, String msg) {
+            event.replyEmbeds(builder().setDescription(msg).build()).setEphemeral(true).queue();
+        }
+
         public static EmbedBuilder setFooter(EmbedBuilder builder) {
-            return new EmbedBuilder().setFooter("Gesendet am " + DateUtility.DATE_FORMAT.format(new Date(Calendar.getInstance().getTimeInMillis())));
+            return new EmbedBuilder().setAuthor("Varilx.de | Bot").setFooter("Gesendet am " + DateUtility.DATE_FORMAT.format(new Date(Calendar.getInstance().getTimeInMillis())));
         }
 
         public static @NotNull EmbedBuilder builder() {

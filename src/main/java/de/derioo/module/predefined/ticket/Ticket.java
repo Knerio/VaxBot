@@ -27,6 +27,8 @@ public class Ticket {
 
     Long channelId;
 
+    String type;
+
     @Builder.Default
     List<HistoryItem> history = new ArrayList<>();
 

@@ -19,10 +19,12 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
@@ -86,21 +88,26 @@ public class TicketModule extends Module {
     }
 
     private void sendNewTicketMessage(@NotNull TextChannel channel) throws JsonProcessingException, ExecutionException, InterruptedException {
+        StringSelectMenu.Builder builder = StringSelectMenu.create("new-ticket");
+
+        builder.addOption("Ticket", "ticket", "Ein normales Ticket für normale Supportangelegenheiten!");
+        builder.addOption("BugReport", "bug", "Ein Ticket, welches nur für Bugs gedacht ist (Minecraft, Discord, Website,...)");
+        builder.setMaxValues(1);
+        builder.setMinValues(1);
         channel.sendMessageEmbeds(getEmbed())
                 .addActionRow(
-                        Button.success("new-ticket", "Ticket -> ✉️"),
                         Button.link("https://tube-hosting.com/pricing", "Partner").withEmoji(Emoji.fromFormatted("<:TubehostingVarilx:1101657813794693120>"))
                 )
-                .submit().get();
+                .addActionRow(
+                        builder.build()
+                ).submit().get();
     }
 
     @ModuleListener
-    public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
-        switch (event.getButton().getId()) {
-            case "cancel-close" -> ticketManager.cancelTicketDeletion(event.getChannel().asTextChannel(), event);
-            case "ticket-close" -> ticketManager.closeTicket(event.getChannel().asTextChannel(), event);
+    public void onMenuSelection(StringSelectInteractionEvent event) {
+        switch (event.getSelectMenu().getId()) {
             case "new-ticket" -> {
-                System.out.println("1");
+                String choice = event.getInteraction().getValues().getFirst();
                 TextInput name =
                         TextInput.create("name", "Dein Ingame Name", TextInputStyle.SHORT)
                                 .setPlaceholder("z.B. \"Knerio\"")
@@ -109,14 +116,27 @@ public class TicketModule extends Module {
                                 .setRequired(true)
                                 .build();
                 TextInput issue =
-                        TextInput.create("issue", "Kurze Beschreibung des Problems", TextInputStyle.PARAGRAPH)
+                        TextInput.create("issue", choice.equals("bug") ? "Kurze Beschreibung deines Bugs" : "Kurze Beschreibung des Problems", TextInputStyle.PARAGRAPH)
                                 .setRequired(true)
-                                .setPlaceholder("z.B. \"Ich kann kein /help machen\"")
+                                .setPlaceholder(choice.equals("bug") ? "z.B. \"Ich habe eine Fehler im System x gefunden\"" : "z.B. \"Ich kann kein /help machen\"")
                                 .setMinLength(10)
                                 .setMaxLength(999)
                                 .build();
-                Modal modal = Modal.create("new-ticket", "Ticket").addActionRows(ActionRow.of(issue), ActionRow.of(name)).build();
+                Modal modal = Modal.create("new-ticket-" + choice, "Ticket").addActionRows(ActionRow.of(issue), ActionRow.of(name)).build();
                 event.replyModal(modal).queue();
+            }
+            case null, default -> {
+            }
+        }
+    }
+
+    @ModuleListener
+    public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
+        switch (event.getButton().getId()) {
+            case "cancel-close" -> ticketManager.cancelTicketDeletion(event.getChannel().asTextChannel(), event);
+            case "ticket-close" -> ticketManager.closeTicket(event.getChannel().asTextChannel(), event);
+            case "new-ticket" -> {
+
             }
             case "ticket-claim" -> ticketManager.claimTicket(event.getChannel().asTextChannel(), event);
             case null, default -> {
@@ -127,8 +147,8 @@ public class TicketModule extends Module {
 
     @ModuleListener
     public void onModalInteraction(@NotNull ModalInteractionEvent event) {
-        if (!event.getModalId().equals("new-ticket")) return;
-        Ticket ticket = ticketManager.createTicket(event.getGuild(), event.getUser(), event);
+        if (!event.getModalId().startsWith("new-ticket")) return;
+        Ticket ticket = ticketManager.createTicket(event.getGuild(), event.getUser(), event, Arrays.stream(event.getModalId().split("-")).toList().getLast());
         if (ticket == null) {
             event.reply("Du hast bereits ein Ticket offen!").setEphemeral(true).queue();
             return;
@@ -144,14 +164,14 @@ public class TicketModule extends Module {
         if (!event.getChannel().getName().contains("-")) return;
         TicketRepo ticketRepo = (TicketRepo) bot.getRepo(TicketRepo.class);
         ticketRepo.asyncFindFirstById(new ObjectId(List.of(event.getChannel().asTextChannel().getName().split("-")).getLast())).thenAcceptAsync(ticket -> {
-           if (ticket == null) return;
-           ticket.getHistory()
-                   .add(Ticket.HistoryItem.builder()
-                           .id(new ObjectId())
-                           .senderId(event.getAuthor().getIdLong())
-                           .content(event.getMessage().getContentDisplay())
-                           .build());
-           ticketRepo.save(ticket);
+            if (ticket == null) return;
+            ticket.getHistory()
+                    .add(Ticket.HistoryItem.builder()
+                            .id(new ObjectId())
+                            .senderId(event.getAuthor().getIdLong())
+                            .content(event.getMessage().getContentDisplay())
+                            .build());
+            ticketRepo.save(ticket);
         });
     }
 

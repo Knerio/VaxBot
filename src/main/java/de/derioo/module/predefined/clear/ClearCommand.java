@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 public class ClearCommand {
 
     @Execute
-    @Description("Löscht die x neuen Nachrichten im aktuellen Channel")
+    @Description("Löscht die x neusten Nachrichten im aktuellen Channel")
     @NeedsRole(Config.Id.Role.CLEAR)
     void executeClear(@Arg("menge") @Description("Wie viele Nachrichten sollen gelöscht werden?") int amount, @Context @NotNull SlashCommandInteractionEvent event) {
         if (amount <= 0) {
