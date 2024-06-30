@@ -52,11 +52,11 @@ public class TicketManager {
         for (Member member : membersWithRoles) {
             if (member.getUser().isBot()) continue;
             member.getUser().openPrivateChannel().queue(privateChannel -> {
-                privateChannel.sendMessage("Du kannst nun das Ticket " + ticketChannel.getAsMention() + " sehen").queue();
+                privateChannel.sendMessageEmbeds(DiscordBot.Default.builder().setDescription("Du kannst nun das Ticket " + ticketChannel.getAsMention() + " sehen").build()).queue();
             });
         }
         creator.getUser().openPrivateChannel().queue(privateChannel -> {
-            privateChannel.sendMessage("Du kannst nun das Ticket " + ticketChannel.getAsMention() + " sehen").queue();
+            privateChannel.sendMessageEmbeds(DiscordBot.Default.builder().setDescription("Du kannst nun das Ticket " + ticketChannel.getAsMention() + " sehen").build()).queue();
         });
 
         ticketChannel.sendMessage(event.getUser().getAsMention() + guild.getRoleById(bot.get(guild).getRoles().get(Config.Id.Role.TICKET_EDIT.name())).getAsMention())
@@ -69,7 +69,6 @@ public class TicketManager {
                         )
                         .addField(new MessageEmbed.Field("Ingame-Name", event.getValue("name").getAsString(), false))
                         .addField(new MessageEmbed.Field("Beschreibung des " + (type.equals("bug") ? "Bugs" : "Problems"), event.getValue("issue").getAsString(), false))
-
                         .setColor(Color.GREEN)
                         .build())
                 .addActionRow(Button.danger("ticket-close", "Ticket schließen -> \uD83D\uDDD1"), Button.primary("ticket-claim", "Ticket claimen -> \uD83D\uDD12"))
@@ -193,7 +192,7 @@ public class TicketManager {
 
     }
 
-    private @NotNull String getTicketInformations(Ticket ticket, Guild guild) {
+    private @NotNull String getTicketInformations(@NotNull Ticket ticket, Guild guild) {
         StringBuilder builder = new StringBuilder();
         for (Ticket.HistoryItem historyItem : ticket.getHistory()) {
             if (historyItem.getSenderId() == null) {
@@ -209,7 +208,7 @@ public class TicketManager {
         return builder.toString();
     }
 
-    private String getSupporters(Ticket ticket, Guild guild) {
+    private @NotNull String getSupporters(@NotNull Ticket ticket, Guild guild) {
         Set<String> set = new HashSet<>();
         for (Ticket.HistoryItem historyItem : ticket.getHistory()) {
             if (historyItem.getSenderId() == null) continue;
