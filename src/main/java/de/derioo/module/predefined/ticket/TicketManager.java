@@ -2,7 +2,6 @@ package de.derioo.module.predefined.ticket;
 
 import de.derioo.bot.DiscordBot;
 import de.derioo.config.Config;
-import de.derioo.config.ConfigData;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
