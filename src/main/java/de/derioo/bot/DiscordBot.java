@@ -16,6 +16,7 @@ import de.derioo.module.predefined.giveaway.GiveAwayModule;
 import de.derioo.module.predefined.giveaway.commands.GiveAwayCommand;
 import de.derioo.module.predefined.giveaway.db.GiveawayRepo;
 import de.derioo.module.predefined.moveall.MoveallCommand;
+import de.derioo.module.predefined.punishment.*;
 import de.derioo.module.predefined.stafflist.StafflistModule;
 import de.derioo.module.predefined.stafflist.TeamCommand;
 import de.derioo.module.predefined.statuschanger.StatusChangerModule;
@@ -75,6 +76,7 @@ public class DiscordBot extends ListenerAdapter {
         this.repositories.put(TicketRepo.class, this.mongoManager.create(TicketRepo.class));
         this.repositories.put(GiveawayRepo.class, this.mongoManager.create(GiveawayRepo.class));
         this.repositories.put(SuggestionRepo.class, this.mongoManager.create(SuggestionRepo.class));
+        this.repositories.put(WarnRepo.class, this.mongoManager.create(WarnRepo.class));
 
         new StafflistModule(this).start();
         new StatusChangerModule(this).start();
@@ -84,7 +86,7 @@ public class DiscordBot extends ListenerAdapter {
         giveAwayModule.start();
 
         LiteJDAFactory.builder(jda)
-                .commands(new ClearCommand(), new UserInfoCommand(), new MoveallCommand(), new GiveAwayCommand(this, giveAwayModule), new ChannelSetCommand(this), new UnclaimCommand(this), new TicketCommand(this), new TeamCommand(this), new EightballCommand())
+                .commands(new WarnCommand(this),new TimeoutCommand(), new BanCommand(), new KickCommand(),new ClearCommand(), new UserInfoCommand(), new MoveallCommand(), new GiveAwayCommand(this, giveAwayModule), new ChannelSetCommand(this), new UnclaimCommand(this), new TicketCommand(this), new TeamCommand(this), new EightballCommand())
                 .exceptionUnexpected((invocation, throwable, resultHandlerChain) -> {
                     SlashCommandInteractionEvent event = invocation.context().get(SlashCommandInteractionEvent.class).get();
                     String stacktrace = String.join("\n", Arrays.stream(throwable.getStackTrace()).map(StackTraceElement::toString).toList());
