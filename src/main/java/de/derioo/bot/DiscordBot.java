@@ -19,6 +19,9 @@ import de.derioo.module.predefined.moveall.MoveallCommand;
 import de.derioo.module.predefined.stafflist.StafflistModule;
 import de.derioo.module.predefined.stafflist.TeamCommand;
 import de.derioo.module.predefined.statuschanger.StatusChangerModule;
+import de.derioo.module.predefined.suggestion.Suggestion;
+import de.derioo.module.predefined.suggestion.SuggestionModule;
+import de.derioo.module.predefined.suggestion.SuggestionRepo;
 import de.derioo.module.predefined.ticket.*;
 import de.derioo.module.predefined.userinfo.UserInfoCommand;
 import dev.rollczi.litecommands.jda.LiteJDAFactory;
@@ -71,10 +74,12 @@ public class DiscordBot extends ListenerAdapter {
         this.repositories.put(ConfigRepo.class, this.mongoManager.create(ConfigRepo.class));
         this.repositories.put(TicketRepo.class, this.mongoManager.create(TicketRepo.class));
         this.repositories.put(GiveawayRepo.class, this.mongoManager.create(GiveawayRepo.class));
+        this.repositories.put(SuggestionRepo.class, this.mongoManager.create(SuggestionRepo.class));
 
         new StafflistModule(this).start();
         new StatusChangerModule(this).start();
         new TicketModule(this, langConfig).start();
+        new SuggestionModule(this).start();
         GiveAwayModule giveAwayModule = new GiveAwayModule(this);
         giveAwayModule.start();
 
@@ -173,6 +178,7 @@ public class DiscordBot extends ListenerAdapter {
                                 .map(StackTraceElement::toString).collect(Collectors.joining("\n")), 1018)
                         + "```", false));
                 log.log(Level.SEVERE, "Es ist ein Fehler aufgetreten!", stacktrace);
+                throwable.printStackTrace();
             }
             return builder;
 
