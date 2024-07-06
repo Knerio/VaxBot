@@ -159,7 +159,7 @@ public class SuggestionModule extends Module {
         for (Suggestion suggestion : repo.findAll()) {
             if (!suggestion.getGuildId().equals(event.getGuild().getIdLong())) continue;
             if (!suggestion.getUserId().equals(event.getUser().getIdLong())) continue;
-            if (suggestion.getId().getDate().getTime() + TimeUnit.MINUTES.toMillis(30) > System.currentTimeMillis()) { //TODO
+            if (suggestion.getId().getDate().getTime() + TimeUnit.MINUTES.toMillis(30) > System.currentTimeMillis()) {
                 event.reply("Du kannst nur alle 30min etwas vorschlagen").setEphemeral(true).queue();
                 break;
             }
