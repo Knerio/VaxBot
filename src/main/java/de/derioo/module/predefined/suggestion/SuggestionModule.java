@@ -116,11 +116,8 @@ public class SuggestionModule extends Module {
                     event.reply("Erfolgreich gelöscht").setEphemeral(true).queue();
                     return;
                 }
-                System.out.println(event.getButton().getId().toString());
-                System.out.println(Arrays.stream(event.getButton().getId().split("-")).toList().getLast());
                 if (event.getButton().getId().startsWith("accept-suggestion-") || event.getButton().getId().startsWith("decline-suggestion-")) {
                     String last = Arrays.stream(event.getButton().getId().split("-")).toList().getLast();
-                    System.out.println(last);
                     ObjectId id = new ObjectId(last);
                     Suggestion suggestion = repo.findFirstById(id);
                     suggestion.setStatus(event.getButton().getId().startsWith("accept") ? Suggestion.Status.ACCEPTED : Suggestion.Status.DECLINED);
