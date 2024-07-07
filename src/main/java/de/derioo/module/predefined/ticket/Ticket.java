@@ -37,7 +37,7 @@ public class Ticket {
     @Getter
     public enum Type {
 
-        BUG(Config.Id.Role.BUG_REPORT_EDIT, "❌ BugReport", "Du hast einen Fehler gefunden? Melde ihn hier!"),
+        BUG(Config.Id.Role.BUG_REPORT_EDIT, "❌ Bugreport", "Du hast einen Fehler gefunden? Melde ihn hier!"),
         QUESTIONS(Config.Id.Role.TICKET_EDIT, "❓Allgemeine Fragen", "Allgemeine Fragen"),
         PARTNER(Config.Id.Role.TICKET_EDIT, "\uD83E\uDD1D Partner Anfrage", "Du willst Partner werden?"),
         HELP_AND_SUPPORT(Config.Id.Role.TICKET_EDIT, "\uD83D\uDC65 Hilfe & Support", "Du brauchst allgemeine Hilfe?")
