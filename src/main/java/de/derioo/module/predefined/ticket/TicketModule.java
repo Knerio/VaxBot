@@ -173,7 +173,7 @@ public class TicketModule extends Module {
         inputs.add(TextInput.create("name", "Dein Ingame Name", TextInputStyle.SHORT)
                 .setPlaceholder("z.B. \"Knerio\"")
                 .setMinLength(3)
-                .setMaxLength(10)
+                .setMaxLength(15)
                 .setRequired(true)
                 .build());
     }
