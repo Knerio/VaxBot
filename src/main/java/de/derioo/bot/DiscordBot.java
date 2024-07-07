@@ -15,6 +15,7 @@ import de.derioo.module.predefined.eightball.EightballCommand;
 import de.derioo.module.predefined.giveaway.GiveAwayModule;
 import de.derioo.module.predefined.giveaway.commands.GiveAwayCommand;
 import de.derioo.module.predefined.giveaway.db.GiveawayRepo;
+import de.derioo.module.predefined.join.JoinModule;
 import de.derioo.module.predefined.moveall.MoveallCommand;
 import de.derioo.module.predefined.punishment.*;
 import de.derioo.module.predefined.stafflist.StafflistModule;
@@ -78,6 +79,7 @@ public class DiscordBot extends ListenerAdapter {
         this.repositories.put(SuggestionRepo.class, this.mongoManager.create(SuggestionRepo.class));
         this.repositories.put(WarnRepo.class, this.mongoManager.create(WarnRepo.class));
 
+        new JoinModule(this).start();
         new StafflistModule(this).start();
         new StatusChangerModule(this).start();
         new TicketModule(this, langConfig).start();

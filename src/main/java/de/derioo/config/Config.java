@@ -74,7 +74,7 @@ public class Config {
             KICK_USER,
             TIMEOUT_USER,
             WARN_USER,
-            GIVEAWAY_PING_ROLE
+            JOIN_CHANNEL, PLAYER_ROLE, GIVEAWAY_PING_ROLE
         }
 
         public enum Data {
