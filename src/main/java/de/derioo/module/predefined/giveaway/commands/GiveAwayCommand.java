@@ -20,6 +20,8 @@ import org.bson.types.ObjectId;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Command(name = "giveaway")
 public class GiveAwayCommand {
@@ -53,8 +55,8 @@ public class GiveAwayCommand {
                         .duration(durationDate.getTime())
                         .build();
 
-        event.getChannel().sendMessage(event.getGuild().getRoleById(bot.get(event.getGuild()).getRoles().get(Config.Id.Role.GIVEAWAY_PING_ROLE.name())).getAsMention())
-                .addEmbeds(module.getEmbed(giveAway))
+        event.getChannel().sendMessage(bot.get(event.getGuild()).getMentions(Config.Id.Role.GIVEAWAY_PING_ROLE, event.getGuild())
+                ).addEmbeds(module.getEmbed(giveAway))
                 .addActionRow(Button.success("giveaway-participate", Emoji.fromUnicode("\uD83C\uDF89")))
                 .queue(message -> {
                     giveAway.setMessageId(message.getIdLong());

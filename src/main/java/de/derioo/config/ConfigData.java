@@ -6,11 +6,14 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Role;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -27,13 +30,31 @@ public class ConfigData {
 
 
     // id, role-id
-    Map<String, Long> roles;
+    Map<String, List<Long>> roles;
 
     Map<String, String> data;
 
     @Contract("_ -> new")
     public static @NotNull ConfigData defaultData(String guild) {
-        return new ConfigData(guild,new HashMap<>(), new HashMap<>(), new HashMap<>());
+        return new ConfigData(guild, new HashMap<>(), new HashMap<>(), new HashMap<>());
+    }
+
+
+    public boolean isRoleValid(Config.Id.Role role, Role id) {
+        return isRoleValid(role, id.getIdLong());
+    }
+
+
+    public boolean isRoleValid(Config.Id.Role role, Long id) {
+        return roles.get(role.name()).contains(id);
+    }
+
+    public String getMentions(Config.Id.Role role, Guild guild) {
+        return roles.get(role.name()).stream().map(id -> guild.getRoleById(id).getAsMention()).collect(Collectors.joining(","));
+    }
+
+    public List<Role> getRoleObjects(Config.Id.Role role, Guild guild) {
+        return roles.get(role.name()).stream().map(id -> guild.getRoleById(id)).toList();
     }
 
 

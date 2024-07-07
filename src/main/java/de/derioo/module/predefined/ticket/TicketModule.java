@@ -41,6 +41,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static de.derioo.config.Config.Id.Data.TEAM_ROLE;
+import static de.derioo.module.predefined.ticket.Ticket.Type.BUG;
+import static de.derioo.module.predefined.ticket.Ticket.Type.QUESTIONS;
 
 public class TicketModule extends Module {
 
@@ -90,8 +92,8 @@ public class TicketModule extends Module {
     private void sendNewTicketMessage(@NotNull TextChannel channel) throws JsonProcessingException, ExecutionException, InterruptedException {
         StringSelectMenu.Builder builder = StringSelectMenu.create("new-ticket");
 
-        builder.addOption("Ticket", "ticket", "Ein normales Ticket für normale Supportangelegenheiten!");
-        builder.addOption("BugReport", "bug", "Ein Ticket, welches nur für Bugs gedacht ist (Minecraft, Discord, Website,...)");
+        builder.addOption("Ticket", QUESTIONS.name(), "Ein normales Ticket für normale Supportangelegenheiten!");
+        builder.addOption("BugReport", BUG.name(), "Ein Ticket, welches nur für Bugs gedacht ist (Minecraft, Discord, Website,...)");
         builder.setMaxValues(1);
         builder.setMinValues(1);
         channel.sendMessageEmbeds(getEmbed())
@@ -148,7 +150,7 @@ public class TicketModule extends Module {
     @ModuleListener
     public void onModalInteraction(@NotNull ModalInteractionEvent event) {
         if (!event.getModalId().startsWith("new-ticket")) return;
-        Ticket ticket = ticketManager.createTicket(event.getGuild(), event.getUser(), event, Arrays.stream(event.getModalId().split("-")).toList().getLast());
+        Ticket ticket = ticketManager.createTicket(event.getGuild(), event.getUser(), event, Ticket.Type.valueOf(Arrays.stream(event.getModalId().split("-")).toList().getLast()));
         if (ticket == null) {
             event.reply("Du hast bereits ein Ticket offen!").setEphemeral(true).queue();
             return;

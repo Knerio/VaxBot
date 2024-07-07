@@ -38,8 +38,7 @@ public class TeamCommand {
         Member member = guild.getMemberById(user.getIdLong());
         guild.addRoleToMember(member, role).queue();
         TextChannel channel = guild.getTextChannelById(bot.get(guild).getChannels().get(Config.Id.Channel.PROMOTE_CHANNEL.name()));
-        Role teamRole = guild.getRoleById(bot.get(guild).getRoles().get(Config.Id.Role.TEAM_ROLE.name()));
-        channel.sendMessage(teamRole.getAsMention() +
+        channel.sendMessage(bot.get(guild).getMentions(Config.Id.Role.TEAM_ROLE, guild) +
                         "\n**Team Neuzugang**\n\n" +
                         "Wir begrüßen " + user.getAsMention() + " im Bereich " + role.getAsMention() + "und wünschen eine lange und gute Zusammenarbeit!\n\n" +
                         "Mit freundlichen Grüßen,\n"
@@ -61,8 +60,7 @@ public class TeamCommand {
         guild.addRoleToMember(member, role).queue();
         if (old != null) guild.removeRoleFromMember(member, old).queue();
         TextChannel channel = guild.getTextChannelById(bot.get(guild).getChannels().get(Config.Id.Channel.PROMOTE_CHANNEL.name()));
-        Role teamRole = guild.getRoleById(bot.get(guild).getRoles().get(Config.Id.Role.TEAM_ROLE.name()));
-        channel.sendMessage(teamRole.getAsMention() +
+        channel.sendMessage(bot.get(guild).getMentions(Config.Id.Role.TEAM_ROLE, guild) +
                         "\n**Team Uprank**\n\n" +
                         user.getAsMention() + "wurde auf " + role.getAsMention() + " befördert\n\n" +
                         "Mit freundlichen Grüßen,\n"

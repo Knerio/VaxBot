@@ -1,5 +1,6 @@
 package de.derioo.module.predefined.ticket;
 
+import de.derioo.config.Config;
 import eu.koboo.en2do.repository.entity.Id;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -27,12 +28,28 @@ public class Ticket {
 
     Long channelId;
 
-    String type;
+    Type type;
 
     @Builder.Default
     List<HistoryItem> history = new ArrayList<>();
 
 
+    @Getter
+    enum Type {
+
+        BUG(Config.Id.Role.BUG_REPORT_EDIT),
+        QUESTIONS(Config.Id.Role.TICKET_EDIT),
+        HELP_AND_SUPPORT(Config.Id.Role.TICKET_EDIT),
+        PARTNER(Config.Id.Role.TICKET_EDIT)
+
+        ;
+
+        private final Config.Id.Role role;
+
+        Type(Config.Id.Role role) {
+            this.role = role;
+        }
+    }
 
     @AllArgsConstructor
     @NoArgsConstructor
@@ -51,7 +68,6 @@ public class Ticket {
         String content;
 
     }
-
 
 
 }

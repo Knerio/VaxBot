@@ -103,8 +103,8 @@ public class DiscordBot extends ListenerAdapter {
 
                         if (!context.getMethod().isAnnotationPresent(NeedsRole.class)) return ValidatorResult.valid();
                         NeedsRole annotation = context.getMethod().getAnnotation(NeedsRole.class);
-                        Map<String, Long> roles = get(member.getGuild()).getRoles();
-                        if (!roles.containsKey(annotation.value().name())) return ValidatorResult.valid();
+                        ConfigData configData = get(member.getGuild());
+                        if (!configData.getRoles().containsKey(annotation.value().name())) return ValidatorResult.valid();
 
                         if (context.getMethod().isAnnotationPresent(NeedsAdmin.class)) {
                             if (!member.getPermissions().contains(Permission.ADMINISTRATOR))
@@ -113,8 +113,9 @@ public class DiscordBot extends ListenerAdapter {
                         if (member.getPermissions().contains(Permission.ADMINISTRATOR)) return ValidatorResult.valid();
 
                         for (Role role : member.getRoles()) {
-                            if (role.getIdLong() == roles.get(annotation.value().name()))
+                            if (configData.isRoleValid(annotation.value(), role)) {
                                 return ValidatorResult.valid();
+                            }
                         }
                         return ValidatorResult.invalid("Dazu hast du keine Rechte!");
                     });

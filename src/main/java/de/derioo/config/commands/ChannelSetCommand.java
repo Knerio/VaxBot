@@ -38,19 +38,41 @@ public class ChannelSetCommand {
     }
 
     @NeedsAdmin
-    @Execute(name = "role")
-    void executeRole(@Arg("id")
-                     @Description("Die ID, welche neu gesetzt werden soll") Config.Id.Role id,
+    @Execute(name = "addrole")
+    void addRole(@Arg("id")
+                     @Description("Die ID, welche neu hinzugefügt werden soll") Config.Id.Role id,
                      @Arg("rolle") @Description("Die Rolle, welcher nun genutzt werden soll") Role role,
                      @Context User sender, @Context SlashCommandInteractionEvent event) {
         set("roles", id.name(), role.getIdLong(), event);
         event
                 .replyEmbeds(DiscordBot.Default.changed()
-                        .setDescription("Die Rolle `" + id + "` ist nun " + role.getAsMention())
+                        .setDescription("Die Rolle " + role.getAsMention() + " wurde nun hinzugefügt")
                         .build()
                 )
                 .setEphemeral(true).queue();
     }
+
+    @NeedsAdmin
+    @Execute(name = "removerole")
+    void removeRole(@Arg("id")
+                     @Description("Die ID, welche neu hinzugefügt werden soll") Config.Id.Role id,
+                     @Arg("rolle") @Description("Die Rolle, welcher nun genutzt werden soll") Role role,
+                     @Context User sender, @Context SlashCommandInteractionEvent event) {
+        Config config = Config.get(repo);
+
+        Map<String, List<Long>> roles = config.get(event.getGuild()).getRoles();
+        roles.putIfAbsent(id.name(), new ArrayList<>());
+        roles.get(id.name()).remove(role.getIdLong());
+        repo.save(config);
+
+        event
+                .replyEmbeds(DiscordBot.Default.changed()
+                        .setDescription("Die Rolle " + role.getAsMention() + " wurde nun entfernt")
+                        .build()
+                )
+                .setEphemeral(true).queue();
+    }
+
 
     @NeedsAdmin
     @Execute(name = "channel")
@@ -61,7 +83,7 @@ public class ChannelSetCommand {
         set(id.name(), channel.getIdLong(), event);
         event
                 .replyEmbeds(DiscordBot.Default.changed()
-                        .setDescription("Die Rolle `" + id + "` ist nun " + channel.getAsMention())
+                        .setDescription("Der Channel `" + id + "` ist nun " + channel.getAsMention())
                         .build()
                 )
                 .setEphemeral(true).queue();
@@ -124,11 +146,14 @@ public class ChannelSetCommand {
 
     private void set(@NotNull String type, String id, long longId, SlashCommandInteractionEvent event) {
         Config config = Config.get(repo);
-        Map<String, Long> ids = switch (type) {
-            case "roles" -> config.getData().get(event.getGuild().getId()).getRoles();
-            default -> config.getData().get(event.getGuild().getId()).getChannels();
-        };
-        ids.put(id, longId);
+
+        if (type.equals("roles")) {
+            Map<String, List<Long>> roles = config.get(event.getGuild()).getRoles();
+            roles.putIfAbsent(id, new ArrayList<>());
+            roles.get(id).add(longId);
+        } else {
+            config.getData().get(event.getGuild().getId()).getChannels().put(id, longId);
+        }
 
         repo.save(config);
     }

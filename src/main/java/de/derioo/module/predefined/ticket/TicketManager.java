@@ -32,20 +32,23 @@ public class TicketManager {
         this.bot = bot;
     }
 
-    public Ticket createTicket(Guild guild, User user, ModalInteractionEvent event, String type) {
+    public Ticket createTicket(Guild guild, User user, ModalInteractionEvent event, Ticket.Type type) {
         for (Ticket ticket : bot.getRepo(TicketRepo.class).findAll()) {
             if (!Objects.equals(ticket.getType(), type)) continue;
             if (ticket.getUserId().equals(user.getIdLong())) return null;
         }
         ObjectId objectId = new ObjectId();
-        TextChannel ticketChannel = guild.createTextChannel(user.getName() + "-" + type + "-" + objectId, guild.getCategoryById(bot.get(guild).getChannels().get(Config.Id.Category.TICKET_CATEGORY.name()))).complete();
-        Long ticketSeeId = bot.get(guild).getRoles().get(type.equals("bug") ? Config.Id.Role.BUG_REPORT_EDIT.name() : Config.Id.Role.TICKET_EDIT.name());
-        Role roleById = guild.getRoleById(ticketSeeId);
-        List<Member> membersWithRoles = guild.getMembersWithRoles(roleById);
+        TextChannel ticketChannel = guild.createTextChannel(type + "-" + user.getName() + "-" + objectId, guild.getCategoryById(bot.get(guild).getChannels().get(Config.Id.Category.TICKET_CATEGORY.name()))).complete();
+        List<Role> roles = bot.get(guild).getRoleObjects(type.getRole(), guild);
+        List<Member> membersWithRoles = roles.stream().map(guild::getMembersWithRoles).flatMap(Collection::stream).toList();
         Member creator = guild.getMemberById(user.getIdLong());
 
+        for (Role role : roles) {
+            ticketChannel.getManager()
+                    .putPermissionOverride(role, EnumSet.of(VIEW_CHANNEL), null).complete();
+        }
+
         ticketChannel.getManager()
-                .putPermissionOverride(roleById, EnumSet.of(VIEW_CHANNEL), null)
                 .putPermissionOverride(creator, EnumSet.of(VIEW_CHANNEL), null).complete();
 
         for (Member member : membersWithRoles) {
@@ -58,7 +61,7 @@ public class TicketManager {
             privateChannel.sendMessageEmbeds(DiscordBot.Default.builder().setDescription("Du kannst nun das Ticket " + ticketChannel.getAsMention() + " sehen").build()).queue();
         });
 
-        ticketChannel.sendMessage(event.getUser().getAsMention() + guild.getRoleById(bot.get(guild).getRoles().get(Config.Id.Role.TICKET_EDIT.name())).getAsMention())
+        ticketChannel.sendMessage(event.getUser().getAsMention() + bot.get(guild).getMentions(Config.Id.Role.TICKET_EDIT, guild))
                 .addEmbeds(DiscordBot.Default.builder()
                         .setTitle("Varilx Tickets")
                         .setDescription("""
@@ -117,11 +120,13 @@ public class TicketManager {
         ).queue();
 
         Guild guild = event.getGuild();
-        Long ticketSeeId = bot.get(guild).getRoles().get(ticket.getType().equals("bug") ? Config.Id.Role.BUG_REPORT_EDIT : Config.Id.Role.TICKET_EDIT.name());
-        Role roleById = guild.getRoleById(ticketSeeId);
+        List<Role> roles = bot.get(guild).getRoleObjects(ticket.getType().getRole(), guild);
+        for (Role role : roles) {
+            channel.getManager()
+                    .putPermissionOverride(role, EnumSet.of(VIEW_CHANNEL), null).complete();
+        }
 
         channel.getManager()
-                .putPermissionOverride(roleById, null, EnumSet.of(VIEW_CHANNEL))
                 .putPermissionOverride(guild.getMember(event.getUser()), EnumSet.of(VIEW_CHANNEL), null)
                 .queue();
 
@@ -152,14 +157,14 @@ public class TicketManager {
         AtomicReference<InteractionHook> current = new AtomicReference<>();
         EmbedBuilder builder = DiscordBot.Default.builder()
                 .setTitle("Ticket schließt...")
-                .setDescription("Das Ticket schließt 10 in Sekunden");
+                .setDescription("Das Ticket schließt **10** in Sekunden");
         event.replyEmbeds(
                 builder.build()
         ).addActionRow(Button.primary("cancel-close", "Abbrechen")).queue(current::set);
         for (int i = 0; i < 10; i++) {
             int delay = i;
             ScheduledFuture<?> scheduledTask = scheduler.schedule(() -> {
-                current.get().editOriginalEmbeds(builder.setDescription("Das Ticket schließt " + (10 - delay) + " in Sekunden").build()).queue();
+                current.get().editOriginalEmbeds(builder.setDescription("Das Ticket schließt **" + (10 - delay) + "** in Sekunden").build()).queue();
             }, i, TimeUnit.SECONDS);
             scheduledTasks.get(ticket.getId()).add(scheduledTask);
         }
@@ -174,10 +179,10 @@ public class TicketManager {
                     .setColor(Color.GREEN)
                     .setTitle("Varilx.de | Ticket")
                     .addField(new MessageEmbed.Field("Ticket Informationen", getTicketInformations(ticket, event.getGuild()), false))
-                    .addField(new MessageEmbed.Field(":mountain_snow: Ticket Name", channel.getName(), false))
-                    .addField(new MessageEmbed.Field(":mountain_snow: Geschlossen von:", getMention(event.getUser()), true))
-                    .addField(new MessageEmbed.Field(":mountain_snow: Claimer:", ticket.getClaimerId() == null ? "**Nicht geclaimed**" : (getMention(guild.getMemberById(ticket.getClaimerId()))), true))
-                    .addField(new MessageEmbed.Field(":mountain_snow: Teilnehmer:", getSupporters(ticket, guild), true))
+                    .addField(new MessageEmbed.Field("<:varilx_textchannel:1139957022696157294> Ticket Name", channel.getName(), false))
+                    .addField(new MessageEmbed.Field("<:varilx_clendar:1139956980576960653> Geschlossen von:", getMention(event.getUser()), true))
+                    .addField(new MessageEmbed.Field("<:varilx_user:1139957321196376107> Claimer:", ticket.getClaimerId() == null ? "**Nicht geclaimed**" : (getMention(guild.getMemberById(ticket.getClaimerId()))), true))
+                    .addField(new MessageEmbed.Field("<:varilx_user:1139957321196376107> Teilnehmer:", getSupporters(ticket, guild), true))
                     .build();
             logs.sendMessageEmbeds(embed).queue();
             event.getJDA().getUserById(ticket.getUserId()).openPrivateChannel().queue(pc -> pc.sendMessageEmbeds(embed).queue());

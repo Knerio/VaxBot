@@ -64,6 +64,7 @@ public class SuggestionModule extends Module {
 
     private void sendNewSuggestionMessage(TextChannel channel) {
         channel.sendMessageEmbeds(DiscordBot.Default.builder()
+                        .setAuthor("")
                         .setTitle("Varilx Vorschläge")
                         .setColor(Color.GREEN)
                         .setDescription("""
@@ -179,8 +180,10 @@ public class SuggestionModule extends Module {
         TextChannel suggestionChannel = event.getGuild().getChannelById(TextChannel.class, suggestionChannelId);
 
         MessageEmbed embed = DiscordBot.Default.builder()
+                .setAuthor(null)
+                .setColor(Color.GREEN)
                 .setTitle("Varilx Vorschläge")
-                .addField("**`Vorschlage / Idee: `**", suggestion.getSuggestion(), false)
+                .addField("**`Vorschlag / Idee: `**", suggestion.getSuggestion(), false)
                 .addField("Idee kommt von: ", event.getUser().getAsMention(), false)
                 .build();
         suggestionChannel.sendMessageEmbeds(embed)

@@ -38,11 +38,11 @@ public class Config {
 
 
     public ConfigData get(@NotNull Guild guild) {
-        return data.get(guild.getId());
+        return data.getOrDefault(guild.getId(), ConfigData.defaultData(guild.getId()));
     }
 
     public ConfigData get(String id) {
-        return data.get(id);
+        return data.getOrDefault(id, ConfigData.defaultData(id));
     }
 
 
