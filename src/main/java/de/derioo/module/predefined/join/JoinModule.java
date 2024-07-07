@@ -22,7 +22,7 @@ public class JoinModule extends Module {
     @ModuleListener
     public void onUserJoin(GuildMemberJoinEvent event) {
         ConfigData configData = bot.get(event.getGuild());
-        Long l = configData.getChannels().get(Config.Id.Role.JOIN_CHANNEL.name());
+        Long l = configData.getChannels().get(Config.Id.Channel.JOIN_CHANNEL.name());
         event.getGuild().getTextChannelById(l).sendMessageEmbeds(DiscordBot.Default.builder()
                         .setDescription("Hey " + event.getUser().getAsMention() + " willkommen auf \n**" + event.getGuild().getName() + "**\n" +
                                 "\n" +
