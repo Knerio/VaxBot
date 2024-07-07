@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import org.bson.types.ObjectId;
 import org.jetbrains.annotations.NotNull;
 
@@ -70,9 +71,21 @@ public class TicketManager {
 
         Map<String, String> values = new HashMap<>();
         switch (type) {
-            default -> {
-                values.put("Problem", event.getValue("issue").getAsString());
+            case PARTNER -> {
+                values.put("Website/Discord", event.getValue("website").getAsString());
+                values.put("Kontakt", event.getValue("contact").getAsString());
+                values.put("Bewerbung", event.getValue("text").getAsString());
+            }
+            case BUG -> {
+                values.put("Problembeschreibung", event.getValue("issue").getAsString());
                 values.put("Ingame Name", event.getValue("name").getAsString());
+                ModalMapping picture = event.getValue("picture");
+                if (picture != null) {
+                    values.put("Bilder", picture.getAsString());
+                }
+            }
+            case QUESTIONS -> {
+                values.put("Frage", event.getValue("question").getAsString());
             }
         }
         values.put("Typ des Tickets", type.getTag());
@@ -95,6 +108,12 @@ public class TicketManager {
                         .build())
                 .addActionRow(Button.danger("ticket-close", "Ticket schließen -> \uD83D\uDDD1"), Button.primary("ticket-claim", "Ticket claimen -> \uD83D\uDD12"))
                 .queue();
+
+        if (values.containsKey("Bilder")) {
+            for (String s : values.get("Bilder").split(" ")) {
+                ticketChannel.sendMessage(s).queue();
+            }
+        }
 
         return Ticket.builder()
                 .id(objectId)

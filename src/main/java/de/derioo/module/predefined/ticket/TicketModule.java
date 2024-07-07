@@ -114,18 +114,43 @@ public class TicketModule extends Module {
                 Ticket.Type choice = Ticket.Type.valueOf(event.getInteraction().getValues().getFirst());
                 List<TextInput> inputs = new ArrayList<>();
                 switch (choice) {
-                    default -> {
+                    case PARTNER -> {
+                        inputs.add(TextInput.create("website", "Websiten oder Discord Link", TextInputStyle.SHORT)
+                                .setRequired(true)
+                                .setPlaceholder("\"discord.gg/varilx\"")
+                                .build());
+                        inputs.add(TextInput.create("contact", "Kontakt", TextInputStyle.SHORT)
+                                .setRequired(true)
+                                .setPlaceholder("\"email@example.com\"")
+                                .build());
+                        inputs.add(TextInput.create("text", "Bewerbung", TextInputStyle.PARAGRAPH)
+                                .setRequired(true)
+                                .setPlaceholder("Hallo liebes Varilx.DE Team, \n...")
+                                .setMinLength(15)
+                                .build());
+                    }
+                    case BUG -> {
                         inputs.add(TextInput.create("issue", "Kurze Beschreibung des Bugs / Problems", TextInputStyle.PARAGRAPH)
                                 .setPlaceholder("z.B. \"Ich habe eine Fehler im System x gefunden\"")
                                 .setRequired(true)
                                 .setMinLength(10)
                                 .build());
-                       inputs.add(TextInput.create("name", "Dein Ingame Name", TextInputStyle.SHORT)
-                               .setPlaceholder("z.B. \"Knerio\"")
-                               .setMinLength(3)
-                               .setMaxLength(10)
-                               .setRequired(true)
-                               .build());
+                        inputs.add(TextInput.create("name", "Dein Ingame Name", TextInputStyle.SHORT)
+                                .setPlaceholder("z.B. \"Knerio\"")
+                                .setMinLength(3)
+                                .setMaxLength(10)
+                                .setRequired(true)
+                                .build());
+                        inputs.add(TextInput.create("picture", "Bilder getrennt mit Leerzeichendd (optional)", TextInputStyle.SHORT)
+                                .setRequired(false)
+                                .build());
+                    }
+                    case QUESTIONS -> {
+                        inputs.add(TextInput.create("question", "Kurze Beschreibung deiner Frage", TextInputStyle.PARAGRAPH)
+                                .setPlaceholder("z.B. \"Ich habe eine Frage zum System x\"")
+                                .setRequired(true)
+                                .setMinLength(10)
+                                .build());
                     }
                 }
                 Modal modal = Modal.create("new-ticket-" + choice, "Ticket").addActionRows(inputs.stream().map(ActionRow::of).toList()).build();
@@ -141,9 +166,6 @@ public class TicketModule extends Module {
         switch (event.getButton().getId()) {
             case "cancel-close" -> ticketManager.cancelTicketDeletion(event.getChannel().asTextChannel(), event);
             case "ticket-close" -> ticketManager.closeTicket(event.getChannel().asTextChannel(), event);
-            case "new-ticket" -> {
-
-            }
             case "ticket-claim" -> ticketManager.claimTicket(event.getChannel().asTextChannel(), event);
             case null, default -> {
             }
