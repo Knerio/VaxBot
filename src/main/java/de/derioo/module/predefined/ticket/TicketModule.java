@@ -113,6 +113,7 @@ public class TicketModule extends Module {
             case "new-ticket" -> {
                 Ticket.Type choice = Ticket.Type.valueOf(event.getInteraction().getValues().getFirst());
                 List<TextInput> inputs = new ArrayList<>();
+                System.out.println(choice);
                 switch (choice) {
                     case PARTNER -> {
                         inputs.add(TextInput.create("website", "Websiten oder Discord Link", TextInputStyle.SHORT)
@@ -135,15 +136,8 @@ public class TicketModule extends Module {
                                 .setRequired(true)
                                 .setMinLength(10)
                                 .build());
-                        inputs.add(TextInput.create("name", "Dein Ingame Name", TextInputStyle.SHORT)
-                                .setPlaceholder("z.B. \"Knerio\"")
-                                .setMinLength(3)
-                                .setMaxLength(10)
-                                .setRequired(true)
-                                .build());
-                        inputs.add(TextInput.create("picture", "Bilder getrennt mit Leerzeichen (optional)", TextInputStyle.SHORT)
-                                .setRequired(false)
-                                .build());
+                        addIngameNameInput(inputs);
+                        addPictureInput(inputs);
                     }
                     case BUG -> {
                         inputs.add(TextInput.create("issue", "Kurze Beschreibung des Bugs / Problems", TextInputStyle.PARAGRAPH)
@@ -151,15 +145,8 @@ public class TicketModule extends Module {
                                 .setRequired(true)
                                 .setMinLength(10)
                                 .build());
-                        inputs.add(TextInput.create("name", "Dein Ingame Name", TextInputStyle.SHORT)
-                                .setPlaceholder("z.B. \"Knerio\"")
-                                .setMinLength(3)
-                                .setMaxLength(10)
-                                .setRequired(true)
-                                .build());
-                        inputs.add(TextInput.create("picture", "Bilder getrennt mit Leerzeichen (optional)", TextInputStyle.SHORT)
-                                .setRequired(false)
-                                .build());
+                        addIngameNameInput(inputs);
+                        addPictureInput(inputs);
                     }
                     case QUESTIONS -> {
                         inputs.add(TextInput.create("question", "Kurze Beschreibung deiner Frage", TextInputStyle.PARAGRAPH)
@@ -175,6 +162,21 @@ public class TicketModule extends Module {
             case null, default -> {
             }
         }
+    }
+
+    private static void addPictureInput(@NotNull List<TextInput> inputs) {
+        inputs.add(TextInput.create("picture", "Bilder getrennt mit Leerzeichen (optional)", TextInputStyle.SHORT)
+                .setRequired(false)
+                .build());
+    }
+
+    private static void addIngameNameInput(@NotNull List<TextInput> inputs) {
+        inputs.add(TextInput.create("name", "Dein Ingame Name", TextInputStyle.SHORT)
+                .setPlaceholder("z.B. \"Knerio\"")
+                .setMinLength(3)
+                .setMaxLength(10)
+                .setRequired(true)
+                .build());
     }
 
     @ModuleListener
