@@ -190,8 +190,10 @@ public class TicketModule extends Module {
         if (event.getMessage().getAuthor().isBot()) return;
         if (!event.getChannel().getType().isMessage()) return;
         if (!event.getChannel().getName().contains("-")) return;
+        String id = List.of(event.getChannel().asTextChannel().getName().split("-")).getLast();
+        if (!ObjectId.isValid(id)) return;
         TicketRepo ticketRepo = (TicketRepo) bot.getRepo(TicketRepo.class);
-        ticketRepo.asyncFindFirstById(new ObjectId(List.of(event.getChannel().asTextChannel().getName().split("-")).getLast())).thenAcceptAsync(ticket -> {
+        ticketRepo.asyncFindFirstById(new ObjectId(id)).thenAcceptAsync(ticket -> {
             if (ticket == null) return;
             ticket.getHistory()
                     .add(Ticket.HistoryItem.builder()
