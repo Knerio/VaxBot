@@ -9,6 +9,8 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,10 +22,11 @@ public class StafflistModule extends Module {
     public StafflistModule(DiscordBot bot) {
         super(bot, "stafflist");
         this.bot = bot;
+        timer();
+        setTimers(300_000L, this::timer);
     }
 
-    @Override
-    public void timer() throws Throwable {
+    public void timer() {
         for (Guild guild : bot.getJda().getGuilds()) {
             Long channelId = bot.get(guild).getChannels().get(Config.Id.Channel.STAFFLIST_CHANNEL.name());
             if (channelId == null) continue;
@@ -38,16 +41,26 @@ public class StafflistModule extends Module {
 
                 StringBuilder desc = new StringBuilder();
 
-                for (Long roleId : data) {
-                    Role role = guild.getRoleById(roleId);
+
+                List<Role> roleList = data.stream().map(guild::getRoleById)
+                        .sorted((o1, o2) ->Integer.compare(o2.getPosition(), o1.getPosition()))
+                        .toList();
+
+                for (Role role : roleList) {
                     List<Member> members = guild.getMembersWithRoles(role);
+                    List<String> list = members.stream().map(IMentionable::getAsMention).toList();
                     desc
                             .append("➥ ")
                             .append(role.getAsMention())
                             .append(" (")
                             .append(members.size())
-                            .append(") \n")
-                            .append(members.stream().map(IMentionable::getAsMention).collect(Collectors.joining(",")));
+                            .append(") \n");
+                    if (!list.isEmpty()) {
+                        desc.append(String.join(",", list)).append("\n");
+                    } else {
+                        desc.append(" ");
+                    }
+                    desc.append("\n");
                 }
                 embed.setDescription(desc.toString());
 

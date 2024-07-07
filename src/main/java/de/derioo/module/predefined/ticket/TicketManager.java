@@ -59,13 +59,13 @@ public class TicketManager {
             if (member.getUser().isBot()) continue;
             if (sent.contains(member.getIdLong())) continue;
             member.getUser().openPrivateChannel().queue(privateChannel -> {
-                privateChannel.sendMessageEmbeds(DiscordBot.Default.builder().setDescription("Du kannst nun das Ticket " + ticketChannel.getAsMention() + " sehen").build()).queue();
+                privateChannel.sendMessageEmbeds(DiscordBot.Default.builder().setColor(Color.GREEN).setDescription("Du kannst nun das Ticket " + ticketChannel.getAsMention() + " sehen").build()).queue();
             });
             sent.add(member.getIdLong());
         }
         if (!sent.contains(creator.getIdLong())) {
             creator.getUser().openPrivateChannel().queue(privateChannel -> {
-                privateChannel.sendMessageEmbeds(DiscordBot.Default.builder().setDescription("Du kannst nun das Ticket " + ticketChannel.getAsMention() + " sehen").build()).queue();
+                privateChannel.sendMessageEmbeds(DiscordBot.Default.builder().setColor(Color.GREEN).setDescription("Du kannst nun das Ticket " + ticketChannel.getAsMention() + " sehen").build()).queue();
             });
         }
 

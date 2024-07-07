@@ -141,7 +141,7 @@ public class TicketModule extends Module {
                                 .setMaxLength(10)
                                 .setRequired(true)
                                 .build());
-                        inputs.add(TextInput.create("picture", "Bilder getrennt mit Leerzeichendd (optional)", TextInputStyle.SHORT)
+                        inputs.add(TextInput.create("picture", "Bilder getrennt mit Leerzeichen (optional)", TextInputStyle.SHORT)
                                 .setRequired(false)
                                 .build());
                     }

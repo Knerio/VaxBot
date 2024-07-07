@@ -73,7 +73,7 @@ public class SuggestionModule extends Module {
                                 bitte beachte dabei, dass dein Vorschlag mit sofortiger Wirkung in eine Umfrage umgewandelt wird, und jeder sie lesen kann!""")
                         .setImage("https://cdn.discordapp.com/attachments/1055223755909111808/1160507955507101736/Varilx_Tube-hosting_version.png?ex=6534ea41&is=65227541&hm=e2dad9d371a1f8a26f84ab29871fc2a754b0135ccbc76c557d9f7c30dbaf371f&")
                         .build())
-                .addActionRow(Button.primary("create-suggestion", "Vorschlag -> ⭐"))
+                .addActionRow(Button.success("create-suggestion", "Vorschlag -> ⭐"))
                 .queue();
     }
 
