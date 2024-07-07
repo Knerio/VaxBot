@@ -17,6 +17,7 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import static de.derioo.utils.UserUtils.getMention;
 import static net.dv8tion.jda.api.Permission.VIEW_CHANNEL;
@@ -51,27 +52,46 @@ public class TicketManager {
         ticketChannel.getManager()
                 .putPermissionOverride(creator, EnumSet.of(VIEW_CHANNEL), null).complete();
 
+        List<Long> sent = new ArrayList<>();
+
         for (Member member : membersWithRoles) {
             if (member.getUser().isBot()) continue;
+            if (sent.contains(member.getIdLong())) continue;
             member.getUser().openPrivateChannel().queue(privateChannel -> {
                 privateChannel.sendMessageEmbeds(DiscordBot.Default.builder().setDescription("Du kannst nun das Ticket " + ticketChannel.getAsMention() + " sehen").build()).queue();
             });
+            sent.add(member.getIdLong());
         }
-        creator.getUser().openPrivateChannel().queue(privateChannel -> {
-            privateChannel.sendMessageEmbeds(DiscordBot.Default.builder().setDescription("Du kannst nun das Ticket " + ticketChannel.getAsMention() + " sehen").build()).queue();
+        if (!sent.contains(creator.getIdLong())) {
+            creator.getUser().openPrivateChannel().queue(privateChannel -> {
+                privateChannel.sendMessageEmbeds(DiscordBot.Default.builder().setDescription("Du kannst nun das Ticket " + ticketChannel.getAsMention() + " sehen").build()).queue();
+            });
+        }
+
+        Map<String, String> values = new HashMap<>();
+        switch (type) {
+            default -> {
+                values.put("Problem", event.getValue("issue").getAsString());
+                values.put("Ingame Name", event.getValue("name").getAsString());
+            }
+        }
+        values.put("Typ des Tickets", type.getTag());
+
+        EmbedBuilder embedBuilder = DiscordBot.Default.builder()
+                .setTitle("Varilx Tickets")
+                .setDescription("""
+                        · Bitte gedulde dich ein bisschen, es wird sich bald jemand um dich kümmern.
+                        · Sollten wir nicht erreichbar sein, melde dich bitte im Forum!
+                        https://forum.varilx.de/forum/view/8-support/"""
+                )
+                .setColor(Color.GREEN);
+
+        values.forEach((s, s2) -> {
+            embedBuilder.addField(s, s2, false);
         });
 
         ticketChannel.sendMessage(event.getUser().getAsMention() + bot.get(guild).getMentions(Config.Id.Role.TICKET_EDIT, guild))
-                .addEmbeds(DiscordBot.Default.builder()
-                        .setTitle("Varilx Tickets")
-                        .setDescription("""
-                                · Bitte gedulde dich ein bisschen, es wird sich bald jemand um dich kümmern.
-                                · Sollten wir nicht erreichbar sein, melde dich bitte im Forum!
-                                https://forum.varilx.de/forum/view/8-support/"""
-                        )
-                        .addField(new MessageEmbed.Field("Ingame-Name", event.getValue("name").getAsString(), false))
-                        .addField(new MessageEmbed.Field("Beschreibung des " + (type.equals("bug") ? "Bugs" : "Problems"), event.getValue("issue").getAsString(), false))
-                        .setColor(Color.GREEN)
+                .addEmbeds(embedBuilder
                         .build())
                 .addActionRow(Button.danger("ticket-close", "Ticket schließen -> \uD83D\uDDD1"), Button.primary("ticket-claim", "Ticket claimen -> \uD83D\uDD12"))
                 .queue();
@@ -85,9 +105,7 @@ public class TicketManager {
                 .channelId(ticketChannel.getIdLong())
                 .history(new ArrayList<>(List.of(Ticket.HistoryItem.builder()
                         .id(new ObjectId())
-                        .senderId(user.getIdLong())
-                        .content("Mein Ingame name ist `" + event.getValue("name").getAsString() + "`. \n" +
-                                "Mein Problem ist: " + event.getValue("issue").getAsString())
+                        .content(values.entrySet().stream().map(entry -> entry.getKey() + ": " + entry.getValue()).collect(Collectors.joining("\n")))
                         .build())))
                 .build();
     }
@@ -109,7 +127,7 @@ public class TicketManager {
         ticket.getHistory()
                 .add(Ticket.HistoryItem.builder()
                         .id(new ObjectId())
-                        .content(ticket.getClaimerId() + " hat das Ticket geclaimed")
+                        .content("Das Ticket wurde von " + event.getUser().getAsMention() + " geclaimed")
                         .build());
 
         event.replyEmbeds(DiscordBot.Default.builder()
@@ -186,7 +204,8 @@ public class TicketManager {
                     .build();
             logs.sendMessageEmbeds(embed).queue();
             event.getJDA().getUserById(ticket.getUserId()).openPrivateChannel().queue(pc -> pc.sendMessageEmbeds(embed).queue());
-            event.getUser().openPrivateChannel().queue(pc -> pc.sendMessageEmbeds(embed).queue());
+            if (ticket.getUserId() != event.getUser().getIdLong())
+                event.getUser().openPrivateChannel().queue(pc -> pc.sendMessageEmbeds(embed).queue());
             if (ticket.getClaimerId() != null)
                 guild.getMemberById(ticket.getClaimerId()).getUser().openPrivateChannel().queue(pc -> pc.sendMessageEmbeds(embed).queue());
 

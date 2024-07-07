@@ -92,8 +92,10 @@ public class TicketModule extends Module {
     private void sendNewTicketMessage(@NotNull TextChannel channel) throws JsonProcessingException, ExecutionException, InterruptedException {
         StringSelectMenu.Builder builder = StringSelectMenu.create("new-ticket");
 
-        builder.addOption("Ticket", QUESTIONS.name(), "Ein normales Ticket für normale Supportangelegenheiten!");
-        builder.addOption("BugReport", BUG.name(), "Ein Ticket, welches nur für Bugs gedacht ist (Minecraft, Discord, Website,...)");
+        for (Ticket.Type value : Ticket.Type.values()) {
+            builder.addOption(value.getTag(), value.name(), value.getDesc());
+        }
+
         builder.setMaxValues(1);
         builder.setMinValues(1);
         channel.sendMessageEmbeds(getEmbed())
@@ -109,22 +111,24 @@ public class TicketModule extends Module {
     public void onMenuSelection(StringSelectInteractionEvent event) {
         switch (event.getSelectMenu().getId()) {
             case "new-ticket" -> {
-                String choice = event.getInteraction().getValues().getFirst();
-                TextInput name =
-                        TextInput.create("name", "Dein Ingame Name", TextInputStyle.SHORT)
-                                .setPlaceholder("z.B. \"Knerio\"")
-                                .setMinLength(3)
-                                .setMaxLength(10)
+                Ticket.Type choice = Ticket.Type.valueOf(event.getInteraction().getValues().getFirst());
+                List<TextInput> inputs = new ArrayList<>();
+                switch (choice) {
+                    default -> {
+                        inputs.add(TextInput.create("issue", "Kurze Beschreibung des Bugs / Problems", TextInputStyle.PARAGRAPH)
+                                .setPlaceholder("z.B. \"Ich habe eine Fehler im System x gefunden\"")
                                 .setRequired(true)
-                                .build();
-                TextInput issue =
-                        TextInput.create("issue", choice.equals("bug") ? "Kurze Beschreibung deines Bugs" : "Kurze Beschreibung des Problems", TextInputStyle.PARAGRAPH)
-                                .setRequired(true)
-                                .setPlaceholder(choice.equals("bug") ? "z.B. \"Ich habe eine Fehler im System x gefunden\"" : "z.B. \"Ich kann kein /help machen\"")
                                 .setMinLength(10)
-                                .setMaxLength(999)
-                                .build();
-                Modal modal = Modal.create("new-ticket-" + choice, "Ticket").addActionRows(ActionRow.of(issue), ActionRow.of(name)).build();
+                                .build());
+                       inputs.add(TextInput.create("name", "Dein Ingame Name", TextInputStyle.SHORT)
+                               .setPlaceholder("z.B. \"Knerio\"")
+                               .setMinLength(3)
+                               .setMaxLength(10)
+                               .setRequired(true)
+                               .build());
+                    }
+                }
+                Modal modal = Modal.create("new-ticket-" + choice, "Ticket").addActionRows(inputs.stream().map(ActionRow::of).toList()).build();
                 event.replyModal(modal).queue();
             }
             case null, default -> {

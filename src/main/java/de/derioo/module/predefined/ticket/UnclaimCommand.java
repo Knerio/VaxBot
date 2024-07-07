@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.bson.types.ObjectId;
 
+import java.awt.*;
 import java.util.List;
 
 @Command(name = "unclaim")
@@ -37,13 +38,22 @@ public class UnclaimCommand {
         }
         ObjectId objectId = new ObjectId(id);
         Ticket ticket = bot.getRepo(TicketRepo.class).findFirstById(objectId);
-        if (ticket.getClaimerId() != null && ticket.getClaimerId() != event.getUser().getIdLong()) {
+        if (ticket.getClaimerId() == null || ticket.getClaimerId() != event.getUser().getIdLong()) {
             event.reply("Du kannst das Ticket nicht enclaimen").setEphemeral(true).queue();
             return;
         }
+
         ticket.setClaimerId(null);
+        ticket.getHistory().add(Ticket.HistoryItem.builder()
+                .id(new ObjectId())
+                .content("Das Ticket wurde von " + event.getUser().getAsMention() + " entclaimed")
+                .build());
         bot.getRepo(TicketRepo.class).save(ticket);
-        event.reply("Du hast das Ticket enclaimed").setEphemeral(true).queue();
+        event.replyEmbeds(DiscordBot.Default.builder()
+                .setTitle("Ticket wurde entclaimed")
+                .setDescription("Das Ticket wurde von " + event.getUser().getAsMention() + " entclaimed")
+                .setColor(Color.GREEN)
+                .build()).queue();
     }
 
     private void noTicketChannel(SlashCommandInteractionEvent event) {

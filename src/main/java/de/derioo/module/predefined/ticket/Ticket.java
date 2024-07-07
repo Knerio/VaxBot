@@ -35,19 +35,23 @@ public class Ticket {
 
 
     @Getter
-    enum Type {
+    public enum Type {
 
-        BUG(Config.Id.Role.BUG_REPORT_EDIT),
-        QUESTIONS(Config.Id.Role.TICKET_EDIT),
-        HELP_AND_SUPPORT(Config.Id.Role.TICKET_EDIT),
-        PARTNER(Config.Id.Role.TICKET_EDIT)
+        BUG(Config.Id.Role.BUG_REPORT_EDIT, "BugReport", "Für Bugs"),
+        QUESTIONS(Config.Id.Role.TICKET_EDIT, "Allgemeine Fragen", "Allgemeine Fragen halt"),
+        HELP_AND_SUPPORT(Config.Id.Role.TICKET_EDIT, "Hilfe und Support", "Simple Fragen und normale Support Anfragen"),
+        PARTNER(Config.Id.Role.TICKET_EDIT, "Partner Anfrage", "Du willst Partner werden?")
 
         ;
 
         private final Config.Id.Role role;
+        private final String tag;
+        private final String desc;
 
-        Type(Config.Id.Role role) {
+        Type(Config.Id.Role role, String tag, String desc) {
             this.role = role;
+            this.tag = tag;
+            this.desc = desc;
         }
     }
 
