@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
+import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 import org.bson.types.ObjectId;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,32 +43,16 @@ public class TicketManager {
         ObjectId objectId = new ObjectId();
         TextChannel ticketChannel = guild.createTextChannel(type + "-" + user.getName() + "-" + objectId, guild.getCategoryById(bot.get(guild).getChannels().get(Config.Id.Category.TICKET_CATEGORY.name()))).complete();
         List<Role> roles = bot.get(guild).getRoleObjects(type.getRole(), guild);
-        List<Member> membersWithRoles = roles.stream().map(guild::getMembersWithRoles).flatMap(Collection::stream).toList();
         Member creator = guild.getMemberById(user.getIdLong());
 
+        TextChannelManager manager = ticketChannel.getManager();
+
         for (Role role : roles) {
-            ticketChannel.getManager()
-                    .putPermissionOverride(role, EnumSet.of(VIEW_CHANNEL), null).complete();
+            System.out.println(role.getName());
+            manager.putPermissionOverride(role, EnumSet.of(VIEW_CHANNEL), null);
         }
+        manager.putPermissionOverride(creator, EnumSet.of(VIEW_CHANNEL), null).queue();
 
-        ticketChannel.getManager()
-                .putPermissionOverride(creator, EnumSet.of(VIEW_CHANNEL), null).complete();
-
-        List<Long> sent = new ArrayList<>();
-
-        for (Member member : membersWithRoles) {
-            if (member.getUser().isBot()) continue;
-            if (sent.contains(member.getIdLong())) continue;
-            member.getUser().openPrivateChannel().queue(privateChannel -> {
-                privateChannel.sendMessageEmbeds(DiscordBot.Default.builder().setColor(Color.GREEN).setDescription("Du kannst nun das Ticket " + ticketChannel.getAsMention() + " sehen").build()).queue();
-            });
-            sent.add(member.getIdLong());
-        }
-        if (!sent.contains(creator.getIdLong())) {
-            creator.getUser().openPrivateChannel().queue(privateChannel -> {
-                privateChannel.sendMessageEmbeds(DiscordBot.Default.builder().setColor(Color.GREEN).setDescription("Du kannst nun das Ticket " + ticketChannel.getAsMention() + " sehen").build()).queue();
-            });
-        }
 
         Map<String, String> values = new HashMap<>();
         switch (type) {
@@ -103,7 +88,7 @@ public class TicketManager {
             embedBuilder.addField(s, s2, false);
         });
 
-        ticketChannel.sendMessage(event.getUser().getAsMention() + bot.get(guild).getMentions(Config.Id.Role.TICKET_EDIT, guild))
+        ticketChannel.sendMessage(event.getUser().getAsMention() + bot.get(guild).getMentions(type.getRole(), guild))
                 .addEmbeds(embedBuilder
                         .build())
                 .addActionRow(Button.danger("ticket-close", "Ticket schließen -> \uD83D\uDDD1"), Button.primary("ticket-claim", "Ticket claimen -> \uD83D\uDD12"))
@@ -111,6 +96,7 @@ public class TicketManager {
 
         if (values.containsKey("Bilder")) {
             for (String s : values.get("Bilder").split(" ")) {
+                if (s.isBlank()) continue;
                 ticketChannel.sendMessage(s).queue();
             }
         }
@@ -158,14 +144,12 @@ public class TicketManager {
 
         Guild guild = event.getGuild();
         List<Role> roles = bot.get(guild).getRoleObjects(ticket.getType().getRole(), guild);
+        TextChannelManager manager = channel.getManager();
         for (Role role : roles) {
-            channel.getManager()
-                    .putPermissionOverride(role, EnumSet.of(VIEW_CHANNEL), null).complete();
+           manager = manager.putPermissionOverride(role, null, EnumSet.of(VIEW_CHANNEL));
         }
 
-        channel.getManager()
-                .putPermissionOverride(guild.getMember(event.getUser()), EnumSet.of(VIEW_CHANNEL), null)
-                .queue();
+        manager.putPermissionOverride(guild.getMember(event.getUser()), null, EnumSet.of(VIEW_CHANNEL)).queue();
 
         bot.getRepo(TicketRepo.class).save(ticket);
 
@@ -193,11 +177,12 @@ public class TicketManager {
         }
         AtomicReference<InteractionHook> current = new AtomicReference<>();
         EmbedBuilder builder = DiscordBot.Default.builder()
+                .setColor(Color.RED)
                 .setTitle("Ticket schließt...")
                 .setDescription("Das Ticket schließt **10** in Sekunden");
         event.replyEmbeds(
                 builder.build()
-        ).addActionRow(Button.primary("cancel-close", "Abbrechen")).queue(current::set);
+        ).addActionRow(Button.danger("cancel-close", "Abbrechen")).queue(current::set);
         for (int i = 0; i < 10; i++) {
             int delay = i;
             ScheduledFuture<?> scheduledTask = scheduler.schedule(() -> {

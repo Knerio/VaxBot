@@ -3,15 +3,24 @@ package de.derioo.module.predefined.ticket;
 import de.derioo.bot.DiscordBot;
 import dev.rollczi.litecommands.annotations.command.Command;
 import dev.rollczi.litecommands.annotations.context.Context;
+import dev.rollczi.litecommands.annotations.description.Description;
 import dev.rollczi.litecommands.annotations.execute.Execute;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 import org.bson.types.ObjectId;
 
 import java.awt.*;
+import java.util.EnumSet;
 import java.util.List;
 
+import static net.dv8tion.jda.api.Permission.VIEW_CHANNEL;
+
 @Command(name = "unclaim")
+@Description("Unclaimed ein Ticket")
 public class UnclaimCommand {
 
     private final DiscordBot bot;
@@ -42,6 +51,13 @@ public class UnclaimCommand {
             event.reply("Du kannst das Ticket nicht enclaimen").setEphemeral(true).queue();
             return;
         }
+
+        TextChannelManager manager = ((TextChannel) channel).getManager();
+        for (Role role : bot.get(event.getGuild()).getRoleObjects(ticket.getType().getRole(), event.getGuild())) {
+            System.out.println(role.getName());
+            manager = manager.putPermissionOverride(role, EnumSet.of(VIEW_CHANNEL), null);
+        }
+        manager.queue();
 
         ticket.setClaimerId(null);
         ticket.getHistory().add(Ticket.HistoryItem.builder()
