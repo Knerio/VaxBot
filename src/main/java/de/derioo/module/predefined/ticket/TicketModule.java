@@ -113,7 +113,6 @@ public class TicketModule extends Module {
             case "new-ticket" -> {
                 Ticket.Type choice = Ticket.Type.valueOf(event.getInteraction().getValues().getFirst());
                 List<TextInput> inputs = new ArrayList<>();
-                System.out.println(choice);
                 switch (choice) {
                     case PARTNER -> {
                         inputs.add(TextInput.create("website", "Websiten oder Discord Link", TextInputStyle.SHORT)
