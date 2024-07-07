@@ -129,6 +129,22 @@ public class TicketModule extends Module {
                                 .setMinLength(15)
                                 .build());
                     }
+                    case HELP_AND_SUPPORT -> {
+                        inputs.add(TextInput.create("issue", "Kurze Beschreibung deines Anliegens", TextInputStyle.PARAGRAPH)
+                                .setPlaceholder("z.B. \"Ich will das und das machen und habe deshalb ein Problem\"")
+                                .setRequired(true)
+                                .setMinLength(10)
+                                .build());
+                        inputs.add(TextInput.create("name", "Dein Ingame Name", TextInputStyle.SHORT)
+                                .setPlaceholder("z.B. \"Knerio\"")
+                                .setMinLength(3)
+                                .setMaxLength(10)
+                                .setRequired(true)
+                                .build());
+                        inputs.add(TextInput.create("picture", "Bilder getrennt mit Leerzeichen (optional)", TextInputStyle.SHORT)
+                                .setRequired(false)
+                                .build());
+                    }
                     case BUG -> {
                         inputs.add(TextInput.create("issue", "Kurze Beschreibung des Bugs / Problems", TextInputStyle.PARAGRAPH)
                                 .setPlaceholder("z.B. \"Ich habe eine Fehler im System x gefunden\"")

@@ -76,7 +76,7 @@ public class TicketManager {
                 values.put("Kontakt", event.getValue("contact").getAsString());
                 values.put("Bewerbung", event.getValue("text").getAsString());
             }
-            case BUG -> {
+            case BUG, HELP_AND_SUPPORT -> {
                 values.put("Problembeschreibung", event.getValue("issue").getAsString());
                 values.put("Ingame Name", event.getValue("name").getAsString());
                 ModalMapping picture = event.getValue("picture");
