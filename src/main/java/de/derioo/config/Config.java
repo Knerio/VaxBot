@@ -61,7 +61,6 @@ public class Config {
 
         public enum Role {
             TICKET_EDIT,
-            TICKET_MANAGE,
             REMOVE_USER_FROM_TICKET,
             TEAM_ADD,
             TEAM_ROLE,

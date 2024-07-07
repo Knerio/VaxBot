@@ -65,7 +65,7 @@ public class TicketManager {
                 values.put("Problembeschreibung", event.getValue("issue").getAsString());
                 values.put("Ingame Name", event.getValue("name").getAsString());
                 ModalMapping picture = event.getValue("picture");
-                if (picture != null) {
+                if (picture != null && !picture.getAsString().isBlank()) {
                     values.put("Bilder", picture.getAsString());
                 }
             }
