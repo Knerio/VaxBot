@@ -43,7 +43,7 @@ public class StafflistModule extends Module {
 
 
                 List<Role> roleList = data.stream().map(guild::getRoleById)
-                        .sorted((o1, o2) ->Integer.compare(o2.getPosition(), o1.getPosition()))
+                        .sorted((o1, o2) -> Integer.compare(o2.getPosition(), o1.getPosition()))
                         .toList();
 
                 for (Role role : roleList) {
