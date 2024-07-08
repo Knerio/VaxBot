@@ -22,11 +22,11 @@ public class StafflistModule extends Module {
     public StafflistModule(DiscordBot bot) {
         super(bot, "stafflist");
         this.bot = bot;
-        timer();
-        setTimers(300_000L, this::timer);
+        runStaffList();
+        setTimers(300_000L, this::runStaffList);
     }
 
-    public void timer() {
+    public void runStaffList() {
         for (Guild guild : bot.getJda().getGuilds()) {
             Long channelId = bot.get(guild).getChannels().get(Config.Id.Channel.STAFFLIST_CHANNEL.name());
             if (channelId == null) continue;
