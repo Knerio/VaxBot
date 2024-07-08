@@ -146,10 +146,10 @@ public class TicketManager {
         List<Role> roles = bot.get(guild).getRoleObjects(ticket.getType().getRole(), guild);
         TextChannelManager manager = channel.getManager();
         for (Role role : roles) {
-           manager = manager.putPermissionOverride(role, null, EnumSet.of(VIEW_CHANNEL));
+            manager = manager.putPermissionOverride(role, null, EnumSet.of(VIEW_CHANNEL));
         }
 
-        manager.putPermissionOverride(guild.getMember(event.getUser()), null, EnumSet.of(VIEW_CHANNEL)).queue();
+        manager.putPermissionOverride(guild.getMember(event.getUser()), EnumSet.of(VIEW_CHANNEL), null).queue();
 
         bot.getRepo(TicketRepo.class).save(ticket);
 
