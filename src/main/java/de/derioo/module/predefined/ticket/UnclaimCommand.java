@@ -5,6 +5,7 @@ import dev.rollczi.litecommands.annotations.command.Command;
 import dev.rollczi.litecommands.annotations.context.Context;
 import dev.rollczi.litecommands.annotations.description.Description;
 import dev.rollczi.litecommands.annotations.execute.Execute;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -47,9 +48,11 @@ public class UnclaimCommand {
         }
         ObjectId objectId = new ObjectId(id);
         Ticket ticket = bot.getRepo(TicketRepo.class).findFirstById(objectId);
-        if (ticket.getClaimerId() == null || ticket.getClaimerId() != event.getUser().getIdLong()) {
-            event.reply("Du kannst das Ticket nicht enclaimen").setEphemeral(true).queue();
-            return;
+        if (!event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
+            if (ticket.getClaimerId() == null || ticket.getClaimerId() != event.getUser().getIdLong()) {
+                event.reply("Du kannst das Ticket nicht enclaimen").setEphemeral(true).queue();
+                return;
+            }
         }
 
         TextChannelManager manager = ((TextChannel) channel).getManager();
