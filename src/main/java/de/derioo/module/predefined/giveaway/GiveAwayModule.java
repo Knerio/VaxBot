@@ -109,18 +109,19 @@ public class GiveAwayModule extends Module {
     public @NotNull MessageEmbed getEmbed(@NotNull GiveAway giveAway) {
         StringBuilder builder = new StringBuilder();
         builder.append("- Gestartet von: ").append("<@").append(giveAway.getCreatorId()).append(">").append("\n")
-                .append("- Was wird verlost: ").append(giveAway.getReward()).append("\n");
+                .append("- Was wird verlost: **").append(giveAway.getReward()).append("**\n");
         if (!giveAway.getWinners().isEmpty()) {
             builder.append("- Gewinner: ").append(giveAway.getWinners().stream().map(id -> "<@" + id + ">").collect(Collectors.joining(","))).append("\n");
         }
-        builder.append("- Restzeit: ").append(giveAway.getDuration() < System.currentTimeMillis() ? "**ABGELAUFEN**" : "<t:" + getUnix(new Date(giveAway.getDuration()).getTime()) + ":R>").append("\n");
+        builder.append("- Restzeit: ").append(giveAway.getDuration() < System.currentTimeMillis() ? "**ABGELAUFEN**" : "**<t:" + getUnix(new Date(giveAway.getDuration()).getTime()) + ":R>**").append("\n");
         if (!giveAway.getWinners().isEmpty()) {
-            builder.append("- Wurde beendet am: ").append("<t:").append(getUnix(new Date(giveAway.getDuration()).getTime())).append(":R>").append("\n");
+            builder.append("- Wurde beendet am: **").append("<t:").append(getUnix(new Date(giveAway.getDuration()).getTime())).append(":R>**").append("\n");
         }
         builder.append("- Teilnehmer: ").append(giveAway.getParticipants().size());
         return DiscordBot.Default.builder()
                 .setTitle("\uD83C\uDF89 Giveaway \uD83C\uDF89")
                 .setDescription(builder.toString())
+                .setColor(Color.GRAY)
                 .build();
     }
 
