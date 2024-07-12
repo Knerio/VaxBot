@@ -22,7 +22,7 @@ import java.util.concurrent.ExecutionException;
 
 public abstract class Module {
 
-    private final DiscordBot bot;
+    protected final DiscordBot bot;
 
     private final String name;
 
