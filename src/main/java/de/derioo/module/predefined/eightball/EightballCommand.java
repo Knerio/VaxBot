@@ -22,7 +22,7 @@ public class EightballCommand {
     public void ask(@Arg("frage") @Description("Deine Frage bzw. Nachricht") String message, @Context SlashCommandInteractionEvent event) {
         Collections.shuffle(replies);
         event.replyEmbeds(DiscordBot.Default.builder()
-                        .setTitle(event.getUser().getEffectiveName())
+                        .setTitle(event.getUser().getName())
                         .setDescription("Frage: **" + message + "**\n\nAntwort: **" + replies.getFirst() + "**")
                         .setColor(Color.CYAN)
                 .build()).queue();

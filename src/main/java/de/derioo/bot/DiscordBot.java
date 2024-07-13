@@ -24,6 +24,7 @@ import de.derioo.module.predefined.statuschanger.StatusChangerModule;
 import de.derioo.module.predefined.suggestion.Suggestion;
 import de.derioo.module.predefined.suggestion.SuggestionModule;
 import de.derioo.module.predefined.suggestion.SuggestionRepo;
+import de.derioo.module.predefined.support.SupportModule;
 import de.derioo.module.predefined.ticket.*;
 import de.derioo.module.predefined.usercount.UserCountModule;
 import de.derioo.module.predefined.userinfo.UserInfoCommand;
@@ -86,6 +87,7 @@ public class DiscordBot extends ListenerAdapter {
         new TicketModule(this, langConfig).start();
         new SuggestionModule(this).start();
         new UserCountModule(this).start();
+        new SupportModule(this).start();
         GiveAwayModule giveAwayModule = new GiveAwayModule(this);
         giveAwayModule.start();
 

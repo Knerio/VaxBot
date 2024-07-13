@@ -40,10 +40,10 @@ public class UserInfoCommand {
         User user = toShow.getUser();
         event.replyEmbeds(DiscordBot.Default.builder()
                 .setColor(Color.GREEN)
-                .setTitle("Informationen zu " + user.getGlobalName())
+                .setTitle("Informationen zu " + user.getName())
                 .setThumbnail("https://cdn.discordapp.com/attachments/1055223755909111808/1160508079419424840/Unbenanntdsadasd-2.png?ex=6534ea5f&is=6522755f&hm=00ea7dd8a3fd0c5dfcfccfa6952527b679094abf07d22143fee44b0b7221aa4a&")
                 .setDescription(String.join("\n", List.of(
-                        Emote.USER.getData() + " Anzeigename: **" + user.getEffectiveName() + "**",
+                        Emote.USER.getData() + " Anzeigename: **" + user.getName() + "**",
                         Emote.USER.getData() + " Name: **" + user.getName() + "**\n",
                         Emote.CALENDAR.getData() + " Account erstellt am: **<t:" + getUnix(user.getTimeCreated().toInstant().toEpochMilli()) + ":D>**",
                         Emote.CLOCK.getData() + " Account erstellt vor: **<t:" + getUnix(user.getTimeCreated().toInstant().toEpochMilli()) + ":R>**\n",

@@ -60,7 +60,7 @@ public class TicketCommand {
         ticket.getHistory().add(Ticket.HistoryItem.builder()
                 .senderId(null)
                 .id(new ObjectId())
-                .content(member.getEffectiveName() + " wurde zum Ticket " + event.getUser().getEffectiveName() + " hinzugefügt")
+                .content(member.getEffectiveName() + " wurde zum Ticket " + event.getUser().getName() + " hinzugefügt")
                 .build());
         bot.getRepo(TicketRepo.class).save(ticket);
 
@@ -95,7 +95,7 @@ public class TicketCommand {
         ticket.getHistory().add(Ticket.HistoryItem.builder()
                 .senderId(null)
                 .id(new ObjectId())
-                .content(member.getEffectiveName() + " wurde von " + event.getUser().getEffectiveName() + " entfernt")
+                .content(member.getEffectiveName() + " wurde von " + event.getUser().getName() + " entfernt")
                 .build());
         bot.getRepo(TicketRepo.class).save(ticket);
 

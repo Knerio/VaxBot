@@ -14,6 +14,7 @@ import lombok.SneakyThrows;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -207,6 +208,7 @@ public class TicketModule extends Module {
         if (event.getMessage().getAuthor().isBot()) return;
         if (!event.getChannel().getType().isMessage()) return;
         if (!event.getChannel().getName().contains("-")) return;
+        if (!event.getChannel().getType().equals(ChannelType.TEXT)) return;
         String id = List.of(event.getChannel().asTextChannel().getName().split("-")).getLast();
         if (!ObjectId.isValid(id)) return;
         TicketRepo ticketRepo = (TicketRepo) bot.getRepo(TicketRepo.class);

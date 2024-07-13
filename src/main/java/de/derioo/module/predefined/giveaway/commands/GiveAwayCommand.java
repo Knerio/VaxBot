@@ -48,7 +48,7 @@ public class GiveAwayCommand {
                         .id(new ObjectId())
                         .creatorId(event.getUser().getIdLong())
                         .guildId(event.getGuild().getIdLong())
-                        .channelId(event.getChannelIdLong())
+                        .channelId(event.getChannel().getIdLong())
                         .winners(new ArrayList<>())
                         .winnersCount(winner)
                         .participants(new ArrayList<>())
