@@ -57,11 +57,6 @@ public class SupportModule extends Module {
                 for (Guild guild : bot.getJda().getGuilds()) {
                     Long channelId = bot.get(guild).getChannels().get(Config.Id.Channel.SUPPORT_CHANNEL.name());
                     VoiceChannel channel = guild.getVoiceChannelById(channelId);
-                    List<Member> members = guild.getVoiceChannelById(channelId).getMembers();
-                    if (members.size() == 1) {
-                        guild.getAudioManager().closeAudioConnection();
-                        return;
-                    }
                     startTrack(channel);
                 }
             }
@@ -117,7 +112,11 @@ public class SupportModule extends Module {
         AudioChannelUnion channel = event.getChannelJoined() == null ? event.getChannelLeft() : event.getChannelJoined();
         if (channel.getIdLong() != supportChannelId) return;
         if (event.getMember().getUser().isBot()) return;
-
+        if (channelLeft != null) {
+            trackScheduler.getQueue().clear();
+            event.getGuild().getAudioManager().closeAudioConnection();
+            return;
+        }
         if (channelJoined != null) {
             startTrack(channelJoined.asVoiceChannel());
             Long channelId = data.getChannels().get(Config.Id.Channel.TEAM_CHAT.name());

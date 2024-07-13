@@ -3,6 +3,7 @@ package de.derioo.module.predefined.support;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import lombok.Getter;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -10,6 +11,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class TrackSheduler extends AudioEventAdapter {
 
     private final AudioPlayer player;
+    @Getter
     private final BlockingQueue<AudioTrack> queue;
 
     public TrackSheduler(AudioPlayer player) {
