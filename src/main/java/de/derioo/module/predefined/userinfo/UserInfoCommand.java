@@ -1,6 +1,7 @@
 package de.derioo.module.predefined.userinfo;
 
 import de.derioo.bot.DiscordBot;
+import de.derioo.utils.Emote;
 import dev.rollczi.litecommands.annotations.argument.Arg;
 import dev.rollczi.litecommands.annotations.command.Command;
 import dev.rollczi.litecommands.annotations.context.Context;
@@ -22,14 +23,13 @@ public class UserInfoCommand {
 
     private static final Map<User.UserFlag, String> BADGE_EMOJIS = new HashMap<>(
             Map.of(
-                    User.UserFlag.HYPESQUAD_BALANCE, "<:hype1:1140656206747287603>",
-                    User.UserFlag.HYPESQUAD_BRILLIANCE, "<:hype2:1140656191886872646>",
-                    User.UserFlag.HYPESQUAD_BRAVERY, "<:hype3:1140656174140756049>",
-                    User.UserFlag.ACTIVE_DEVELOPER, "<:active_dev:1140656159662030888>",
-                    User.UserFlag.VERIFIED_DEVELOPER, "<:dev:1140656146584178770>",
-                    User.UserFlag.PARTNER, "<:partner:1140656134504599552>"
+                    User.UserFlag.HYPESQUAD_BALANCE, Emote.HYPESQUAD_BALANCE.getData(),
+                    User.UserFlag.HYPESQUAD_BRILLIANCE, Emote.HYPESQUAD_BRILLIANCE.getData(),
+                    User.UserFlag.HYPESQUAD_BRAVERY, Emote.HYPESQUAD_BRAVERY.getData(),
+                    User.UserFlag.ACTIVE_DEVELOPER, Emote.ACTIVE_DEVELOPER.getData(),
+                    User.UserFlag.VERIFIED_DEVELOPER, Emote.VERIFIED_DEVELOPER.getData(),
+                    User.UserFlag.PARTNER, Emote.PARTNER.getData()
             )
-
     );
 
     @Execute
@@ -43,15 +43,16 @@ public class UserInfoCommand {
                 .setTitle("Informationen zu " + user.getGlobalName())
                 .setThumbnail("https://cdn.discordapp.com/attachments/1055223755909111808/1160508079419424840/Unbenanntdsadasd-2.png?ex=6534ea5f&is=6522755f&hm=00ea7dd8a3fd0c5dfcfccfa6952527b679094abf07d22143fee44b0b7221aa4a&")
                 .setDescription(String.join("\n", List.of(
-                        "<:varilx_user:1139957321196376107> Anzeigename: **" + user.getEffectiveName() + "**",
-                        "<:varilx_user:1139957321196376107> Name: **" + user.getName() + "**\n",
-                        "<:varilx_clendar:1139956980576960653> Account erstellt am: **<t:" + getUnix(user.getTimeCreated().toInstant().toEpochMilli()) + ":D>**",
-                        "<:varilx_clock:1139957097522528257> Account erstellt vor: **<t:" + getUnix(user.getTimeCreated().toInstant().toEpochMilli()) + ":R>**\n",
-                        "<:varilx_clendar:1139956980576960653> Server betreten am: **<t:" + getUnix(toShow.getTimeJoined().toInstant().toEpochMilli()) + ":D>**",
-                        "<:varilx_clock:1139957097522528257>Server betreten vor: **<t:" + getUnix(toShow.getTimeJoined().toInstant().toEpochMilli()) + ":R>**\n",
-                        "<:vax_pen:1140659710836621342 Nickname: **" + toShow.getNickname() + "**",
-                        "<:vax_bot:1140659750724435979> Bot: **" + (user.isBot() ? "Ja" : "Nein") + "**\n",
-                        "<:varilx_star:1139957135707484290> Badges:", getFormattedBadges(user))
+                        Emote.USER.getData() + " Anzeigename: **" + user.getEffectiveName() + "**",
+                        Emote.USER.getData() + " Name: **" + user.getName() + "**\n",
+                        Emote.CALENDAR.getData() + " Account erstellt am: **<t:" + getUnix(user.getTimeCreated().toInstant().toEpochMilli()) + ":D>**",
+                        Emote.CLOCK.getData() + " Account erstellt vor: **<t:" + getUnix(user.getTimeCreated().toInstant().toEpochMilli()) + ":R>**\n",
+                        Emote.CALENDAR.getData() + " Server betreten am: **<t:" + getUnix(toShow.getTimeJoined().toInstant().toEpochMilli()) + ":D>**",
+                        Emote.CLOCK.getData() + " Server betreten vor: **<t:" + getUnix(toShow.getTimeJoined().toInstant().toEpochMilli()) + ":R>**\n",
+                        Emote.PEN.getData() + " Nickname: **" + toShow.getNickname() + "**",
+                        Emote.BOT.getData() + " Bot: **" + (user.isBot() ? "Ja" : "Nein") + "**\n",
+                        Emote.STAR.getData() + " Badges:",
+                        getFormattedBadges(user))
                 ))
                 .build()).queue();
     }

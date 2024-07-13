@@ -5,6 +5,7 @@ import de.derioo.bot.DiscordBot;
 import de.derioo.module.Module;
 import de.derioo.module.predefined.giveaway.db.GiveAway;
 import de.derioo.module.predefined.giveaway.db.GiveawayRepo;
+import de.derioo.utils.Emote;
 import eu.koboo.en2do.repository.Repository;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -67,7 +68,7 @@ public class GiveAwayModule extends Module {
             }
             giveAway.setWinners(winners.stream().map(Member::getIdLong).toList());
             message.editMessageEmbeds(getEmbed(giveAway))
-                    .setActionRow(new ButtonImpl("id", "", ButtonStyle.SUCCESS, true, Emoji.fromUnicode("\uD83C\uDF89")))
+                    .setActionRow(new ButtonImpl("id", "", ButtonStyle.SUCCESS, true, Emote.PARTY_EMOTE.unicode()))
                     .queue();
             repo.delete(giveAway);
         }
@@ -119,7 +120,7 @@ public class GiveAwayModule extends Module {
         }
         builder.append("- Teilnehmer: ").append(giveAway.getParticipants().size());
         return DiscordBot.Default.builder()
-                .setTitle("\uD83C\uDF89 Giveaway \uD83C\uDF89")
+                .setTitle(Emote.PARTY_EMOTE.getFormatted() + " Giveaway " + Emote.PARTY_EMOTE.getFormatted())
                 .setDescription(builder.toString())
                 .setColor(Color.GRAY)
                 .build();

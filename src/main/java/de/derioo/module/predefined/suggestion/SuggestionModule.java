@@ -6,6 +6,7 @@ import de.derioo.config.Config;
 import de.derioo.config.ConfigData;
 import de.derioo.config.repository.ConfigRepo;
 import de.derioo.module.Module;
+import de.derioo.utils.Emote;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -189,8 +190,8 @@ public class SuggestionModule extends Module {
         suggestionChannel.sendMessageEmbeds(embed)
                 .queue(message -> {
                     suggestion.setMessageId(message.getIdLong());
-                    message.addReaction(Emoji.fromUnicode("\uD83D\uDC4D")).queue();
-                    message.addReaction(Emoji.fromUnicode("\uD83D\uDC4E")).queue();
+                    message.addReaction(Emote.THUMBS_UP.unicode()).queue();
+                    message.addReaction(Emote.THUMBS_DOWN.unicode()).queue();
                     repo.save(suggestion);
                 });
 

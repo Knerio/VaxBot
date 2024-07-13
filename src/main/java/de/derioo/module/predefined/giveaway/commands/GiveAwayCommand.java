@@ -7,6 +7,7 @@ import de.derioo.javautils.common.DateUtility;
 import de.derioo.module.predefined.giveaway.GiveAwayModule;
 import de.derioo.module.predefined.giveaway.db.GiveAway;
 import de.derioo.module.predefined.giveaway.db.GiveawayRepo;
+import de.derioo.utils.Emote;
 import dev.rollczi.litecommands.annotations.argument.Arg;
 import dev.rollczi.litecommands.annotations.command.Command;
 import dev.rollczi.litecommands.annotations.context.Context;
@@ -57,7 +58,7 @@ public class GiveAwayCommand {
 
         event.getChannel().sendMessage(bot.get(event.getGuild()).getMentions(Config.Id.Role.GIVEAWAY_PING_ROLE, event.getGuild())
                 ).addEmbeds(module.getEmbed(giveAway))
-                .addActionRow(Button.success("giveaway-participate", Emoji.fromUnicode("\uD83C\uDF89")))
+                .addActionRow(Button.success("giveaway-participate", Emote.PARTY_EMOTE.unicode()))
                 .queue(message -> {
                     giveAway.setMessageId(message.getIdLong());
                     bot.getRepo(GiveawayRepo.class).save(giveAway);

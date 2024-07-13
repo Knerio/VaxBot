@@ -2,6 +2,7 @@ package de.derioo.module.predefined.ticket;
 
 import de.derioo.bot.DiscordBot;
 import de.derioo.config.Config;
+import de.derioo.utils.Emote;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -91,7 +92,10 @@ public class TicketManager {
         ticketChannel.sendMessage(event.getUser().getAsMention() + bot.get(guild).getMentions(type.getRole(), guild))
                 .addEmbeds(embedBuilder
                         .build())
-                .addActionRow(Button.danger("ticket-close", "Ticket schließen -> \uD83D\uDDD1"), Button.primary("ticket-claim", "Ticket claimen -> \uD83D\uDD12"))
+                .addActionRow(
+                        Button.danger("ticket-close", "Ticket schließen -> " + Emote.TRASH.getData()),
+                        Button.primary("ticket-claim", "Ticket claimen -> " + Emote.LOCK.getData())
+                )
                 .queue();
 
         if (values.containsKey("Bilder")) {
@@ -201,10 +205,10 @@ public class TicketManager {
                     .setColor(Color.GREEN)
                     .setTitle("Varilx.de | Ticket")
                     .addField(new MessageEmbed.Field("Ticket Informationen", ticket.getInformations(guild), false))
-                    .addField(new MessageEmbed.Field("<:varilx_textchannel:1139957022696157294> Ticket Name", channel.getName(), false))
-                    .addField(new MessageEmbed.Field("<:varilx_clendar:1139956980576960653> Geschlossen von:", getMention(event.getUser()), true))
-                    .addField(new MessageEmbed.Field("<:varilx_user:1139957321196376107> Claimer:", ticket.getClaimerId() == null ? "**Nicht geclaimed**" : (getMention(guild.getMemberById(ticket.getClaimerId()))), true))
-                    .addField(new MessageEmbed.Field("<:varilx_user:1139957321196376107> Teilnehmer:", ticket.getParticipants(guild), true))
+                    .addField(new MessageEmbed.Field(Emote.TEXT_CHANNEL.getData() + "Ticket Name", channel.getName(), false))
+                    .addField(new MessageEmbed.Field(Emote.CALENDAR.getData() + "Geschlossen von:", getMention(event.getUser()), true))
+                    .addField(new MessageEmbed.Field(Emote.USER.getData() + "Claimer:", ticket.getClaimerId() == null ? "**Nicht geclaimed**" : (getMention(guild.getMemberById(ticket.getClaimerId()))), true))
+                    .addField(new MessageEmbed.Field(Emote.USER.getData() + "Teilnehmer:", ticket.getParticipants(guild), true))
                     .build();
             logs.sendMessageEmbeds(embed).queue();
             event.getJDA().getUserById(ticket.getUserId()).openPrivateChannel().queue(pc -> pc.sendMessageEmbeds(embed).queue());

@@ -1,6 +1,7 @@
 package de.derioo.module.predefined.ticket;
 
 import de.derioo.config.Config;
+import de.derioo.utils.Emote;
 import de.derioo.utils.UserUtils;
 import eu.koboo.en2do.repository.entity.Id;
 import lombok.*;
@@ -69,8 +70,8 @@ public class Ticket {
 
         BUG(Config.Id.Role.BUG_REPORT_EDIT, "❌ Bugreport", "Du hast einen Fehler gefunden? Melde ihn hier!"),
         QUESTIONS(Config.Id.Role.TICKET_EDIT, "❓Allgemeine Fragen", "Allgemeine Fragen"),
-        PARTNER(Config.Id.Role.TICKET_EDIT, "\uD83E\uDD1D Partner Anfrage", "Du willst Partner werden?"),
-        HELP_AND_SUPPORT(Config.Id.Role.TICKET_EDIT, "\uD83D\uDC65 Hilfe & Support", "Du brauchst allgemeine Hilfe?");
+        PARTNER(Config.Id.Role.TICKET_EDIT, Emote.HANDSHAKE.getData() + "Partner Anfrage", "Du willst Partner werden?"),
+        HELP_AND_SUPPORT(Config.Id.Role.TICKET_EDIT, Emote.BUSTS.getData() + "Hilfe & Support", "Du brauchst allgemeine Hilfe?");
 
         private final Config.Id.Role role;
         private final String tag;
