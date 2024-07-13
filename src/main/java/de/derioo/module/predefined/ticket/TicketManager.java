@@ -200,11 +200,11 @@ public class TicketManager {
             MessageEmbed embed = DiscordBot.Default.builder()
                     .setColor(Color.GREEN)
                     .setTitle("Varilx.de | Ticket")
-                    .addField(new MessageEmbed.Field("Ticket Informationen", getTicketInformations(ticket, event.getGuild()), false))
+                    .addField(new MessageEmbed.Field("Ticket Informationen", ticket.getInformations(guild), false))
                     .addField(new MessageEmbed.Field("<:varilx_textchannel:1139957022696157294> Ticket Name", channel.getName(), false))
                     .addField(new MessageEmbed.Field("<:varilx_clendar:1139956980576960653> Geschlossen von:", getMention(event.getUser()), true))
                     .addField(new MessageEmbed.Field("<:varilx_user:1139957321196376107> Claimer:", ticket.getClaimerId() == null ? "**Nicht geclaimed**" : (getMention(guild.getMemberById(ticket.getClaimerId()))), true))
-                    .addField(new MessageEmbed.Field("<:varilx_user:1139957321196376107> Teilnehmer:", getSupporters(ticket, guild), true))
+                    .addField(new MessageEmbed.Field("<:varilx_user:1139957321196376107> Teilnehmer:", ticket.getParticipants(guild), true))
                     .build();
             logs.sendMessageEmbeds(embed).queue();
             event.getJDA().getUserById(ticket.getUserId()).openPrivateChannel().queue(pc -> pc.sendMessageEmbeds(embed).queue());
@@ -219,30 +219,5 @@ public class TicketManager {
 
     }
 
-    private @NotNull String getTicketInformations(@NotNull Ticket ticket, Guild guild) {
-        StringBuilder builder = new StringBuilder();
-        for (Ticket.HistoryItem historyItem : ticket.getHistory()) {
-            if (historyItem.getSenderId() == null) {
-                builder.append("*").append(historyItem.getContent()).append("*").append("\n");
-                continue;
-            }
-            builder.append(getMention(guild.getMemberById(historyItem.getSenderId())))
-                    .append(" -> ")
-                    .append(historyItem.getContent())
-                    .append("\n");
-        }
-        builder.append("~~**---»-----------------------------------------«---**~~");
-        return builder.toString();
-    }
-
-    private @NotNull String getSupporters(@NotNull Ticket ticket, Guild guild) {
-        Set<String> set = new HashSet<>();
-        for (Ticket.HistoryItem historyItem : ticket.getHistory()) {
-            if (historyItem.getSenderId() == null) continue;
-            Member member = guild.getMemberById(historyItem.getSenderId());
-            set.add(getMention(member.getUser()));
-        }
-        return String.join("\n", set);
-    }
 
 }
