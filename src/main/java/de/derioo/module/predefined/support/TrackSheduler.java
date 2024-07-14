@@ -25,8 +25,5 @@ public class TrackSheduler extends AudioEventAdapter {
         }
     }
 
-    public void nextTrack() {
-        player.startTrack(queue.poll(), false);
-    }
 
 }

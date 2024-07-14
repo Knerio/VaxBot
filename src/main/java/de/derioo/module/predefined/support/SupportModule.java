@@ -104,7 +104,6 @@ public class SupportModule extends Module {
     public void onJoin(GuildVoiceUpdateEvent event) {
         ConfigData data = bot.get(event.getGuild());
         AudioChannelUnion channelJoined = event.getChannelJoined();
-        AudioChannelUnion channelLeft = event.getChannelLeft();
         Long supportChannelId = data.getChannels().get(Config.Id.Channel.SUPPORT_CHANNEL.name());
 
         AudioChannelUnion channel = event.getChannelJoined() == null ? event.getChannelLeft() : event.getChannelJoined();
