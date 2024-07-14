@@ -8,14 +8,16 @@ import de.derioo.utils.Emote;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 
+import java.util.concurrent.TimeUnit;
+
 public class UserCountModule extends Module {
 
     public UserCountModule(DiscordBot bot) {
         super(bot, "usercount");
+        setTimers(TimeUnit.MINUTES.toMillis(5), this::updateUserCount);
     }
 
-    @Override
-    public void timer() throws Throwable {
+    public void updateUserCount() throws Throwable {
         for (Guild guild : bot.getJda().getGuilds()) {
             ConfigData data = bot.get(guild);
             Long userCountChannelId = data.getChannels().getOrDefault(Config.Id.Channel.USER_COUNT_CHANNEL.name(), null);

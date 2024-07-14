@@ -42,7 +42,9 @@ public class Ticket {
     public String getParticipants(Guild guild) {
         Set<String> participants = new HashSet<>();
         history.forEach(historyItem -> {
-            Member member = Objects.requireNonNull(guild.getMemberById(historyItem.getSenderId()));
+            if (historyItem == null || historyItem.getSenderId() == null) return;
+            Member member = guild.getMemberById(historyItem.getSenderId());
+            if (member == null) return;
             participants.add(UserUtils.getMention(member));
         });
         return String.join("\n", participants);
