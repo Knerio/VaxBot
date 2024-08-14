@@ -45,7 +45,7 @@ dependencies {
     implementation("eu.koboo:en2do:2.3.9")
 
     /** Test dependencies **/
-    testImplementation(platform("org.junit:junit-bom:5.10.3"))
+    testImplementation(platform("org.junit:junit-bom:5.11.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.assertj:assertj-core:3.26.3")
     testImplementation("org.projectlombok:lombok:1.18.34")
