@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 public enum Emote {
 
 
-    PARTY_EMOTE("<a:Vaxparty:1139957321196376107>"),
+    PARTY_EMOTE("\uD83C\uDF89"),
     USER("<:varilx_user:1139957321196376107>"),
     TEXT_CHANNEL("<:varilx_textchannel:1139957022696157294>"),
     CALENDAR("<:varilx_clendar:1139956980576960653>"),

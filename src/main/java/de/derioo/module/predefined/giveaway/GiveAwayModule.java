@@ -120,7 +120,7 @@ public class GiveAwayModule extends Module {
         }
         builder.append("- Teilnehmer: ").append(giveAway.getParticipants().size());
         return DiscordBot.Default.builder()
-                .setTitle(Emote.PARTY_EMOTE.getFormatted() + " Giveaway " + Emote.PARTY_EMOTE.getFormatted())
+                .setTitle(Emote.PARTY_EMOTE.getData() + " Giveaway " + Emote.PARTY_EMOTE.getData())
                 .setDescription(builder.toString())
                 .setColor(Color.GRAY)
                 .build();

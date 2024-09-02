@@ -58,7 +58,7 @@ public class GiveAwayCommand {
 
         event.getChannel().sendMessage(bot.get(event.getGuild()).getMentions(Config.Id.Role.GIVEAWAY_PING_ROLE, event.getGuild())
                 ).addEmbeds(module.getEmbed(giveAway))
-                .addActionRow(Button.success("giveaway-participate", Emote.PARTY_EMOTE.unicode()))
+                .addActionRow(Button.success("giveaway-participate", Emote.PARTY_EMOTE.getFormatted()))
                 .queue(message -> {
                     giveAway.setMessageId(message.getIdLong());
                     bot.getRepo(GiveawayRepo.class).save(giveAway);
