@@ -209,20 +209,23 @@ public class TicketModule extends Module {
         if (!event.getChannel().getType().isMessage()) return;
         if (!event.getChannel().getName().contains("-")) return;
         if (!event.getChannel().getType().equals(ChannelType.TEXT)) return;
-        String id = List.of(event.getChannel().asTextChannel().getName().split("-")).getLast();
-        if (!ObjectId.isValid(id)) return;
-        TicketRepo ticketRepo = (TicketRepo) bot.getRepo(TicketRepo.class);
-        ticketRepo.asyncFindFirstById(new ObjectId(id)).thenAcceptAsync(ticket -> {
-            if (ticket == null) return;
-            ticket.getHistory()
-                    .add(Ticket.HistoryItem.builder()
-                            .id(new ObjectId())
-                            .senderId(event.getAuthor().getIdLong())
-                            .content(event.getMessage().getContentDisplay())
-                            .build());
-            ticketRepo.save(ticket);
-        });
+        Ticket ticket = getTicket(event.getChannel().getIdLong());
+        if (ticket == null) return;
+        ticket.getHistory()
+                .add(Ticket.HistoryItem.builder()
+                        .id(new ObjectId())
+                        .senderId(event.getAuthor().getIdLong())
+                        .content(event.getMessage().getContentDisplay())
+                        .build());
+        bot.getRepo(TicketRepo.class).save(ticket);
     }
 
+
+    private Ticket getTicket(Long channelId) {
+        for (Ticket ticket : bot.getRepo(TicketRepo.class).findAll()) {
+            if (Objects.equals(ticket.getChannelId(), channelId)) return ticket;
+        }
+        return null;
+    }
 
 }

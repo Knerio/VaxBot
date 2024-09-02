@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.entities.Member;
 import org.bson.types.ObjectId;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static de.derioo.utils.UserUtils.getMention;
 
@@ -42,10 +41,14 @@ public class Ticket {
     public String getParticipants(Guild guild) {
         Set<String> participants = new HashSet<>();
         history.forEach(historyItem -> {
-            if (historyItem == null || historyItem.getSenderId() == null) return;
-            Member member = guild.getMemberById(historyItem.getSenderId());
-            if (member == null) return;
-            participants.add(UserUtils.getMention(member));
+           try {
+               if (historyItem == null || historyItem.getSenderId() == null) return;
+               Member member = guild.getMemberById(historyItem.getSenderId());
+               if (member == null) return;
+               participants.add(UserUtils.getMention(member));
+           } catch (Throwable e) {
+               e.printStackTrace();
+           }
         });
         return String.join("\n", participants);
     }
@@ -70,17 +73,19 @@ public class Ticket {
     @Getter
     public enum Type {
 
-        BUG(Config.Id.Role.BUG_REPORT_EDIT, "❌ Bugreport", "Du hast einen Fehler gefunden? Melde ihn hier!"),
-        QUESTIONS(Config.Id.Role.TICKET_EDIT, "❓Allgemeine Fragen", "Allgemeine Fragen"),
-        PARTNER(Config.Id.Role.TICKET_EDIT, Emote.HANDSHAKE.getData() + "Partner Anfrage", "Du willst Partner werden?"),
-        HELP_AND_SUPPORT(Config.Id.Role.TICKET_EDIT, Emote.BUSTS.getData() + "Hilfe & Support", "Du brauchst allgemeine Hilfe?");
+        BUG(Config.Id.Role.BUG_REPORT_EDIT, Config.Id.Category.BUG_CATEGORY, "❌ Bugreport", "Du hast einen Fehler gefunden? Melde ihn hier!"),
+        QUESTIONS(Config.Id.Role.TICKET_EDIT, Config.Id.Category.TICKET_CATEGORY, "❓Allgemeine Fragen", "Allgemeine Fragen"),
+        PARTNER(Config.Id.Role.TICKET_EDIT, Config.Id.Category.TICKET_CATEGORY, Emote.HANDSHAKE.getData() + "Partner Anfrage", "Du willst Partner werden?"),
+        HELP_AND_SUPPORT(Config.Id.Role.TICKET_EDIT, Config.Id.Category.TICKET_CATEGORY, Emote.BUSTS.getData() + "Hilfe & Support", "Du brauchst allgemeine Hilfe?");
 
         private final Config.Id.Role role;
+        private final Config.Id.Category category;
         private final String tag;
         private final String desc;
 
-        Type(Config.Id.Role role, String tag, String desc) {
+        Type(Config.Id.Role role, Config.Id.Category category, String tag, String desc) {
             this.role = role;
+            this.category = category;
             this.tag = tag;
             this.desc = desc;
         }

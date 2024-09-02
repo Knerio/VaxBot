@@ -17,6 +17,7 @@ import org.bson.types.ObjectId;
 import java.awt.*;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Objects;
 
 import static net.dv8tion.jda.api.Permission.VIEW_CHANNEL;
 
@@ -37,17 +38,11 @@ public class UnclaimCommand {
             noTicketChannel(event);
             return;
         }
-        if (!channel.getName().contains("-")) {
+        Ticket ticket = getTicket(event.getChannelIdLong());
+        if (ticket == null) {
             noTicketChannel(event);
             return;
         }
-        String id = List.of(channel.getName().split("-")).getLast();
-        if (!ObjectId.isValid(id)) {
-            noTicketChannel(event);
-            return;
-        }
-        ObjectId objectId = new ObjectId(id);
-        Ticket ticket = bot.getRepo(TicketRepo.class).findFirstById(objectId);
         if (!event.getMember().hasPermission(Permission.ADMINISTRATOR)) {
             if (ticket.getClaimerId() == null || ticket.getClaimerId() != event.getUser().getIdLong()) {
                 event.reply("Du kannst das Ticket nicht enclaimen").setEphemeral(true).queue();
@@ -79,4 +74,11 @@ public class UnclaimCommand {
         event.reply("Dies ist kein Ticket Kanal").setEphemeral(true).queue();
     }
 
+
+    private Ticket getTicket(Long channelId) {
+        for (Ticket ticket : bot.getRepo(TicketRepo.class).findAll()) {
+            if (Objects.equals(ticket.getChannelId(), channelId)) return ticket;
+        }
+        return null;
+    }
 }

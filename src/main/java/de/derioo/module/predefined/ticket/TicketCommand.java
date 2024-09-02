@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Objects;
 
 @Command(name = "ticket")
 public class TicketCommand {
@@ -103,22 +104,10 @@ public class TicketCommand {
 
     @Nullable
     private Ticket validateChannel(SlashCommandInteractionEvent event) {
-        Channel channel = event.getChannel();
-        if (!channel.getType().isMessage()) {
+        Ticket ticket = getTicket(event.getChannelIdLong());
+        if (ticket == null) {
             noTicketChannel(event);
-            return null;
         }
-        if (!channel.getName().contains("-")) {
-            noTicketChannel(event);
-            return null;
-        }
-        String id = List.of(channel.getName().split("-")).getLast();
-        if (!ObjectId.isValid(id)) {
-            noTicketChannel(event);
-            return null;
-        }
-        ObjectId objectId = new ObjectId(id);
-        Ticket ticket = bot.getRepo(TicketRepo.class).findFirstById(objectId);
         return ticket;
     }
 
@@ -126,4 +115,10 @@ public class TicketCommand {
         event.reply("Dies ist kein Ticket Kanal").setEphemeral(true).queue();
     }
 
+    private Ticket getTicket(Long channelId) {
+        for (Ticket ticket : bot.getRepo(TicketRepo.class).findAll()) {
+            if (Objects.equals(ticket.getChannelId(), channelId)) return ticket;
+        }
+        return null;
+    }
 }

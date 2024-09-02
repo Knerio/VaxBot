@@ -42,7 +42,7 @@ public class TicketManager {
             if (ticket.getUserId().equals(user.getIdLong())) return null;
         }
         ObjectId objectId = new ObjectId();
-        TextChannel ticketChannel = guild.createTextChannel(type + "-" + user.getName() + "-" + objectId, guild.getCategoryById(bot.get(guild).getChannels().get(Config.Id.Category.TICKET_CATEGORY.name()))).complete();
+        TextChannel ticketChannel = guild.createTextChannel(type + "-" + user.getName() + "-" + objectId, guild.getCategoryById(bot.get(guild).getChannels().get(type.getCategory().name()))).complete();
         List<Role> roles = bot.get(guild).getRoleObjects(type.getRole(), guild);
         Member creator = guild.getMemberById(user.getIdLong());
 
@@ -120,7 +120,7 @@ public class TicketManager {
     }
 
     public Ticket claimTicket(@NotNull TextChannel channel, @NotNull ButtonInteractionEvent event) {
-        Ticket ticket = bot.getRepo(TicketRepo.class).findFirstById(new ObjectId(List.of(channel.getName().split("-")).getLast()));
+        Ticket ticket = getTicket(channel.getIdLong());
 
         if (ticket.getUserId() == event.getUser().getIdLong()) {
             event.reply("Du darfst dieses Ticket nicht claimen").setEphemeral(true).queue();
@@ -161,7 +161,7 @@ public class TicketManager {
     }
 
     public void cancelTicketDeletion(@NotNull TextChannel channel, ButtonInteractionEvent event) {
-        Ticket ticket = bot.getRepo(TicketRepo.class).findFirstById(new ObjectId(List.of(channel.getName().split("-")).getLast()));
+        Ticket ticket = getTicket(channel.getIdLong());
         List<ScheduledFuture<?>> scheduledFutures = scheduledTasks.get(ticket.getId());
         for (ScheduledFuture<?> task : new ArrayList<>(scheduledFutures)) {
             task.cancel(true);
@@ -173,7 +173,7 @@ public class TicketManager {
     }
 
     public void closeTicket(@NotNull TextChannel channel, ButtonInteractionEvent event) {
-        Ticket ticket = bot.getRepo(TicketRepo.class).findFirstById(new ObjectId(List.of(channel.getName().split("-")).getLast()));
+        Ticket ticket = getTicket(channel.getIdLong());
         scheduledTasks.putIfAbsent(ticket.getId(), new ArrayList<>());
         if (!scheduledTasks.get(ticket.getId()).isEmpty()) {
             event.reply("Das Ticket schließt schon!").setEphemeral(true).queue();
@@ -221,6 +221,13 @@ public class TicketManager {
         scheduledTasks.get(ticket.getId()).add(deleteTask);
 
 
+    }
+
+    private Ticket getTicket(Long channelId) {
+        for (Ticket ticket : bot.getRepo(TicketRepo.class).findAll()) {
+            if (Objects.equals(ticket.getChannelId(), channelId)) return ticket;
+        }
+        return null;
     }
 
 

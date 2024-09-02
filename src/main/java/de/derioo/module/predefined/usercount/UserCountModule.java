@@ -23,7 +23,7 @@ public class UserCountModule extends Module {
             Long userCountChannelId = data.getChannels().getOrDefault(Config.Id.Channel.USER_COUNT_CHANNEL.name(), null);
             if (userCountChannelId == null) continue;
             GuildChannel channel = guild.getGuildChannelById(userCountChannelId);
-            channel.getManager().setName(Emote.PUSH_PIN.getData() + "・ | User: " + guild.getMembers().size()).queue();
+            channel.getManager().setName(Emote.PUSH_PIN.getData() + "・ | User: " + (guild.getMembers().size() + 1)).queue();
         }
     }
 }

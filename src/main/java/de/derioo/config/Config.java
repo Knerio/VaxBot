@@ -56,7 +56,7 @@ public class Config {
         }
 
         public enum Category {
-            TICKET_CATEGORY
+            BUG_CATEGORY, TICKET_CATEGORY
         }
 
         public enum Role {
