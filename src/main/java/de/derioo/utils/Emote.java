@@ -30,7 +30,7 @@ public enum Emote {
     LOCK("\uD83D\uDD12"),
     HANDSHAKE("\uD83E\uDD1D"),
     BUSTS("\uD83D\uDC65"),
-    PUSH_PIN("\uD83D\uDCCC");
+    PUSH_PIN("\uD83D\uDCCC"), CHAT_BOX("<:varilxChatbox:1136013753301868555>");
 
     private final String data;
 
