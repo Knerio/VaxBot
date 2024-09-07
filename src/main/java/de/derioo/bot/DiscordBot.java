@@ -12,6 +12,7 @@ import de.derioo.javautils.common.DateUtility;
 import de.derioo.javautils.common.StringUtility;
 import de.derioo.module.predefined.clear.ClearCommand;
 import de.derioo.module.predefined.eightball.EightballCommand;
+import de.derioo.module.predefined.feedback.FeedbackModule;
 import de.derioo.module.predefined.giveaway.GiveAwayModule;
 import de.derioo.module.predefined.giveaway.commands.GiveAwayCommand;
 import de.derioo.module.predefined.giveaway.db.GiveawayRepo;
@@ -88,6 +89,7 @@ public class DiscordBot extends ListenerAdapter {
         new SuggestionModule(this).start();
         new UserCountModule(this).start();
         new SupportModule(this).start();
+        new FeedbackModule(this).start();
         GiveAwayModule giveAwayModule = new GiveAwayModule(this);
         giveAwayModule.start();
 
