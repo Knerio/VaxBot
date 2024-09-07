@@ -10,6 +10,7 @@ import de.derioo.config.local.LocalConfig;
 import de.derioo.config.repository.ConfigRepo;
 import de.derioo.javautils.common.DateUtility;
 import de.derioo.javautils.common.StringUtility;
+import de.derioo.module.predefined.boost.BoostModule;
 import de.derioo.module.predefined.clear.ClearCommand;
 import de.derioo.module.predefined.eightball.EightballCommand;
 import de.derioo.module.predefined.feedback.FeedbackModule;
@@ -90,6 +91,7 @@ public class DiscordBot extends ListenerAdapter {
         new UserCountModule(this).start();
         new SupportModule(this).start();
         new FeedbackModule(this).start();
+        new BoostModule(this).start();
         GiveAwayModule giveAwayModule = new GiveAwayModule(this);
         giveAwayModule.start();
 
