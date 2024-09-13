@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
+import java.text.MessageFormat;
 import java.util.Optional;
 
 @Command(name = "team")
@@ -38,11 +39,14 @@ public class TeamCommand {
         Member member = guild.getMemberById(user.getIdLong());
         guild.addRoleToMember(member, role).queue();
         TextChannel channel = guild.getTextChannelById(bot.get(guild).getChannels().get(Config.Id.Channel.PROMOTE_CHANNEL.name()));
-        channel.sendMessage(bot.get(guild).getMentions(Config.Id.Role.TEAM_ROLE, guild) +
-                        "\n**Team Neuzugang**\n\n" +
-                        "Wir begrüßen " + user.getAsMention() + " im Bereich " + role.getAsMention() + "und wünschen eine lange und gute Zusammenarbeit!\n\n" +
-                        "Mit freundlichen Grüßen,\n"
-                        + bot.getJda().getSelfUser().getAsMention())
+        channel.sendMessage(MessageFormat.format("""
+                        > {0}>\s
+                        > **Team Neuzugang**
+                        >\s
+                        > Wir begrüßen {1} im Bereich {2} und wünschen eine lange und gute Zusammenarbeit!
+                        >\s
+                        > Mit freundlichen Grüßen,
+                        > {3}""", bot.get(guild).getMentions(Config.Id.Role.TEAM_ROLE, guild), user.getAsMention(), role.getAsMention(), bot.getJda().getSelfUser().getAsMention()))
                 .queue();
         event.reply("Erfolgreich hinzugefügt").setEphemeral(true).queue();
     }
@@ -57,14 +61,18 @@ public class TeamCommand {
     ) {
         Guild guild = event.getGuild();
         Member member = guild.getMemberById(user.getIdLong());
-        guild.addRoleToMember(member, role).queue();
         if (old != null) guild.removeRoleFromMember(member, old).queue();
+        guild.addRoleToMember(member, role).queue();
         TextChannel channel = guild.getTextChannelById(bot.get(guild).getChannels().get(Config.Id.Channel.PROMOTE_CHANNEL.name()));
-        channel.sendMessage(bot.get(guild).getMentions(Config.Id.Role.TEAM_ROLE, guild) +
-                        "\n**Team Uprank**\n\n" +
-                        user.getAsMention() + "wurde auf " + role.getAsMention() + " befördert\n\n" +
-                        "Mit freundlichen Grüßen,\n"
-                        + bot.getJda().getSelfUser().getAsMention())
+        channel.sendMessage(
+                        MessageFormat.format("""
+                                > {0}>\s
+                                > **Team Uprank**
+                                >
+                                > {1} wurde auf {2} befördert
+                                >
+                                > Mit freundlichen Grüßen,
+                                > {3}""", bot.get(guild).getMentions(Config.Id.Role.TEAM_ROLE, guild), user.getAsMention(), role.getAsMention(), bot.getJda().getSelfUser().getAsMention()))
                 .queue();
         event.reply("Erfolgreich geupranked").setEphemeral(true).queue();
     }

@@ -18,6 +18,7 @@ public class BoostModule extends Module {
     public void onBoost(GuildMemberUpdateBoostTimeEvent event) {
         if (!event.getMember().isBoosting()) return;
         Long channelId = bot.get(event.getGuild()).getChannels().get(Config.Id.Channel.BOOST_CHANNEL.name());
+        if (channelId == null) return;
         event.getGuild().getTextChannelById(channelId).sendMessageEmbeds(DiscordBot.Default.builder()
                         .setColor(Color.MAGENTA)
                         .setTitle("Varilx Boost")

@@ -4,6 +4,7 @@ package de.derioo;
 import de.derioo.bot.DiscordBot;
 import de.derioo.config.local.LangConfig;
 import de.derioo.config.local.LocalConfig;
+import de.derioo.status.StatusHandler;
 import eu.koboo.en2do.Credentials;
 import eu.koboo.en2do.MongoManager;
 
@@ -36,6 +37,8 @@ public class Main {
         LangConfig langConfig = langFile.exists() ? LangConfig.load(langFile) : LangConfig.load(ClassLoader.getSystemClassLoader().getResourceAsStream("lang.json"));
         MongoManager mongoManager = new MongoManager(Credentials.of(config.getConnectionString(), config.getDb()));
 
-        new DiscordBot(config, mongoManager, langConfig);
+
+        DiscordBot bot = new DiscordBot(config, mongoManager, langConfig);
+        new StatusHandler(bot);
     }
 }
