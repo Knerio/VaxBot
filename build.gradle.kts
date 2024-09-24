@@ -39,7 +39,7 @@ dependencies {
     implementation("dev.rollczi:litecommands-jda:3.4.2")
 
     /** Mongo DB **/
-    implementation("org.mongodb:mongodb-driver-sync:5.1.2")
+    implementation("org.mongodb:mongodb-driver-sync:5.2.0")
 
     /** En2do **/
     implementation("eu.koboo:en2do:2.3.9")
