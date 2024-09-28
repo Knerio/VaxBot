@@ -30,6 +30,7 @@ import de.derioo.module.predefined.support.SupportModule;
 import de.derioo.module.predefined.ticket.*;
 import de.derioo.module.predefined.usercount.UserCountModule;
 import de.derioo.module.predefined.userinfo.UserInfoCommand;
+import de.derioo.utils.UserUtils;
 import dev.rollczi.litecommands.jda.LiteJDAFactory;
 import dev.rollczi.litecommands.validator.ValidatorResult;
 import eu.koboo.en2do.MongoManager;
@@ -38,6 +39,7 @@ import lombok.Getter;
 import lombok.extern.java.Log;
 import net.dv8tion.jda.api.*;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -45,6 +47,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -96,7 +99,7 @@ public class DiscordBot extends ListenerAdapter {
         giveAwayModule.start();
 
         LiteJDAFactory.builder(jda)
-                .commands(new WarnCommand(this),new TimeoutCommand(), new BanCommand(), new KickCommand(),new ClearCommand(), new UserInfoCommand(), new MoveallCommand(), new GiveAwayCommand(this, giveAwayModule), new ChannelSetCommand(this), new UnclaimCommand(this), new TicketCommand(this), new TeamCommand(this), new EightballCommand())
+                .commands(new WarnCommand(this), new TimeoutCommand(), new BanCommand(), new KickCommand(), new ClearCommand(), new UserInfoCommand(), new MoveallCommand(), new GiveAwayCommand(this, giveAwayModule), new ChannelSetCommand(this), new UnclaimCommand(this), new TicketCommand(this), new TeamCommand(this), new EightballCommand())
                 .exceptionUnexpected((invocation, throwable, resultHandlerChain) -> {
                     SlashCommandInteractionEvent event = invocation.context().get(SlashCommandInteractionEvent.class).get();
                     String stacktrace = String.join("\n", Arrays.stream(throwable.getStackTrace()).map(StackTraceElement::toString).toList());
@@ -111,19 +114,25 @@ public class DiscordBot extends ListenerAdapter {
                         User sender = context.getInvocation().sender();
                         Member member = context.getInvocation().context().get(SlashCommandInteractionEvent.class).get().getGuild().getMemberById(sender.getIdLong());
 
-                        if (!context.getMethod().isAnnotationPresent(NeedsRole.class)) return ValidatorResult.valid();
+                        if (!context.getMethod().isAnnotationPresent(NeedsRole.class) && !context.getMethod().isAnnotationPresent(NeedsAdmin.class)) {
+                            logCommand(member, context.getMethod(), context.getArgs());
+                            return ValidatorResult.valid();
+                        }
                         NeedsRole annotation = context.getMethod().getAnnotation(NeedsRole.class);
                         ConfigData configData = get(member.getGuild());
-                        if (!configData.getRoles().containsKey(annotation.value().name())) return ValidatorResult.valid();
 
-                        if (context.getMethod().isAnnotationPresent(NeedsAdmin.class)) {
+                        if (context.getMethod().isAnnotationPresent(NeedsAdmin.class) || !configData.getRoles().containsKey(annotation.value().name())) {
                             if (!member.getPermissions().contains(Permission.ADMINISTRATOR))
                                 return ValidatorResult.invalid("Dazu hast du keine Rechte!");
                         }
-                        if (member.getPermissions().contains(Permission.ADMINISTRATOR)) return ValidatorResult.valid();
+                        if (member.getPermissions().contains(Permission.ADMINISTRATOR)) {
+                            logCommand(member, context.getMethod(), context.getArgs());
+                            return ValidatorResult.valid();
+                        }
 
                         for (Role role : member.getRoles()) {
                             if (configData.isRoleValid(annotation.value(), role)) {
+                                logCommand(member, context.getMethod(), context.getArgs());
                                 return ValidatorResult.valid();
                             }
                         }
@@ -140,6 +149,16 @@ public class DiscordBot extends ListenerAdapter {
         }
 
 
+    }
+
+    private void logCommand(Member member, Method method, Object[] args) {
+        try {
+            Long channel = get(member.getGuild()).getChannels().get(Config.Id.Channel.ERROR_CHANNEL.name());
+            TextChannel textChannel = member.getGuild().getTextChannelById(channel);
+            textChannel.sendMessage(UserUtils.getMention(member) + " is executing \"" + method.getName() + "\" (" + method.getDeclaringClass().getSimpleName() + ", " + String.join(",", Arrays.stream(args).map(Object::toString).toList())).queue();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public ConfigData get(Guild guild) {

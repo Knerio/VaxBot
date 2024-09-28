@@ -62,8 +62,17 @@ public class TicketManager {
                 values.put("Kontakt", event.getValue("contact").getAsString());
                 values.put("Bewerbung", event.getValue("text").getAsString());
             }
-            case BUG, HELP_AND_SUPPORT -> {
+            case HELP_AND_SUPPORT -> {
                 values.put("Problembeschreibung", event.getValue("issue").getAsString());
+                values.put("Ingame Name", event.getValue("name").getAsString());
+                ModalMapping picture = event.getValue("picture");
+                if (picture != null && !picture.getAsString().isBlank()) {
+                    values.put("Bilder", picture.getAsString());
+                }
+            }
+            case BUG ->  {
+                values.put("Problembeschreibung", event.getValue("issue").getAsString());
+                values.put("Schritte zum Reproduzieren", event.getValue("reproduce").getAsString());
                 values.put("Ingame Name", event.getValue("name").getAsString());
                 ModalMapping picture = event.getValue("picture");
                 if (picture != null && !picture.getAsString().isBlank()) {

@@ -140,6 +140,11 @@ public class TicketModule extends Module {
                         addPictureInput(inputs);
                     }
                     case BUG -> {
+                        inputs.add(TextInput.create("reproduce", "Schritte zum Reproduzieren", TextInputStyle.PARAGRAPH)
+                                .setPlaceholder("z.B. \"Du musst zuerst das machen, damit x Fehler passiert\"")
+                                .setRequired(true)
+                                .setMinLength(10)
+                                .build());
                         inputs.add(TextInput.create("issue", "Kurze Beschreibung des Bugs / Problems", TextInputStyle.PARAGRAPH)
                                 .setPlaceholder("z.B. \"Ich habe eine Fehler im System x gefunden\"")
                                 .setRequired(true)
