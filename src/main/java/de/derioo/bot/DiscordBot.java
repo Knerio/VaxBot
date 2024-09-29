@@ -10,6 +10,7 @@ import de.derioo.config.local.LocalConfig;
 import de.derioo.config.repository.ConfigRepo;
 import de.derioo.javautils.common.DateUtility;
 import de.derioo.javautils.common.StringUtility;
+import de.derioo.module.predefined.apply.ApplyModule;
 import de.derioo.module.predefined.boost.BoostModule;
 import de.derioo.module.predefined.clear.ClearCommand;
 import de.derioo.module.predefined.eightball.EightballCommand;
@@ -20,6 +21,7 @@ import de.derioo.module.predefined.giveaway.db.GiveawayRepo;
 import de.derioo.module.predefined.join.JoinModule;
 import de.derioo.module.predefined.moveall.MoveallCommand;
 import de.derioo.module.predefined.punishment.*;
+import de.derioo.module.predefined.rules.RulesModule;
 import de.derioo.module.predefined.stafflist.StafflistModule;
 import de.derioo.module.predefined.stafflist.TeamCommand;
 import de.derioo.module.predefined.statuschanger.StatusChangerModule;
@@ -95,6 +97,8 @@ public class DiscordBot extends ListenerAdapter {
         new SupportModule(this).start();
         new FeedbackModule(this).start();
         new BoostModule(this).start();
+        new ApplyModule(this).start();
+        new RulesModule(this).start();
         GiveAwayModule giveAwayModule = new GiveAwayModule(this);
         giveAwayModule.start();
 

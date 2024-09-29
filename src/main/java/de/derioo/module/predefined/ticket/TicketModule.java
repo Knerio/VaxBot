@@ -161,7 +161,7 @@ public class TicketModule extends Module {
                                 .build());
                     }
                 }
-                Modal modal = Modal.create("new-ticket-" + choice, "Ticket").addActionRows(inputs.stream().map(ActionRow::of).toList()).build();
+                Modal modal = Modal.create("new-ticket-" + choice, "Ticket").addComponents(inputs.stream().map(ActionRow::of).toList()).build();
                 event.replyModal(modal).queue();
             }
             case null, default -> {

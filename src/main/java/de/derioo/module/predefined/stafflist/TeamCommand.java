@@ -66,11 +66,11 @@ public class TeamCommand {
         TextChannel channel = guild.getTextChannelById(bot.get(guild).getChannels().get(Config.Id.Channel.PROMOTE_CHANNEL.name()));
         channel.sendMessage(
                         MessageFormat.format("""
-                                > {0}>\s
+                                > {0}\s
                                 > **Team Uprank**
-                                >
+                                >\s
                                 > {1} wurde auf {2} befördert
-                                >
+                                >\s
                                 > Mit freundlichen Grüßen,
                                 > {3}""", bot.get(guild).getMentions(Config.Id.Role.TEAM_ROLE, guild), user.getAsMention(), role.getAsMention(), bot.getJda().getSelfUser().getAsMention()))
                 .queue();

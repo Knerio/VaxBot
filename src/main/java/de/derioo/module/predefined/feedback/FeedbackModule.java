@@ -63,7 +63,7 @@ public class FeedbackModule extends Module {
                                 .setMinLength(10)
                                 .setRequired(true)
                                 .build();
-                Modal modal = Modal.create("new-feedback", "Feedback").addActionRows(ActionRow.of(name)).build();
+                Modal modal = Modal.create("new-feedback", "Feedback").addComponents(ActionRow.of(name)).build();
                 event.replyModal(modal).queue();
             }
         }

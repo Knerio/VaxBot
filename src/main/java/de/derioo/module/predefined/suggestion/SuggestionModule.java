@@ -89,7 +89,7 @@ public class SuggestionModule extends Module {
                                 .setMinLength(10)
                                 .setRequired(true)
                                 .build();
-                Modal modal = Modal.create("new-suggestion", "Vorschlag").addActionRows(ActionRow.of(name)).build();
+                Modal modal = Modal.create("new-suggestion", "Vorschlag").addComponents(ActionRow.of(name)).build();
                 event.replyModal(modal).queue();
             }
             default -> {

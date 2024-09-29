@@ -44,8 +44,7 @@ public class TicketManager {
         ObjectId objectId = new ObjectId();
         TextChannel ticketChannel = guild.createTextChannel(type + "-" + user.getName() + "-" + objectId, guild.getCategoryById(bot.get(guild).getChannels().get(type.getCategory().name()))).complete();
         List<Role> roles = bot.get(guild).getRoleObjects(type.getRole(), guild);
-        Member creator = guild.getMemberById(user.getIdLong());
-
+        Member creator = guild.getMember(user);
         TextChannelManager manager = ticketChannel.getManager();
 
         for (Role role : roles) {
