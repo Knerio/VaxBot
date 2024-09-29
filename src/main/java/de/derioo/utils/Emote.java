@@ -31,6 +31,7 @@ public enum Emote {
     LOCK("\uD83D\uDD12"),
     HANDSHAKE("\uD83E\uDD1D"),
     BUSTS("\uD83D\uDC65"),
+    YES("<:yes:1139209857438863471>"),
     DISCORD_LOGO("<:discordlogo11:1094722866903261205>"),
     PUSH_PIN("\uD83D\uDCCC"), CHAT_BOX("<:varilxChatbox:1136013753301868555>"), DISCORD("<:discord:1048627445735096320>"), TUBE_HOSTING("<:TubehostingVarilx:1101657813794693120>");
 
