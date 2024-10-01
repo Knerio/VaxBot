@@ -25,7 +25,6 @@ import de.derioo.module.predefined.rules.RulesModule;
 import de.derioo.module.predefined.stafflist.StafflistModule;
 import de.derioo.module.predefined.stafflist.TeamCommand;
 import de.derioo.module.predefined.statuschanger.StatusChangerModule;
-import de.derioo.module.predefined.suggestion.Suggestion;
 import de.derioo.module.predefined.suggestion.SuggestionModule;
 import de.derioo.module.predefined.suggestion.SuggestionRepo;
 import de.derioo.module.predefined.support.SupportModule;
@@ -42,7 +41,6 @@ import lombok.extern.java.Log;
 import net.dv8tion.jda.api.*;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -116,10 +114,10 @@ public class DiscordBot extends ListenerAdapter {
                 .annotations(configuration -> {
                     configuration.methodValidator(context -> {
                         User sender = context.getInvocation().sender();
-                        Member member = context.getInvocation().context().get(SlashCommandInteractionEvent.class).get().getGuild().getMemberById(sender.getIdLong());
-
+                        SlashCommandInteractionEvent event = context.getInvocation().context().get(SlashCommandInteractionEvent.class).get();
+                        Member member = event.getGuild().getMemberById(sender.getIdLong());
                         if (!context.getMethod().isAnnotationPresent(NeedsRole.class) && !context.getMethod().isAnnotationPresent(NeedsAdmin.class)) {
-                            logCommand(member, context.getMethod(), context.getArgs());
+                            logCommand(member, context.getMethod(), event, context.getArgs());
                             return ValidatorResult.valid();
                         }
                         NeedsRole annotation = context.getMethod().getAnnotation(NeedsRole.class);
@@ -130,13 +128,13 @@ public class DiscordBot extends ListenerAdapter {
                                 return ValidatorResult.invalid("Dazu hast du keine Rechte!");
                         }
                         if (member.getPermissions().contains(Permission.ADMINISTRATOR)) {
-                            logCommand(member, context.getMethod(), context.getArgs());
+                            logCommand(member, context.getMethod(), event, context.getArgs());
                             return ValidatorResult.valid();
                         }
 
                         for (Role role : member.getRoles()) {
                             if (configData.isRoleValid(annotation.value(), role)) {
-                                logCommand(member, context.getMethod(), context.getArgs());
+                                logCommand(member, context.getMethod(), event, context.getArgs());
                                 return ValidatorResult.valid();
                             }
                         }
@@ -155,11 +153,18 @@ public class DiscordBot extends ListenerAdapter {
 
     }
 
-    private void logCommand(Member member, Method method, Object[] args) {
+    private void logCommand(Member member, Method method, SlashCommandInteractionEvent event, Object[] args) {
         try {
             Long channel = get(member.getGuild()).getChannels().get(Config.Id.Channel.ERROR_CHANNEL.name());
             TextChannel textChannel = member.getGuild().getTextChannelById(channel);
-            textChannel.sendMessage(UserUtils.getMention(member) + " is executing \"" + method.getName() + "\" (" + method.getDeclaringClass().getSimpleName() + ", " + String.join(",", Arrays.stream(args).map(Object::toString).toList())).queue();
+            textChannel.sendMessageEmbeds(Default.builder()
+                    .setColor(Color.GREEN)
+                    .setTitle("Ein Command wurde ausgeführt")
+                    .addField("Command", event.getCommandString(), true)
+                    .addField("User", UserUtils.getMention(member), true)
+                    .addField("CommandStack", method.getDeclaringClass().getSimpleName() + "#" + method.getName(), false)
+                    .addField("Argumente", String.join(",", Arrays.stream(args).map(Object::toString).toList()), false)
+                    .build()).queue();
         } catch (Exception e) {
             e.printStackTrace();
         }
