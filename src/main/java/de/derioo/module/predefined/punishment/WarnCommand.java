@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 @Command(name = "warn")
+@Description("Ein Warnungscommand")
 public class WarnCommand {
 
     private final DiscordBot bot;

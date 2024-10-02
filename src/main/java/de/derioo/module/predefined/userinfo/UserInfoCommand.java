@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Command(name = "userinfo")
+@Description("Ein Command um Informationen über einen Nutzer herauszufinden")
 public class UserInfoCommand {
 
     private static final Map<User.UserFlag, String> BADGE_EMOJIS = new HashMap<>(

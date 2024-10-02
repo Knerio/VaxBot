@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import org.jetbrains.annotations.NotNull;
 
 @Command(name = "clear")
+@Description("Löscht Nachrichten")
 public class ClearCommand {
 
     @Execute

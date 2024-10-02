@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import java.time.Duration;
 
 @Command(name = "timeout")
+@Description("Ein simpler Timeout Command")
 public class TimeoutCommand {
 
 

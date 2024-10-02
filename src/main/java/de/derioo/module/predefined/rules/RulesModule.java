@@ -97,7 +97,7 @@ public class RulesModule extends Module {
                                 Ich hoffe du hast das **Discord Regelwerk/Richtlinien** gründlich durchgelesen, wenn du das hier liest klicke bitte auf den check Reaktions Button um die Regeln zu **Akzeptieren!**""")
                         .setImage("https://media.discordapp.net/attachments/1067809862744019025/1289691157928083577/Varilx.DE_Background.png?ex=66fa66bd&is=66f9153d&hm=35ba8f092d27ed7a0cddc68ef45d7e0d4ac05102cf849ab85af467d7f7eec8a1&=&format=webp&quality=lossless&width=550&height=309");
         channel.sendMessageEmbeds(embed.build()).setActionRow(
-                Button.success("accept-rules", "Regeln aktzeptieren").withEmoji(Emote.YES.getFormatted()),
+                Button.success("accept-rules", "Regeln akzeptieren").withEmoji(Emote.YES.getFormatted()),
                 Button.link("https://discord.com/terms", "TOS").withEmoji(Emote.DISCORD.getFormatted()),
                 Button.link("https://discord.com/guidelines", "Guidelines").withEmoji(Emote.DISCORD_LOGO.getFormatted()),
                 Button.link("https://regelwerk.varilx.de/", "Forum").withEmoji(Emote.VARILX.getFormatted()),
@@ -112,7 +112,7 @@ public class RulesModule extends Module {
         for (Role roleObject : roleObjects) {
             event.getGuild().addRoleToMember(event.getUser(), roleObject).queue();
         }
-        event.reply("Regeln aktzeptiert!").setEphemeral(true).queue();
+        event.reply("Regeln akzeptiert!").setEphemeral(true).queue();
     }
 
 }

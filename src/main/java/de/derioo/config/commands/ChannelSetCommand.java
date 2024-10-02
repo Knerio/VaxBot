@@ -26,7 +26,7 @@ import java.util.Map;
 import static de.derioo.config.Config.Id.Data.TEAM_ROLE;
 
 @Command(name = "set")
-
+@Description("Ein Command für Konfigurationen")
 public class ChannelSetCommand {
 
     private final DiscordBot bot;

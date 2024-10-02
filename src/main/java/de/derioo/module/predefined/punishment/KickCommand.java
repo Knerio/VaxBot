@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import java.util.concurrent.TimeUnit;
 
 @Command(name = "kick")
+@Description("Simpler Kick Command")
 public class KickCommand {
 
     @NeedsRole(Config.Id.Role.KICK_USER)

@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Async;
 import java.util.concurrent.TimeUnit;
 
 @Command(name = "ban")
+@Description("Simpler Bann Command")
 public class BanCommand {
 
     @NeedsRole(Config.Id.Role.BAN_USER)

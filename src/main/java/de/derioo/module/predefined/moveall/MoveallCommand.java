@@ -20,6 +20,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Command(name = "moveall")
+@Description("Verschiebt Nutzer von einem Channel in den anderen")
 public class MoveallCommand {
 
     @Execute(name = "to")

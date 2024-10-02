@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Command(name = "8ball")
+@Description("Frage den magischen Ball")
 public class EightballCommand {
 
     private final List<String> replies = new ArrayList<>(List.of("Ja", "Nein", "Vielleicht...", "Sehr wahrscheinlich", "Wahrscheinlich nicht...", "Auf jeden Fall!", "Nein, niemals!", "Woher soll ich das wissen?"));

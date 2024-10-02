@@ -20,6 +20,7 @@ import java.text.MessageFormat;
 import java.util.Optional;
 
 @Command(name = "team")
+@Description("Ein Command um leute upzuranken oder zum Hinzufügen")
 public class TeamCommand {
 
     private final DiscordBot bot;

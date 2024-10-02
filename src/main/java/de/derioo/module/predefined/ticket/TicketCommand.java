@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Command(name = "ticket")
+@Description("Ein Command für Tickets")
 public class TicketCommand {
 
     private final DiscordBot bot;

@@ -25,6 +25,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Command(name = "giveaway")
+@Description("Ein Command für Verlosungen")
 public class GiveAwayCommand {
 
     private final DiscordBot bot;
