@@ -10,6 +10,7 @@ import de.derioo.config.local.LocalConfig;
 import de.derioo.config.repository.ConfigRepo;
 import de.derioo.javautils.common.DateUtility;
 import de.derioo.javautils.common.StringUtility;
+import de.derioo.module.Module;
 import de.derioo.module.predefined.apply.ApplyModule;
 import de.derioo.module.predefined.boost.BoostModule;
 import de.derioo.module.predefined.clear.ClearCommand;
@@ -31,6 +32,7 @@ import de.derioo.module.predefined.support.SupportModule;
 import de.derioo.module.predefined.ticket.*;
 import de.derioo.module.predefined.usercount.UserCountModule;
 import de.derioo.module.predefined.userinfo.UserInfoCommand;
+import de.derioo.utils.PasteBinUtil;
 import de.derioo.utils.UserUtils;
 import dev.rollczi.litecommands.jda.LiteJDAFactory;
 import dev.rollczi.litecommands.validator.ValidatorResult;
@@ -44,13 +46,12 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 import static net.dv8tion.jda.api.requests.GatewayIntent.*;
 
@@ -103,13 +104,7 @@ public class DiscordBot extends ListenerAdapter {
         LiteJDAFactory.builder(jda)
                 .commands(new WarnCommand(this), new TimeoutCommand(), new BanCommand(), new KickCommand(), new ClearCommand(), new UserInfoCommand(), new MoveallCommand(), new GiveAwayCommand(this, giveAwayModule), new ChannelSetCommand(this), new UnclaimCommand(this), new TicketCommand(this), new TeamCommand(this), new EightballCommand())
                 .exceptionUnexpected((invocation, throwable, resultHandlerChain) -> {
-                    SlashCommandInteractionEvent event = invocation.context().get(SlashCommandInteractionEvent.class).get();
-                    String stacktrace = String.join("\n", Arrays.stream(throwable.getStackTrace()).map(StackTraceElement::toString).toList());
-                    event.getHook().sendMessageEmbeds(
-                            Default.error(throwable)
-                                    .setDescription(stacktrace)
-                                    .build()
-                    ).setEphemeral(true).queue();
+                    Module.logThrowable(this, throwable);
                 })
                 .annotations(configuration -> {
                     configuration.methodValidator(context -> {
@@ -209,21 +204,10 @@ public class DiscordBot extends ListenerAdapter {
         }
 
         public static @NotNull EmbedBuilder error(@NotNull Throwable throwable, boolean stacktrace) {
-            EmbedBuilder builder = builder()
+            return builder()
                     .setTitle("Es ist eine Fehler aufgetreten")
                     .setColor(Color.RED)
-                    .addField(new MessageEmbed.Field("Fehler", throwable.getClass().getName() + ": " + throwable.getMessage(), false));
-            if (stacktrace) {
-                builder.addField(new MessageEmbed.Field("StackTrace", "```" +
-                        StringUtility.capAtNCharacters(Arrays.stream(throwable.getStackTrace())
-                                .map(StackTraceElement::toString).collect(Collectors.joining("\n")), 1018)
-                        + "```", false));
-                log.log(Level.SEVERE, "Es ist ein Fehler aufgetreten!", stacktrace);
-                throwable.printStackTrace();
-            }
-            return builder;
-
-
+                    .addField(new MessageEmbed.Field("Fehler", StringUtility.capAtNCharacters(throwable.getClass().getName() + ": " + throwable.getMessage(), 1000), false));
         }
 
     }

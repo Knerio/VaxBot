@@ -5,20 +5,17 @@ import de.derioo.bot.DiscordBot;
 import de.derioo.config.Config;
 import de.derioo.config.repository.ConfigRepo;
 import de.derioo.javautils.common.MathUtility;
+import de.derioo.utils.PasteBinUtil;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.GenericEvent;
-import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 
 public abstract class Module {
 
@@ -46,7 +43,7 @@ public abstract class Module {
                         try {
                             declaredMethod.invoke(instance, event);
                         } catch (Exception e) {
-                            logThrowable(e);
+                            logThrowable(bot, e);
                         }
                     }
                 }
@@ -61,7 +58,7 @@ public abstract class Module {
         try {
             once();
         } catch (Throwable throwable) {
-            logThrowable(throwable);
+            logThrowable(bot, throwable);
         }
         runnableMap.forEach((duration, runnable) -> {
             timer.scheduleAtFixedRate(new TimerTask() {
@@ -70,7 +67,7 @@ public abstract class Module {
                     try {
                         runnable.run();
                     } catch (Throwable throwable) {
-                        logThrowable(throwable);
+                        logThrowable(bot, throwable);
                     }
                 }
             }, duration + 10, duration);
@@ -82,14 +79,18 @@ public abstract class Module {
 
     }
 
-    public final void logThrowable(Throwable throwable) {
+    public static void logThrowable(DiscordBot bot, Throwable throwable) {
         Config config = Config.get(bot.getRepo(ConfigRepo.class));
         for (Guild guild : bot.getJda().getGuilds()) {
             Long l = config.get(guild).getChannels().getOrDefault(Config.Id.Channel.ERROR_CHANNEL.name(), null);
             if (l == null) continue;
             try {
                 TextChannel textChannel = guild.getChannelById(TextChannel.class, l);
-                textChannel.sendMessageEmbeds(DiscordBot.Default.error(throwable, true).build()).queue();
+                textChannel.sendMessageEmbeds(DiscordBot.Default.error(throwable, true)
+                                .setDescription("Siehe Link für Stacktrace")
+                                .build())
+                        .addActionRow(Button.link(PasteBinUtil.createPasteOfThrowable(throwable).toString(), "Paste.gg"))
+                        .queue();
             } catch (Throwable t) {
                 t.printStackTrace();
             }
