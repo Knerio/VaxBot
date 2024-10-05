@@ -32,7 +32,7 @@ dependencies {
     implementation("de.derioo.javautils:discord:2.7.1")
 
     /** JDA **/
-    implementation("net.dv8tion:JDA:5.0.0-beta.17")
+    implementation("net.dv8tion:JDA:5.1.2")
     implementation("com.github.walkyst:lavaplayer-fork:1.4.3")
 
     /** CommandFramework **/
