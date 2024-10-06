@@ -75,7 +75,7 @@ public class Config {
             KICK_USER,
             TIMEOUT_USER,
             WARN_USER,
-            PLAYER_ROLE, SUPPORT_PING, RULE_ACCEPT_ROLES, GIVEAWAY_PING_ROLE
+            PLAYER_ROLE, SUPPORT_PING, RULE_ACCEPT_ROLES, LEVEL_50_ROLE, LEVEL_30_ROLE, LEVEL_20_ROLE, GIVEAWAY_PING_ROLE
         }
 
         public enum Data {

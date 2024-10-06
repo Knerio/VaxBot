@@ -63,7 +63,7 @@ public class ApplyModule extends Module {
                                 Unter https://forum.varilx.de/bewerben/""", false)
                         .setImage("https://cdn.discordapp.com/attachments/1104111151937245284/1139017969444339722/ValuniaNET-Thumbddnail-Wiederhergestellt.png?ex=66fab165&is=66f95fe5&hm=21bbc3a0892ab4fe6889a57ef80fbc5b52f6dec8571b9490f70875dda86c07f1&");
         channel.sendMessageEmbeds(embed.build()).setActionRow(
-                Button.link("https://forum.varilx.de/forum/topic/197-wir-suchen-dich%21-%7C-varilxde-bewerbungsphase/", "Formusbeitrag").withEmoji(Emoji.fromUnicode("\uD83D\uDD17")),
+                Button.link("https://forum.varilx.de/forum/topic/197-wir-suchen-dich%21-%7C-varilxde-bewerbungsphase/", "Forumsbeitrag").withEmoji(Emoji.fromUnicode("\uD83D\uDD17")),
                 Button.link("https://forum.varilx.de/bewerben/", "Bewerben").withEmoji(Emote.VARILX.getFormatted()),
                 Button.link("https://forum.varilx.de/forum/topic/291-tutorial-%7C-wie-bewirbt-man-sich/", "Bewerbungstutorial").withEmoji(Emote.VARILX.getFormatted()))
                 .queue();

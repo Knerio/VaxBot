@@ -2,6 +2,7 @@ package de.derioo.module.predefined.level;
 
 import de.derioo.annotations.ModuleListener;
 import de.derioo.bot.DiscordBot;
+import de.derioo.config.Config;
 import de.derioo.module.Module;
 import de.derioo.module.predefined.level.db.LevelPlayerData;
 import de.derioo.module.predefined.level.db.LevelPlayerDataRepo;
@@ -9,10 +10,7 @@ import de.derioo.module.predefined.level.listener.MessageXPListener;
 import de.derioo.module.predefined.level.listener.VoiceXPListener;
 import de.derioo.utils.Emote;
 import lombok.Getter;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.guild.voice.GenericGuildVoiceEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 
@@ -140,12 +138,27 @@ public class LevelModule extends Module {
         return 1;
     }
 
-    public   Integer calculateMaxXPForLevel(int level) {
+    public Integer calculateMaxXPForLevel(int level) {
         return (int) (1000 * Math.pow(1.2, level));
     }
 
 
     public void sendNewLevelMessage(Member member, Guild guild, int newLevel) {
+        if (newLevel > 20) {
+            for (Role roleObject : bot.get(guild).getRoleObjects(Config.Id.Role.LEVEL_20_ROLE, guild)) {
+                guild.addRoleToMember(member, roleObject);
+            }
+        }
+        if (newLevel > 30) {
+            for (Role roleObject : bot.get(guild).getRoleObjects(Config.Id.Role.LEVEL_30_ROLE, guild)) {
+                guild.addRoleToMember(member, roleObject);
+            }
+        }
+        if (newLevel > 50) {
+            for (Role roleObject : bot.get(guild).getRoleObjects(Config.Id.Role.LEVEL_50_ROLE, guild)) {
+                guild.addRoleToMember(member, roleObject);
+            }
+        }
         member.getUser().openPrivateChannel().complete().sendMessage(member.getUser().getAsMention())
                 .addEmbeds(DiscordBot.Default.builder()
                         .setColor(Color.GREEN)
