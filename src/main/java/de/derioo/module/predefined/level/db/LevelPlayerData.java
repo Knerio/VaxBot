@@ -36,24 +36,11 @@ public class LevelPlayerData {
     @Builder
     public static class Stats {
 
-        MessageStats messageStats;
+        int xp;
+
         VoiceStats voiceStats;
 
 
-        @AllArgsConstructor
-        @NoArgsConstructor
-        @Getter
-        @Setter
-        @FieldDefaults(level = AccessLevel.PRIVATE)
-        @Builder
-        public static class MessageStats {
-
-            int chars;
-            int words;
-            int messageCount;
-            long xp;
-
-        }
 
         @AllArgsConstructor
         @NoArgsConstructor
@@ -66,9 +53,6 @@ public class LevelPlayerData {
             // In ms
             long totalTime;
 
-            int voiceJoins;
-
-            long activeVoiceChannelId;
             long voiceChannelJoinTimestamp;
 
             public long getLifeTotalTime() {

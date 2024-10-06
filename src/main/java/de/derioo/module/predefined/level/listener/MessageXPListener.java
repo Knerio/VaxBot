@@ -25,14 +25,10 @@ public class MessageXPListener {
     public void onMessage(MessageReceivedEvent event) {
         if (event.getAuthor().isBot()) return;
         LevelPlayerData data = module.getPlayerData(event.getGuild(), event.getAuthor());
-        LevelPlayerData.Stats.MessageStats stats = data.getStats().getMessageStats();
+        LevelPlayerData.Stats stats = data.getStats();
         String message = event.getMessage().getContentDisplay().strip();
         int words = message.split("\\s").length;
         int chars = message.trim().replace(" ", "").length();
-
-        stats.setMessageCount(stats.getMessageCount() + 1);
-        stats.setWords(stats.getMessageCount() + words);
-        stats.setChars(stats.getChars() + chars);
 
         int level = module.getLevelCount(data);
 
@@ -42,16 +38,8 @@ public class MessageXPListener {
         stats.setXp(stats.getXp() + xp);
 
         int newLevel = module.getLevelCount(data);
-        System.out.println("----");
-        System.out.println(level);
-        System.out.println(newLevel);
         if (level != newLevel) {
-            event.getChannel().sendMessage(event.getAuthor().getAsMention())
-                    .addEmbeds(DiscordBot.Default.builder()
-                            .setColor(Color.GREEN)
-                            .setTitle("Du bist nun Level " + newLevel)
-                            .setDescription("Nutze /level für mehr Infos")
-                            .build()).queue();
+            this.module.sendNewLevelMessage(event.getMember(), event.getGuild(), newLevel);
         }
 
         this.repo.save(data);

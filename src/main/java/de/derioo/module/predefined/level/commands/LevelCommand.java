@@ -1,17 +1,16 @@
 package de.derioo.module.predefined.level.commands;
 
-import de.derioo.annotations.NeedsAdmin;
 import de.derioo.bot.DiscordBot;
 import de.derioo.module.predefined.level.LevelModule;
 import de.derioo.module.predefined.level.db.LevelPlayerData;
 import de.derioo.module.predefined.level.db.LevelPlayerDataRepo;
-import de.derioo.utils.Emote;
+import de.derioo.utils.UserUtils;
 import dev.rollczi.litecommands.annotations.argument.Arg;
 import dev.rollczi.litecommands.annotations.command.Command;
 import dev.rollczi.litecommands.annotations.context.Context;
 import dev.rollczi.litecommands.annotations.description.Description;
 import dev.rollczi.litecommands.annotations.execute.Execute;
-import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
@@ -20,7 +19,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 @Command(name = "level")
 @Description("Give info about a user´s level")
@@ -65,7 +64,7 @@ public class LevelCommand {
         LevelPlayerData data = this.module.getPlayerData(member.getGuild(), member);
 
         LevelPlayerData.Stats.VoiceStats stats = data.getStats().getVoiceStats();
-        long joinDiff = stats.getTotalTime() + (stats.getVoiceChannelJoinTimestamp() == -1 ? 0 : (System.currentTimeMillis() - stats.getVoiceChannelJoinTimestamp()));
+        long joinDiff = stats.getLifeTotalTime();
 
 
         long seconds = (joinDiff / 1000) % 60;

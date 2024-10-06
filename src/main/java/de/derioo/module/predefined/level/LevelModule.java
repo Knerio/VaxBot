@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.voice.GenericGuildVoiceEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 
+import java.awt.*;
 import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Level;
@@ -47,15 +48,9 @@ public class LevelModule extends Module {
             this.repo.save(LevelPlayerData.builder()
                     .id(user.getId() + ":" + guild.getId())
                     .stats(LevelPlayerData.Stats.builder()
-                            .messageStats(LevelPlayerData.Stats.MessageStats.builder()
-                                    .chars(0)
-                                    .words(0)
-                                    .messageCount(0)
-                                    .build())
+                            .xp(0)
                             .voiceStats(LevelPlayerData.Stats.VoiceStats.builder()
-                                    .activeVoiceChannelId(-1)
                                     .totalTime(0)
-                                    .voiceJoins(0)
                                     .voiceChannelJoinTimestamp(-1)
                                     .build())
                             .build())
@@ -76,7 +71,7 @@ public class LevelModule extends Module {
     public Integer getMessageRank(LevelPlayerData data, Guild guild) {
         List<LevelPlayerData> list = this.repo.findAll()
                 .stream().filter(obj -> obj.getId().split(":")[1].equalsIgnoreCase(guild.getId()))
-                .sorted(Comparator.comparingLong(o -> ((LevelPlayerData) o).getStats().getMessageStats().getXp()).reversed())
+                .sorted(Comparator.comparingLong(o -> ((LevelPlayerData) o).getStats().getXp()).reversed())
                 .toList();
 
         return list.indexOf(data) + 1;
@@ -99,7 +94,7 @@ public class LevelModule extends Module {
     }
 
     public Long getXP(LevelPlayerData data) {
-        long xp = data.getStats().getMessageStats().getXp();
+        long xp = data.getStats().getXp();
         for (int i = 0; i < Integer.MAX_VALUE; i++) {
             long neededXP = calculateMaxXPForLevel(i);
             xp -= neededXP;
@@ -135,7 +130,7 @@ public class LevelModule extends Module {
     }
 
     public Integer getLevelCount(LevelPlayerData data) {
-        long xp = data.getStats().getMessageStats().getXp();
+        long xp = data.getStats().getXp();
         for (int i = 0; i < Integer.MAX_VALUE; i++) {
             int neededXP = calculateMaxXPForLevel(i);
             xp -= neededXP;
@@ -150,4 +145,12 @@ public class LevelModule extends Module {
     }
 
 
+    public void sendNewLevelMessage(Member member, Guild guild, int newLevel) {
+        member.getUser().openPrivateChannel().complete().sendMessage(member.getUser().getAsMention())
+                .addEmbeds(DiscordBot.Default.builder()
+                        .setColor(Color.GREEN)
+                        .setTitle("Du bist nun Level " + newLevel + " auf " + guild.getName())
+                        .setDescription("Nutze /level auf " + guild.getName() + " für mehr Infos")
+                        .build()).queue();
+    }
 }

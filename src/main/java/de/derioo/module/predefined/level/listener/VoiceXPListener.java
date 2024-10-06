@@ -1,16 +1,21 @@
 package de.derioo.module.predefined.level.listener;
 
 import de.derioo.annotations.ModuleListener;
+import de.derioo.bot.DiscordBot;
 import de.derioo.module.predefined.level.LevelModule;
 import de.derioo.module.predefined.level.db.LevelPlayerData;
 import de.derioo.module.predefined.level.db.LevelPlayerDataRepo;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceDeafenEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMuteEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 
+import java.awt.*;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
 
 public class VoiceXPListener {
 
@@ -26,13 +31,15 @@ public class VoiceXPListener {
                 for (Guild guild : module.getBot().getJda().getGuilds()) {
                     for (VoiceChannel voiceChannel : guild.getVoiceChannels()) {
                         for (Member member : voiceChannel.getMembers()) {
-                            LevelPlayerData playerData = module.getPlayerData(member.getGuild(), member);
-                            onChannelJoin(playerData, playerData.getStats().getVoiceStats(), voiceChannel.getIdLong(), false);
+                            if (!member.getVoiceState().isMuted() && !member.getVoiceState().isDeafened()) {
+                                LevelPlayerData playerData = module.getPlayerData(member.getGuild(), member);
+                                startVoiceMeasuring(playerData, playerData.getStats().getVoiceStats(), member);
+                            }
                         }
                     }
                 }
             }
-        }, 25_000, 25_000);
+        }, 0, 25_000);
     }
 
 
@@ -41,35 +48,73 @@ public class VoiceXPListener {
         LevelPlayerData data = module.getPlayerData(event);
         LevelPlayerData.Stats.VoiceStats stats = data.getStats().getVoiceStats();
         if (event.getChannelJoined() != null && event.getChannelLeft() != null) {
-            onChannelJoin(data, stats, event.getChannelJoined().getIdLong(), true);
+            startVoiceMeasuring(data, stats, event.getMember());
             return;
         }
         if (event.getChannelJoined() != null) {
-            onChannelJoin(data, stats, event.getChannelJoined().getIdLong(), true);
+            startVoiceMeasuring(data, stats, event.getMember());
             return;
         }
         if (event.getChannelLeft() != null) {
-            onChannelLeave(data, stats, event);
+            stopVoiceMeasuring(data, stats, event.getMember());
         }
-
     }
 
-    private void onChannelLeave(LevelPlayerData data, LevelPlayerData.Stats.VoiceStats stats, GuildVoiceUpdateEvent event) {
-        if (stats.getActiveVoiceChannelId() != -1) {
-            stats.setTotalTime(System.currentTimeMillis() - stats.getVoiceChannelJoinTimestamp() + stats.getTotalTime());
+    @ModuleListener
+    public void deafenListener(GuildVoiceDeafenEvent event) {
+        LevelPlayerData data = module.getPlayerData(event);
+        LevelPlayerData.Stats.VoiceStats stats = data.getStats().getVoiceStats();
+        if (event.isDeafened()) {
+            stopVoiceMeasuring(data, stats, event.getMember());
+            return;
         }
-        stats.setActiveVoiceChannelId(-1);
-        stats.setVoiceChannelJoinTimestamp(-1);
+        startVoiceMeasuring(data, stats, event.getMember());
+    }
+
+    @ModuleListener
+    public void muteListener(GuildVoiceMuteEvent event) {
+        LevelPlayerData data = module.getPlayerData(event);
+        LevelPlayerData.Stats.VoiceStats stats = data.getStats().getVoiceStats();
+        if (event.isMuted()) {
+            stopVoiceMeasuring(data, stats, event.getMember());
+            return;
+        }
+        startVoiceMeasuring(data, stats, event.getMember());
+    }
+
+
+    public void startVoiceMeasuring(LevelPlayerData data, LevelPlayerData.Stats.VoiceStats stats, Member member) {
+        if (stats.getVoiceChannelJoinTimestamp() != -1) {
+            stats.setTotalTime(System.currentTimeMillis() - stats.getVoiceChannelJoinTimestamp() + stats.getTotalTime());
+            saveVoiceStats(data, stats, member);
+        }
+        stats.setVoiceChannelJoinTimestamp(System.currentTimeMillis());
         this.repo.save(data);
     }
 
-    public void onChannelJoin(LevelPlayerData data, LevelPlayerData.Stats.VoiceStats stats, Long channelId, boolean voiceJoin) {
-        if (stats.getActiveVoiceChannelId() != -1) {
-            stats.setTotalTime(System.currentTimeMillis() - stats.getVoiceChannelJoinTimestamp() + stats.getTotalTime());
-            if (voiceJoin) stats.setVoiceJoins(stats.getVoiceJoins() + 1);
+    private void saveVoiceStats(LevelPlayerData data, LevelPlayerData.Stats.VoiceStats stats, Member member) {
+        if (stats.getVoiceChannelJoinTimestamp() == -1) return;
+        long time = System.currentTimeMillis() - stats.getVoiceChannelJoinTimestamp();
+
+        int level = this.module.getLevelCount(data);
+        int xp = (int) (((double) time / 60_000D) * 30);
+
+        data.getStats().setXp(data.getStats().getXp() + xp);
+
+        int newLevel = this.module.getLevelCount(data);
+        if (level != newLevel) {
+            this.module.sendNewLevelMessage(member, member.getGuild(), newLevel);
         }
-        stats.setVoiceChannelJoinTimestamp(System.currentTimeMillis());
-        stats.setActiveVoiceChannelId(channelId);
+
+        this.repo.save(data);
+    }
+
+    public void stopVoiceMeasuring(LevelPlayerData data, LevelPlayerData.Stats.VoiceStats stats, Member member) {
+        if (stats.getVoiceChannelJoinTimestamp() != -1) {
+            stats.setTotalTime(System.currentTimeMillis() - stats.getVoiceChannelJoinTimestamp() + stats.getTotalTime());
+            saveVoiceStats(data, stats, member);
+        }
+        stats.setVoiceChannelJoinTimestamp(-1);
         this.repo.save(data);
     }
 
