@@ -41,7 +41,7 @@ public class TeamCommand {
         guild.addRoleToMember(member, role).queue();
         TextChannel channel = guild.getTextChannelById(bot.get(guild).getChannels().get(Config.Id.Channel.PROMOTE_CHANNEL.name()));
         channel.sendMessage(MessageFormat.format("""
-                        > {0}>\s
+                        > {0}\s
                         > **Team Neuzugang**
                         >\s
                         > Wir begrüßen {1} im Bereich {2} und wünschen eine lange und gute Zusammenarbeit!
