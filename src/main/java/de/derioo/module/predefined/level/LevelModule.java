@@ -7,6 +7,7 @@ import de.derioo.module.predefined.level.db.LevelPlayerData;
 import de.derioo.module.predefined.level.db.LevelPlayerDataRepo;
 import de.derioo.module.predefined.level.listener.MessageXPListener;
 import de.derioo.module.predefined.level.listener.VoiceXPListener;
+import lombok.Getter;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -18,10 +19,13 @@ import java.util.logging.Level;
 
 public class LevelModule extends Module {
 
+    @Getter
+    private final DiscordBot bot;
     private final LevelPlayerDataRepo repo;
 
     public LevelModule(DiscordBot bot) {
         super(bot, "level-system");
+        this.bot = bot;
         this.repo = (LevelPlayerDataRepo) bot.getRepo(LevelPlayerDataRepo.class);
         this.registerListener(new VoiceXPListener(this.repo, this));
         this.registerListener(new MessageXPListener(this.repo, this));

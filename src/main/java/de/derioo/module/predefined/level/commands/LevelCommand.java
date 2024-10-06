@@ -14,6 +14,7 @@ import dev.rollczi.litecommands.annotations.execute.Execute;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.awt.*;
@@ -35,14 +36,13 @@ public class LevelCommand {
         this.repo = (LevelPlayerDataRepo) bot.getRepo(LevelPlayerDataRepo.class);
     }
 
-    @NeedsAdmin
     @Execute
-    public void getLevel(@Arg("nutzer") @Description("Nutzer (oder du)") Optional<Member> optionalMember,
+    public void getLevel(@Arg("nutzer") @Description("Nutzer (oder du)") Optional<User> optionalUser,
                          @Context SlashCommandInteractionEvent event) {
         Timer timer = new Timer();
 
-        if (optionalMember.isEmpty()) optionalMember = Optional.of(event.getMember());
-        Member member = optionalMember.get();
+        if (optionalUser.isEmpty()) optionalUser = Optional.of(event.getUser());
+        Member member = event.getGuild().getMember(optionalUser.get());
         event.replyEmbeds(generateLevelEmbed(member))
                 .setEphemeral(true).queue(hook -> {
                     timer.schedule(new TimerTask() {
