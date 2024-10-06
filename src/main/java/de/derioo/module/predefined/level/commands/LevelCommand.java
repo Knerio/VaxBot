@@ -74,102 +74,17 @@ public class LevelCommand {
         long days = joinDiff / (1000 * 60 * 60 * 24);
 
         return DiscordBot.Default.builder()
-                .addField(String.format("Level %s (#%s)", getLevelCount(data), getMessageRank(data, member.getGuild())),
+                .addField(String.format("Level %s (#%s)", module.getLevelCount(data), module.getMessageRank(data, member.getGuild())),
                         String.format("""
                                 %s %s [%s xp / %s xp]
-                                """, getProgressBar(data), getPercentage(data), getXP(data), getMaxXP(data)),
+                                """, module.getProgressBar(data), module.getPercentage(data), module.getXP(data), module.getMaxXP(data)),
                         false)
-                .addField(String.format("Sprachchat (#%s)", getVoiceRank(data, member.getGuild())), String.format("""
+                .addField(String.format("Sprachchat (#%s)", module.getVoiceRank(data, member.getGuild())), String.format("""
                         Insgesamte Zeit in Sprachchat: `%s` Tage, `%s` Stunden, `%s` Minuten, `%s` Sekunden
                         """, days, hours, minutes, seconds), false)
                 .setColor(Color.GREEN)
                 .build();
 
-    }
-
-    private Integer getVoiceRank(LevelPlayerData data, Guild guild) {
-        List<LevelPlayerData> list = this.repo.findAll()
-                .stream().filter(obj -> obj.getId().split(":")[1].equalsIgnoreCase(guild.getId()))
-                .sorted(Comparator.comparingLong(o -> ((LevelPlayerData) o).getStats().getVoiceStats().getLifeTotalTime()).reversed())
-                .toList();
-
-        return list.indexOf(data) + 1;
-    }
-
-    private Integer getMessageRank(LevelPlayerData data, Guild guild) {
-        List<LevelPlayerData> list = this.repo.findAll()
-                .stream().filter(obj -> obj.getId().split(":")[1].equalsIgnoreCase(guild.getId()))
-                .sorted(Comparator.comparingLong(o -> ((LevelPlayerData) o).getStats().getMessageStats().getXp()).reversed())
-                .toList();
-
-        return list.indexOf(data) + 1;
-
-    }
-
-    private String getPercentage(LevelPlayerData data) {
-        long xp = getXP(data);
-        int maxXP = getMaxXP(data);
-
-        if (maxXP == 0) return "0%";
-
-        double percentage = ((double) xp / maxXP) * 100;
-        return String.format("%.2f%%", percentage);
-    }
-
-    private Integer getMaxXP(LevelPlayerData data) {
-        int level = getLevelCount(data);
-        return calculateMaxXPForLevel(level);
-    }
-
-    private Long getXP(LevelPlayerData data) {
-        long xp = data.getStats().getMessageStats().getXp();
-        for (int i = 0; i < Integer.MAX_VALUE; i++) {
-            long neededXP = calculateMaxXPForLevel(i);
-            xp -= neededXP;
-            if (xp < 0) return xp + neededXP;
-        }
-        return -1L;
-    }
-
-    private String getProgressBar(LevelPlayerData data) {
-        long xp = getXP(data);
-        int maxXP = getMaxXP(data);
-
-        int totalBars = 12;
-        int filledBars = (int) ((double) xp / maxXP * totalBars);
-
-        StringBuilder bar = new StringBuilder();
-
-        if (filledBars == 0) {
-            bar.append(Emote.PROGRESS_LEFT_0.getData());
-        } else {
-            bar.append(Emote.PROGRESS_LEFT_1.getData());
-        }
-        bar.append(Emote.PROGRESS_MID_1.getData().repeat(Math.max(filledBars - 2, 0)))
-                .append(Emote.PROGRESS_MID_0.getData().repeat(Math.max(totalBars - filledBars - 2, 0)));
-        if (filledBars == totalBars) {
-            bar.append(Emote.PROGRESS_RIGHT_1.getData());
-        } else {
-            bar.append(Emote.PROGRESS_RIGHT_0.getData());
-        }
-
-
-        return bar.toString();
-    }
-
-    private Integer getLevelCount(LevelPlayerData data) {
-        long xp = data.getStats().getMessageStats().getXp();
-        for (int i = 0; i < Integer.MAX_VALUE; i++) {
-            int neededXP = calculateMaxXPForLevel(i);
-            xp -= neededXP;
-
-            if (xp < 0) return i;
-        }
-        return 1;
-    }
-
-    private Integer calculateMaxXPForLevel(int level) {
-        return (int) (1000 * Math.pow(1.2, level));
     }
 
 
