@@ -20,6 +20,9 @@ import de.derioo.module.predefined.giveaway.GiveAwayModule;
 import de.derioo.module.predefined.giveaway.commands.GiveAwayCommand;
 import de.derioo.module.predefined.giveaway.db.GiveawayRepo;
 import de.derioo.module.predefined.join.JoinModule;
+import de.derioo.module.predefined.level.LevelModule;
+import de.derioo.module.predefined.level.commands.LevelCommand;
+import de.derioo.module.predefined.level.db.LevelPlayerDataRepo;
 import de.derioo.module.predefined.moveall.MoveallCommand;
 import de.derioo.module.predefined.punishment.*;
 import de.derioo.module.predefined.rules.RulesModule;
@@ -86,6 +89,7 @@ public class DiscordBot extends ListenerAdapter {
         this.repositories.put(GiveawayRepo.class, this.mongoManager.create(GiveawayRepo.class));
         this.repositories.put(SuggestionRepo.class, this.mongoManager.create(SuggestionRepo.class));
         this.repositories.put(WarnRepo.class, this.mongoManager.create(WarnRepo.class));
+        this.repositories.put(LevelPlayerDataRepo.class, this.mongoManager.create(LevelPlayerDataRepo.class));
 
         new JoinModule(this).start();
         new StafflistModule(this).start();
@@ -98,11 +102,13 @@ public class DiscordBot extends ListenerAdapter {
         new BoostModule(this).start();
         new ApplyModule(this).start();
         new RulesModule(this).start();
+        LevelModule levelModule = new LevelModule(this);
+        levelModule.start();
         GiveAwayModule giveAwayModule = new GiveAwayModule(this);
         giveAwayModule.start();
 
         LiteJDAFactory.builder(jda)
-                .commands(new WarnCommand(this), new TimeoutCommand(), new BanCommand(), new KickCommand(), new ClearCommand(), new UserInfoCommand(), new MoveallCommand(), new GiveAwayCommand(this, giveAwayModule), new ChannelSetCommand(this), new UnclaimCommand(this), new TicketCommand(this), new TeamCommand(this), new EightballCommand())
+                .commands(new WarnCommand(this), new TimeoutCommand(), new BanCommand(), new KickCommand(), new ClearCommand(), new UserInfoCommand(), new MoveallCommand(), new GiveAwayCommand(this, giveAwayModule), new ChannelSetCommand(this), new UnclaimCommand(this), new TicketCommand(this), new TeamCommand(this), new EightballCommand(), new LevelCommand(this, levelModule))
                 .exceptionUnexpected((invocation, throwable, resultHandlerChain) -> {
                     Module.logThrowable(this, throwable);
                 })
@@ -205,7 +211,7 @@ public class DiscordBot extends ListenerAdapter {
 
         public static @NotNull EmbedBuilder error(@NotNull Throwable throwable, boolean stacktrace) {
             return builder()
-                    .setTitle("Es ist eine Fehler aufgetreten")
+                    .setTitle("Es ist eine Fehler aufgetreten (" + Thread.currentThread().getName() + ")")
                     .setColor(Color.RED)
                     .addField(new MessageEmbed.Field("Fehler", StringUtility.capAtNCharacters(throwable.getClass().getName() + ": " + throwable.getMessage(), 1000), false));
         }

@@ -30,7 +30,10 @@ public abstract class Module {
         this.name = name;
         runnableMap.put(10_000L, this::timer);
 
-        Module instance = this;
+        registerListener(this);
+    }
+
+    public void registerListener(Object instance) {
         bot.getJda().addEventListener(new ListenerAdapter() {
 
             @Override

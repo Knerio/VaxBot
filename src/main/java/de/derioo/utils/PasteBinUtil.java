@@ -21,7 +21,7 @@ public class PasteBinUtil {
     private final String BASE_URL = "https://api.paste.gg/v1/";
 
     public URI createPasteOfThrowable(Throwable throwable) {
-        String name = throwable.getMessage();
+        String name = throwable.getClass().getName() + ": " + throwable.getMessage();
         String stackTrace = Arrays.stream(throwable.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.joining("\n"));
         return createPaste(name, stackTrace);
     }
