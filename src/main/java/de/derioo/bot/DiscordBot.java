@@ -54,6 +54,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.lang.reflect.Method;
+import java.time.Year;
 import java.util.*;
 
 import static net.dv8tion.jda.api.requests.GatewayIntent.*;
@@ -192,7 +193,8 @@ public class DiscordBot extends ListenerAdapter {
         }
 
         public static EmbedBuilder setFooter(EmbedBuilder builder) {
-            return new EmbedBuilder().setAuthor("Varilx.de | Bot").setFooter("Gesendet am " + DateUtility.DATE_FORMAT.format(new Date(Calendar.getInstance().getTimeInMillis())));
+            return new EmbedBuilder().setAuthor("Varilx.de | Bot")
+                    .setFooter("Varilx Botsystem ©️ " + Year.now().getValue() + " | Gesendet am " + DateUtility.DATE_FORMAT.format(new Date(Calendar.getInstance().getTimeInMillis())), "https://cdn.discordapp.com/attachments/1067809862744019025/1292573812524847168/1723812989309.png?ex=67043aab&is=6702e92b&hm=f2cfffb81c97a2e084b21f8b897ff1c80f7b745d47eb8ca8e3720f61b074a788&");
         }
 
         public static @NotNull EmbedBuilder builder() {

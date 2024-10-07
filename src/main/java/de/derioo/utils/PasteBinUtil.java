@@ -8,6 +8,8 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.UtilityClass;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -21,9 +23,12 @@ public class PasteBinUtil {
     private final String BASE_URL = "https://api.paste.gg/v1/";
 
     public URI createPasteOfThrowable(Throwable throwable) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        throwable.printStackTrace(pw);
+
         String name = throwable.getClass().getName() + ": " + throwable.getMessage();
-        String stackTrace = Arrays.stream(throwable.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.joining("\n"));
-        return createPaste(name, stackTrace);
+        return createPaste(name, sw.toString());
     }
 
     public URI createPaste(String fileName, String text) {

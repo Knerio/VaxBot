@@ -94,6 +94,7 @@ public abstract class Module {
                                 .build())
                         .addActionRow(Button.link(PasteBinUtil.createPasteOfThrowable(throwable).toString(), "Paste.gg"))
                         .queue();
+                throwable.printStackTrace();
             } catch (Throwable t) {
                 t.printStackTrace();
             }

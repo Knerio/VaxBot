@@ -6,6 +6,7 @@ import de.derioo.module.predefined.level.LevelModule;
 import de.derioo.module.predefined.level.db.LevelPlayerData;
 import de.derioo.module.predefined.level.db.LevelPlayerDataRepo;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceDeafenEvent;
@@ -28,14 +29,15 @@ public class VoiceXPListener {
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                for (Guild guild : module.getBot().getJda().getGuilds()) {
-                    for (VoiceChannel voiceChannel : guild.getVoiceChannels()) {
-                        for (Member member : voiceChannel.getMembers()) {
-                            if (!member.getVoiceState().isMuted() && !member.getVoiceState().isDeafened()) {
-                                LevelPlayerData playerData = module.getPlayerData(member.getGuild(), member);
-                                startVoiceMeasuring(playerData, playerData.getStats().getVoiceStats(), member);
-                            }
-                        }
+                for (LevelPlayerData data : repo.findAll()) {
+                    Guild guild = module.getBot().getJda().getGuildById(data.getId().split(":")[1]);
+                    Member member = guild.getMemberById(data.getId().split(":")[0]);
+                    GuildVoiceState state = member.getVoiceState();
+                    if (!state.inAudioChannel() || state.isDeafened() || state.isMuted()) {
+                        stopVoiceMeasuring(data, data.getStats().getVoiceStats(), member);
+                    }
+                    if (!state.isMuted() && !state.isDeafened() && state.inAudioChannel()) {
+                        startVoiceMeasuring(data, data.getStats().getVoiceStats(), member);
                     }
                 }
             }
