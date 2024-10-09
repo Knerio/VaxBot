@@ -44,38 +44,19 @@ public class SuggestionModule extends Module {
 
     @Override
     public void once() throws Throwable {
-        Config config = Config.get(configRepo);
-        for (Guild guild : bot.getJda().getGuilds()) {
-            if (!config.getData().get(guild.getId()).getChannels().containsKey(Config.Id.Channel.SUGGESTION_CREATE_CHANNEL.name()))
-                continue;
-            Long channelId = config.getData().get(guild.getId()).getChannels().get(Config.Id.Channel.SUGGESTION_CREATE_CHANNEL.name());
-            TextChannel channel = guild.getChannelById(TextChannel.class, channelId);
-            List<Message> messages = channel.getHistory().retrievePast(1).complete();
-            if (messages.isEmpty()) {
-                sendNewSuggestionMessage(channel);
-            } else {
-                Message message = messages.getFirst();
-                if (message.getAuthor().getIdLong() == bot.getJda().getSelfUser().getIdLong()) {
-                    sendNewSuggestionMessage(channel);
-                    message.delete().queue();
-                }
-            }
-        }
+        updateOrSendEmbed(Config.Id.Channel.SUGGESTION_CREATE_CHANNEL, getEmbed().build(), ActionRow.of(Button.success("create-suggestion", "Vorschlag -> ⭐")));
     }
 
-    private void sendNewSuggestionMessage(TextChannel channel) {
-        channel.sendMessageEmbeds(DiscordBot.Default.builder()
-                        .setAuthor("")
-                        .setTitle("Varilx Vorschläge")
-                        .setColor(Color.GREEN)
-                        .setDescription("""
-                                Du hast eine Idee oder ein Verbesserungsvorschlag für den Server?
-                                Dann drück einfach auf den Button unter dieser Nachricht.
-                                bitte beachte dabei, dass dein Vorschlag mit sofortiger Wirkung in eine Umfrage umgewandelt wird, und jeder sie lesen kann!""")
-                        .setImage("https://cdn.discordapp.com/attachments/1055223755909111808/1160507955507101736/Varilx_Tube-hosting_version.png?ex=6534ea41&is=65227541&hm=e2dad9d371a1f8a26f84ab29871fc2a754b0135ccbc76c557d9f7c30dbaf371f&")
-                        .build())
-                .addActionRow(Button.success("create-suggestion", "Vorschlag -> ⭐"))
-                .queue();
+    private EmbedBuilder getEmbed() {
+        return DiscordBot.Default.builder()
+                .setAuthor("")
+                .setTitle("Varilx Vorschläge")
+                .setColor(Color.GREEN)
+                .setDescription("""
+                        Du hast eine Idee oder ein Verbesserungsvorschlag für den Server?
+                        Dann drück einfach auf den Button unter dieser Nachricht.
+                        bitte beachte dabei, dass dein Vorschlag mit sofortiger Wirkung in eine Umfrage umgewandelt wird, und jeder sie lesen kann!""")
+                .setImage("https://cdn.discordapp.com/attachments/1055223755909111808/1160507955507101736/Varilx_Tube-hosting_version.png?ex=6534ea41&is=65227541&hm=e2dad9d371a1f8a26f84ab29871fc2a754b0135ccbc76c557d9f7c30dbaf371f&");
     }
 
     @ModuleListener

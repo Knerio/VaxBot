@@ -7,10 +7,16 @@ import de.derioo.config.repository.ConfigRepo;
 import de.derioo.javautils.common.MathUtility;
 import de.derioo.utils.PasteBinUtil;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
+import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
@@ -108,6 +114,26 @@ public abstract class Module {
 
     public void once() throws Throwable {
 
+    }
+
+
+    public void updateOrSendEmbed(Config.Id.Channel channelConfig, MessageEmbed embed, ActionRow... rows) {
+        Config config = Config.get(bot.getRepo(ConfigRepo.class));
+        for (Guild guild : bot.getJda().getGuilds()) {
+            if (!config.getData().get(guild.getId()).getChannels().containsKey(channelConfig.name()))
+                continue;
+            Long channelId = config.getData().get(guild.getId()).getChannels().get(channelConfig.name());
+            TextChannel channel = guild.getChannelById(TextChannel.class, channelId);
+            List<Message> messages = channel.getHistory().retrievePast(1).complete();
+            if (messages.isEmpty()) {
+                channel.sendMessageEmbeds(embed).setComponents(rows).queue();
+            } else {
+                Message message = messages.getFirst();
+                if (message.getAuthor().getIdLong() == bot.getJda().getSelfUser().getIdLong()) {
+                    message.editMessageEmbeds(embed).setComponents(rows).queue();
+                }
+            }
+        }
     }
 
 }

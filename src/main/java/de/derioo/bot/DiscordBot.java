@@ -23,6 +23,7 @@ import de.derioo.module.predefined.join.JoinModule;
 import de.derioo.module.predefined.level.LevelModule;
 import de.derioo.module.predefined.level.commands.LevelCommand;
 import de.derioo.module.predefined.level.db.LevelPlayerDataRepo;
+import de.derioo.module.predefined.log.LogModule;
 import de.derioo.module.predefined.moveall.MoveallCommand;
 import de.derioo.module.predefined.punishment.*;
 import de.derioo.module.predefined.randommeme.RandomMemeModule;
@@ -108,6 +109,7 @@ public class DiscordBot extends ListenerAdapter {
         new ApplyModule(this).start();
         new RulesModule(this).start();
         new RandomMemeModule(this).start();
+        new LogModule(this).start();
         LevelModule levelModule = new LevelModule(this);
         levelModule.start();
         GiveAwayModule giveAwayModule = new GiveAwayModule(this);

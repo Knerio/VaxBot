@@ -73,12 +73,12 @@ public class LevelCommand {
         long days = joinDiff / (1000 * 60 * 60 * 24);
 
         return DiscordBot.Default.builder()
-                .addField(String.format("Level %s (#%s)", module.getLevelCount(data), module.getMessageRank(data, member.getGuild())),
+                .addField(String.format("Level %s (#%s / %s)", module.getLevelCount(data), module.getMessageRank(data, member.getGuild()), module.getUserAmount()),
                         String.format("""
                                 %s %s [%s xp / %s xp]
                                 """, module.getProgressBar(data), module.getPercentage(data), module.getXP(data), module.getMaxXP(data)),
                         false)
-                .addField(String.format("Sprachchat (#%s)", module.getVoiceRank(data, member.getGuild())), String.format("""
+                .addField(String.format("Sprachchat (#%s / %s)", module.getVoiceRank(data, member.getGuild()), module.getUserAmount()), String.format("""
                         Insgesamte Zeit in Sprachchat: `%s` Tage, `%s` Stunden, `%s` Minuten, `%s` Sekunden
                         """, days, hours, minutes, seconds), false)
                 .setColor(Color.GREEN)

@@ -66,31 +66,6 @@ public class TicketModule extends Module {
 
     @Override
     public void once() throws JsonProcessingException, ExecutionException, InterruptedException {
-        Config config = Config.get(repo);
-        for (Guild guild : bot.getJda().getGuilds()) {
-            if (!config.getData().get(guild.getId()).getChannels().containsKey(Config.Id.Channel.TICKET_CREATION_CHANNEL.name()))
-                continue;
-            Long channelId = config.getData().get(guild.getId()).getChannels().get(Config.Id.Channel.TICKET_CREATION_CHANNEL.name());
-            TextChannel channel = guild.getChannelById(TextChannel.class, channelId);
-            List<Message> messages = channel.getHistory().retrievePast(1).complete();
-            if (messages.isEmpty()) {
-                sendNewTicketMessage(channel);
-            } else {
-                Message message = messages.getFirst();
-                if (message.getAuthor().getIdLong() == bot.getJda().getSelfUser().getIdLong()) {
-                    sendNewTicketMessage(channel);
-                    message.delete().queue();
-                }
-            }
-        }
-    }
-
-    @NotNull
-    private MessageEmbed getEmbed() throws JsonProcessingException {
-        return EmbedBuilder.fromData(DataObject.fromJson(objectMapper.writeValueAsString(langConfig.getTicket().getTicketCreationEmbed()))).build();
-    }
-
-    private void sendNewTicketMessage(@NotNull TextChannel channel) throws JsonProcessingException, ExecutionException, InterruptedException {
         StringSelectMenu.Builder builder = StringSelectMenu.create("new-ticket");
 
         for (Ticket.Type value : Ticket.Type.values()) {
@@ -99,14 +74,18 @@ public class TicketModule extends Module {
 
         builder.setMaxValues(1);
         builder.setMinValues(1);
-        channel.sendMessageEmbeds(getEmbed())
-                .addActionRow(
-                        Button.link("https://tube-hosting.com/pricing", "Partner").withEmoji(Emoji.fromFormatted("<:TubehostingVarilx:1101657813794693120>"))
-                )
-                .addActionRow(
-                        builder.build()
-                ).submit().get();
+
+        updateOrSendEmbed(Config.Id.Channel.TICKET_CREATION_CHANNEL, getEmbed(),
+                ActionRow.of(Button.link("https://tube-hosting.com/pricing", "Partner").withEmoji(Emoji.fromFormatted("<:TubehostingVarilx:1101657813794693120>"))),
+                ActionRow.of(builder.build())
+        );
     }
+
+    @NotNull
+    private MessageEmbed getEmbed() throws JsonProcessingException {
+        return EmbedBuilder.fromData(DataObject.fromJson(objectMapper.writeValueAsString(langConfig.getTicket().getTicketCreationEmbed()))).build();
+    }
+
 
     @ModuleListener
     public void onMenuSelection(StringSelectInteractionEvent event) {

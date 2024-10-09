@@ -33,23 +33,7 @@ public class FeedbackModule extends Module {
 
     @Override
     public void once() throws ExecutionException, InterruptedException {
-        Config config = Config.get(bot.getRepo(ConfigRepo.class));
-        for (Guild guild : bot.getJda().getGuilds()) {
-            if (!config.getData().get(guild.getId()).getChannels().containsKey(Config.Id.Channel.FEEDBACK_CREATION_CHANNEL.name()))
-                continue;
-            Long channelId = config.getData().get(guild.getId()).getChannels().get(Config.Id.Channel.FEEDBACK_CREATION_CHANNEL.name());
-            TextChannel channel = guild.getChannelById(TextChannel.class, channelId);
-            List<Message> messages = channel.getHistory().retrievePast(1).complete();
-            if (messages.isEmpty()) {
-                sendNewTicketMessage(channel);
-            } else {
-                Message message = messages.getFirst();
-                if (message.getAuthor().getIdLong() == bot.getJda().getSelfUser().getIdLong()) {
-                    sendNewTicketMessage(channel);
-                    message.delete().queue();
-                }
-            }
-        }
+        updateOrSendEmbed(Config.Id.Channel.FEEDBACK_CREATION_CHANNEL, getEmbed().build(),ActionRow.of(Button.secondary("create-feedback", "Feedback").withEmoji(Emote.CHAT_BOX.getFormatted())) );
     }
 
     @ModuleListener
@@ -83,19 +67,16 @@ public class FeedbackModule extends Module {
         event.reply("Dein Feedback wurde erfolgreich gesesendet.").setEphemeral(true).queue();
     }
 
-    private void sendNewTicketMessage(@NotNull TextChannel channel) {
-        EmbedBuilder embed =
-                DiscordBot.Default.builder()
-                        .setColor(Color.GREEN)
-                        .setTitle("Varilx Feedback ")
-                        .setDescription(
-                                """
-                                        Du willst dein Feedback über den Server da lassen?\s
-                                        Dann drück einfach auf den Button unter dieser Nachricht.\s
-                                        Wir wollen nicht, das dieses Feature ausgenutzt wird, daher bitten wir dich ein ordentliches und konstruktives Feedback zu verfassen!
-                                        """)
-                        .setThumbnail("https://cdn.discordapp.com/attachments/1055223755909111808/1160508079419424840/Unbenanntdsadasd-2.png?ex=6534ea5f&is=6522755f&hm=00ea7dd8a3fd0c5dfcfccfa6952527b679094abf07d22143fee44b0b7221aa4a&");
-        channel.sendMessageEmbeds(embed.build()).setActionRow(Button.secondary("create-feedback", "Feedback").withEmoji(Emote.CHAT_BOX.getFormatted())).queue();
-
+    private EmbedBuilder getEmbed() {
+        return DiscordBot.Default.builder()
+                .setColor(Color.GREEN)
+                .setTitle("Varilx Feedback ")
+                .setDescription(
+                        """
+                                Du willst dein Feedback über den Server da lassen?\s
+                                Dann drück einfach auf den Button unter dieser Nachricht.\s
+                                Wir wollen nicht, das dieses Feature ausgenutzt wird, daher bitten wir dich ein ordentliches und konstruktives Feedback zu verfassen!
+                                """)
+                .setThumbnail("https://cdn.discordapp.com/attachments/1055223755909111808/1160508079419424840/Unbenanntdsadasd-2.png?ex=6534ea5f&is=6522755f&hm=00ea7dd8a3fd0c5dfcfccfa6952527b679094abf07d22143fee44b0b7221aa4a&");
     }
 }

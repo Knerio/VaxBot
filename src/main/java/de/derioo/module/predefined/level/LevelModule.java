@@ -166,4 +166,8 @@ public class LevelModule extends Module {
                         .setDescription("Nutze /level auf " + guild.getName() + " für mehr Infos")
                         .build()).queue();
     }
+
+    public Long getUserAmount() {
+        return this.repo.countAll();
+    }
 }
