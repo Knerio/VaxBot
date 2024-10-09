@@ -31,6 +31,7 @@ public class MessageXPListener {
 
     @ModuleListener
     public void onMessage(MessageReceivedEvent event) {
+        if (!event.getChannelType().isGuild()) return;
         if (event.getAuthor().isBot()) return;
         lastMessages.putIfAbsent(event.getAuthor(), new ArrayList<>());
 

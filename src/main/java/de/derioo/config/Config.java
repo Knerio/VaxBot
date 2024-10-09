@@ -48,6 +48,10 @@ public class Config {
 
     public static class Id {
 
+        public enum User {
+            RANDOM_MEME_USERS
+        }
+
         public enum Channel {
             TICKET_CREATION_CHANNEL,
             TICKET_LOGS_CHANNEL,

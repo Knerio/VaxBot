@@ -46,6 +46,7 @@ dependencies {
 
     implementation("io.javalin:javalin:6.3.0")
     implementation("org.slf4j:slf4j-simple:2.0.16")
+    implementation("commons-io:commons-io:2.17.0")
 }
 
 tasks.withType<JavaCompile> {

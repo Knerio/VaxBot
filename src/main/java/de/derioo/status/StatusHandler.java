@@ -9,6 +9,10 @@ public class StatusHandler {
         new Thread(() -> {
             Javalin.create()
                     .get("/ping", ctx -> {
+                        if (bot == null) {
+                            ctx.result("Pong! (Sadge)");
+                            return;
+                        }
                         Long time = bot.getJda().getRestPing().complete();
                         ctx.result("Pong! (" + time + "ms)");
                     })

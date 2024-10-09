@@ -16,6 +16,11 @@ import java.util.TimeZone;
 
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
+        if (args.length == 1 && args[0].equalsIgnoreCase("apionly")) {
+            System.out.println("Launching API ONLY");
+            new StatusHandler(null);
+            return;
+        }
         File file = new File(".", "support.mp3");
         try (FileOutputStream stream = new FileOutputStream(file);
              InputStream resource = Main.class.getClassLoader().getResourceAsStream("support.mp3")
