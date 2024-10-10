@@ -1,7 +1,6 @@
 package de.derioo.config.commands;
 
 import de.derioo.annotations.NeedsAdmin;
-import de.derioo.annotations.NeedsRole;
 import de.derioo.bot.DiscordBot;
 import de.derioo.config.Config;
 import de.derioo.config.ConfigData;
@@ -12,7 +11,6 @@ import dev.rollczi.litecommands.annotations.context.Context;
 import dev.rollczi.litecommands.annotations.description.Description;
 import dev.rollczi.litecommands.annotations.execute.Execute;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TeamMember;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
@@ -25,14 +23,14 @@ import java.util.Map;
 
 import static de.derioo.config.Config.Id.Data.TEAM_ROLE;
 
-@Command(name = "set")
+@Command(name = "config")
 @Description("Ein Command für Konfigurationen")
-public class ChannelSetCommand {
+public class ConfigCommand {
 
     private final DiscordBot bot;
     private final ConfigRepo repo;
 
-    public ChannelSetCommand(DiscordBot bot) {
+    public ConfigCommand(DiscordBot bot) {
         this.bot = bot;
         this.repo = (ConfigRepo) bot.getRepo(ConfigRepo.class);
     }
@@ -75,7 +73,7 @@ public class ChannelSetCommand {
 
 
     @NeedsAdmin
-    @Execute(name = "channel")
+    @Execute(name = "setchannel")
     void executeChannelSet(@Arg("id")
                            @Description("Die ID, welche neu gesetzt werden soll") Config.Id.Channel id,
                            @Arg("channel") @Description("Der Channel, welcher nun genutzt werden soll") Channel channel,
@@ -90,7 +88,7 @@ public class ChannelSetCommand {
     }
 
     @NeedsAdmin
-    @Execute(name = "category")
+    @Execute(name = "setcategory")
     void executeSetCategory(@Arg("id")
                             @Description("Die ID, welche neu gesetzt werden soll") Config.Id.Category id,
                             @Arg("kategorie-id") @Description("Die Kategorie-ID, welcher nun genutzt werden soll") String categoryId, @Context User sender, @Context @NotNull SlashCommandInteractionEvent event) {

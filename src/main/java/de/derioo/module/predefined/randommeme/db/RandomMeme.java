@@ -17,6 +17,7 @@ public class RandomMeme {
     @Id
     ObjectId id;
 
+    Long userId;
     Long guildId;
 
     Binary data;

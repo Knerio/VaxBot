@@ -4,7 +4,7 @@ import de.derioo.annotations.NeedsAdmin;
 import de.derioo.annotations.NeedsRole;
 import de.derioo.config.Config;
 import de.derioo.config.ConfigData;
-import de.derioo.config.commands.ChannelSetCommand;
+import de.derioo.config.commands.ConfigCommand;
 import de.derioo.config.local.LangConfig;
 import de.derioo.config.local.LocalConfig;
 import de.derioo.config.repository.ConfigRepo;
@@ -39,7 +39,6 @@ import de.derioo.module.predefined.support.SupportModule;
 import de.derioo.module.predefined.ticket.*;
 import de.derioo.module.predefined.usercount.UserCountModule;
 import de.derioo.module.predefined.userinfo.UserInfoCommand;
-import de.derioo.utils.PasteBinUtil;
 import de.derioo.utils.UserUtils;
 import dev.rollczi.litecommands.jda.LiteJDAFactory;
 import dev.rollczi.litecommands.validator.ValidatorResult;
@@ -53,7 +52,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -116,7 +114,7 @@ public class DiscordBot extends ListenerAdapter {
         giveAwayModule.start();
 
         LiteJDAFactory.builder(jda)
-                .commands(new WarnCommand(this), new TimeoutCommand(), new BanCommand(), new KickCommand(), new ClearCommand(), new UserInfoCommand(), new MoveallCommand(), new GiveAwayCommand(this, giveAwayModule), new ChannelSetCommand(this), new UnclaimCommand(this), new TicketCommand(this), new TeamCommand(this), new EightballCommand(), new LevelCommand(this, levelModule), new RandomMemeCommand(this))
+                .commands(new WarnCommand(this), new TimeoutCommand(), new BanCommand(), new KickCommand(), new ClearCommand(), new UserInfoCommand(), new MoveallCommand(), new GiveAwayCommand(this, giveAwayModule), new ConfigCommand(this), new UnclaimCommand(this), new TicketCommand(this), new TeamCommand(this), new EightballCommand(), new LevelCommand(this, levelModule), new RandomMemeCommand(this))
                 .exceptionUnexpected((invocation, throwable, resultHandlerChain) -> {
                     Module.logThrowable(this, throwable);
                 })
