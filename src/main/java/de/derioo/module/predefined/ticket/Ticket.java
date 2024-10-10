@@ -8,9 +8,11 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import org.bson.types.ObjectId;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static de.derioo.utils.UserUtils.getMention;
 
@@ -38,19 +40,25 @@ public class Ticket {
     @Builder.Default
     List<HistoryItem> history = new ArrayList<>();
 
-    public String getParticipants(Guild guild) {
-        Set<String> participants = new HashSet<>();
-        history.forEach(historyItem -> {
+    public Set<User> getParticipantUsers(Guild guild) {
+        Set<User> participants = new HashSet<>();
+        participants.add(guild.getJDA().getUserById(this.userId));
+        participants.add(guild.getJDA().getUserById(claimerId));
+        for (HistoryItem item : this.history) {
            try {
-               if (historyItem == null || historyItem.getSenderId() == null) return;
-               Member member = guild.getMemberById(historyItem.getSenderId());
-               if (member == null) return;
-               participants.add(UserUtils.getMention(member));
-           } catch (Throwable e) {
+                if (item == null || item.getSenderId() == null) continue;
+               User user = guild.getJDA().getUserById(item.getSenderId());
+               if (user == null) continue;
+               participants.add(user);
+           } catch (Exception e) {
                e.printStackTrace();
            }
-        });
-        return String.join("\n", participants);
+        }
+        return participants;
+    }
+
+    public String getParticipants(Guild guild) {
+        return getParticipantUsers(guild).stream().map(UserUtils::getMention).collect(Collectors.joining("\n"));
     }
 
     public String getInformations(Guild guild) {

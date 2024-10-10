@@ -219,12 +219,16 @@ public class TicketManager {
                     .addField(new MessageEmbed.Field(Emote.USER.getData() + "Teilnehmer:", ticket.getParticipants(guild), true))
                     .build();
             logs.sendMessageEmbeds(embed).queue();
-            event.getJDA().getUserById(ticket.getUserId()).openPrivateChannel().queue(pc -> pc.sendMessageEmbeds(embed).queue());
-            if (ticket.getUserId() != event.getUser().getIdLong())
-                event.getUser().openPrivateChannel().queue(pc -> pc.sendMessageEmbeds(embed).queue());
-            if (ticket.getClaimerId() != null)
-                guild.getMemberById(ticket.getClaimerId()).getUser().openPrivateChannel().queue(pc -> pc.sendMessageEmbeds(embed).queue());
-
+            Set<User> transcriptions = new HashSet<>();
+            transcriptions.add(event.getJDA().getUserById(ticket.getUserId()));
+            transcriptions.add(event.getUser());
+            transcriptions.add(event.getJDA().getUserById(ticket.getClaimerId()));
+            transcriptions.addAll(ticket.getParticipantUsers(guild));
+            for (User user : transcriptions) {
+                user.openPrivateChannel().queue(pc -> {
+                    pc.sendMessageEmbeds(embed).queue();
+                });
+            }
         }, 11, TimeUnit.SECONDS);
         scheduledTasks.get(ticket.getId()).add(deleteTask);
 
