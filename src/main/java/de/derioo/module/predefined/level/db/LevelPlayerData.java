@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.bson.types.ObjectId;
 
+import java.util.Formatter;
 import java.util.Objects;
 
 @AllArgsConstructor
@@ -59,6 +60,17 @@ public class LevelPlayerData {
                 return getTotalTime() + (getVoiceChannelJoinTimestamp() == -1 ? 0 : (System.currentTimeMillis() - getVoiceChannelJoinTimestamp()));
             }
 
+            public String getLifeTotalTimeFormatted() {
+                long joinDiff = getLifeTotalTime();
+
+
+                long seconds = (joinDiff / 1000) % 60;
+                long minutes = (joinDiff / (1000 * 60)) % 60;
+                long hours = (joinDiff / (1000 * 60 * 60)) % 24;
+                long days = joinDiff / (1000 * 60 * 60 * 24);
+
+                return new Formatter().format("`%s` Tage, `%s` Stunden, `%s` Minuten, `%s` Sekunden", days, hours, minutes, seconds).toString();
+            }
         }
     }
 

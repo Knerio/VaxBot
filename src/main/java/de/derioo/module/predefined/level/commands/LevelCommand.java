@@ -64,13 +64,8 @@ public class LevelCommand {
         LevelPlayerData data = this.module.getPlayerData(member.getGuild(), member);
 
         LevelPlayerData.Stats.VoiceStats stats = data.getStats().getVoiceStats();
-        long joinDiff = stats.getLifeTotalTime();
 
 
-        long seconds = (joinDiff / 1000) % 60;
-        long minutes = (joinDiff / (1000 * 60)) % 60;
-        long hours = (joinDiff / (1000 * 60 * 60)) % 24;
-        long days = joinDiff / (1000 * 60 * 60 * 24);
 
         return DiscordBot.Default.builder()
                 .addField(String.format("Level %s (#%s / %s)", module.getLevelCount(data), module.getMessageRank(data, member.getGuild()), module.getUserAmount()),
@@ -79,8 +74,8 @@ public class LevelCommand {
                                 """, module.getProgressBar(data), module.getPercentage(data), module.getXP(data), module.getMaxXP(data)),
                         false)
                 .addField(String.format("Sprachchat (#%s / %s)", module.getVoiceRank(data, member.getGuild()), module.getUserAmount()), String.format("""
-                        Insgesamte Zeit in Sprachchat: `%s` Tage, `%s` Stunden, `%s` Minuten, `%s` Sekunden
-                        """, days, hours, minutes, seconds), false)
+                        Insgesamte Zeit in Sprachchat %s:
+                        """, stats.getLifeTotalTimeFormatted()), false)
                 .setColor(Color.GREEN)
                 .build();
 

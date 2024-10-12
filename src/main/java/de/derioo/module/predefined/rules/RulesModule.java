@@ -82,7 +82,7 @@ public class RulesModule extends Module {
         return ActionRow.of(Button.success("accept-rules", "Regeln akzeptieren").withEmoji(Emote.YES.getFormatted()),
                 Button.link("https://discord.com/terms", "TOS").withEmoji(Emote.DISCORD.getFormatted()),
                 Button.link("https://discord.com/guidelines", "Guidelines").withEmoji(Emote.DISCORD_LOGO.getFormatted()),
-                Button.link("https://regelwerk.varilx.de/", "Forum").withEmoji(Emote.VARILX.getFormatted()),
+                Button.link("https://regelwerk.varilx.de/", "Regelwerk").withEmoji(Emote.VARILX.getFormatted()),
                 Button.link("https://tube-hosting.com/home", "Partner").withEmoji(Emote.TUBE_HOSTING.getFormatted()));
     }
 

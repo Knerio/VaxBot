@@ -73,7 +73,6 @@ public class LevelModule extends Module {
                 .toList();
 
         return list.indexOf(data) + 1;
-
     }
 
     public String getPercentage(LevelPlayerData data) {

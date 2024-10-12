@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public abstract class Module {
 
@@ -49,11 +50,15 @@ public abstract class Module {
                     if (declaredMethod.getParameters().length != 1) continue;
                     Parameter first = declaredMethod.getParameters()[0];
                     if (first.getType().isAssignableFrom(event.getClass())) {
-                        try {
-                            declaredMethod.invoke(instance, event);
-                        } catch (Exception e) {
-                            logThrowable(bot, e);
-                        }
+                        CompletableFuture.supplyAsync(() -> {
+                            try {
+                                return declaredMethod.invoke(instance, event);
+                            } catch (Exception e) {
+                                logThrowable(bot, e);
+                            }
+                            return null;
+                        });
+
                     }
                 }
             }

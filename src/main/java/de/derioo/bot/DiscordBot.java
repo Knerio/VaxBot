@@ -21,6 +21,7 @@ import de.derioo.module.predefined.giveaway.commands.GiveAwayCommand;
 import de.derioo.module.predefined.giveaway.db.GiveawayRepo;
 import de.derioo.module.predefined.join.JoinModule;
 import de.derioo.module.predefined.level.LevelModule;
+import de.derioo.module.predefined.level.commands.LeaderboardCommand;
 import de.derioo.module.predefined.level.commands.LevelCommand;
 import de.derioo.module.predefined.level.db.LevelPlayerDataRepo;
 import de.derioo.module.predefined.log.LogModule;
@@ -114,7 +115,7 @@ public class DiscordBot extends ListenerAdapter {
         giveAwayModule.start();
 
         LiteJDAFactory.builder(jda)
-                .commands(new WarnCommand(this), new TimeoutCommand(), new BanCommand(), new KickCommand(), new ClearCommand(), new UserInfoCommand(), new MoveallCommand(), new GiveAwayCommand(this, giveAwayModule), new ConfigCommand(this), new UnclaimCommand(this), new TicketCommand(this), new TeamCommand(this), new EightballCommand(), new LevelCommand(this, levelModule), new RandomMemeCommand(this))
+                .commands(new WarnCommand(this), new TimeoutCommand(), new BanCommand(), new KickCommand(), new ClearCommand(), new UserInfoCommand(), new MoveallCommand(), new GiveAwayCommand(this, giveAwayModule), new ConfigCommand(this), new UnclaimCommand(this), new TicketCommand(this), new TeamCommand(this), new EightballCommand(), new LeaderboardCommand(this, levelModule), new LevelCommand(this, levelModule), new RandomMemeCommand(this))
                 .exceptionUnexpected((invocation, throwable, resultHandlerChain) -> {
                     Module.logThrowable(this, throwable);
                 })
