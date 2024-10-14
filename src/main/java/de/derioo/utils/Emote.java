@@ -32,6 +32,8 @@ public enum Emote {
     PARTNER("<:partner:1140656134504599552>"),
     THUMBS_UP("\uD83D\uDC4D"),
     THUMBS_DOWN("\uD83D\uDC4E"),
+    UPVOTE("<:upvote:1294809970264772701>"),
+    DOWNVOTE("<:downvote:1294809995396911136>"),
     CONFETTI("\uD83C\uDF89"),
     TRASH("\uD83D\uDDD1"),
     LOCK("\uD83D\uDD12"),

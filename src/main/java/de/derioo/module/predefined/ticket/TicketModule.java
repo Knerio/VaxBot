@@ -42,8 +42,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static de.derioo.config.Config.Id.Data.TEAM_ROLE;
-import static de.derioo.module.predefined.ticket.Ticket.Type.BUG;
-import static de.derioo.module.predefined.ticket.Ticket.Type.QUESTIONS;
+import static de.derioo.module.predefined.ticket.Ticket.Type.*;
 
 public class TicketModule extends Module {
 
@@ -69,16 +68,47 @@ public class TicketModule extends Module {
         StringSelectMenu.Builder builder = StringSelectMenu.create("new-ticket");
 
         for (Ticket.Type value : Ticket.Type.values()) {
+            if (value == EVENT_TOKEN) continue;
             builder.addOption(value.getTag(), value.name(), value.getDesc());
         }
 
         builder.setMaxValues(1);
         builder.setMinValues(1);
 
+
         updateOrSendEmbed(Config.Id.Channel.TICKET_CREATION_CHANNEL, getEmbed(),
                 ActionRow.of(Button.link("https://tube-hosting.com/pricing", "Partner").withEmoji(Emoji.fromFormatted("<:TubehostingVarilx:1101657813794693120>"))),
                 ActionRow.of(builder.build())
         );
+        StringSelectMenu.Builder eventTokenMenu = StringSelectMenu.create("new-ticket");
+
+        eventTokenMenu.addOption(EVENT_TOKEN.getTag(), EVENT_TOKEN.name(), EVENT_TOKEN.getDesc());
+        eventTokenMenu.setMaxValues(1);
+        eventTokenMenu.setMinValues(1);
+
+        updateOrSendEmbed(Config.Id.Channel.EVENT_TOKEN_CHANNEL, DiscordBot.Default.builder()
+                .setTitle("Event Tokens können unten eingelöst werden")
+                .addField("— Crate Keys —", """
+                        ```1x Vote Crate Key  —  1 Event Token``` ```1x Nether Crate Key  —  2 Event Tokens``` ```1x End Crate Key  —  3 Event Tokens``` ```1x Warden Crate Key  —  4 Event Tokens``` ```1x Eternal Crate Key  —  5 Event Tokens```
+                        """, false)
+                .addField("— Erze —", """
+                        ```16x Netherite Barren  —  4 Event Tokens``` ```32x Netherite Barren  —  7 Event Tokens``` ```48x Netherite Barren  —  10 Event Tokens``` ```64x Netherite Barren  —  12 Event Tokens```
+                        ```2x Netherite Block  —  4 Event Tokens``` ```4x Netherite Block  —  7 Event Tokens``` ```8x Netherite Block  —  13 Event Tokens``` ```16x Netherite Block  —  25 Event Tokens```
+                        ```2x Diamond Block  —  2 Event Tokens``` ```4x Diamond Block  —  3 Event Tokens``` ```8x Diamond Block  —  8 Event Tokens``` ```16x Diamond Block  —  14 Event Tokens``` ```32x Diamond Block  —  25 Event Tokens``` ```64x Diamond Block  —  40 Event Tokens```
+                        """, false)
+                .addField("— Re:Create Shards —", """
+                        ```1x Re:Create Shard  —  15 Event Tokens``` ```5x Re:Create Shard  —  70 Event Tokens``` ```10x Re:Create Shard  —  125 Event Tokens```
+                        """, false)
+                .addField("— Gutscheine —", """
+                        ```1x 1.000 XP Gutschein (Skill wählbar)  —  10 Event Tokens``` ```1x 2.000 XP Gutschein (Skill wählbar)  —  19 Event Tokens``` ```1x 4.000 XP Gutschein (Skill wählbar)  —  35 Event Tokens``` ```1x 8.000 XP Gutschein (Skill wählbar)  —  60 Event Tokens``` ```1x 16.000 XP Gutschein (Skill wählbar)  —  110 Event Tokens```
+                        ```5.000 Coins  —  1 Event Token``` ```11.000 Coins  —  2 Event Tokens``` ```24.000 Coins  —  4 Event Tokens``` ```55.000 Coins  —  8 Event Tokens``` ```120.000 Coins  —  16 Event Tokens``` ```250.000 Coins  —  32 Event Tokens``` ```600.000 Coins  —  64 Event Tokens```
+                        ```1x Emerald Rang Gutschein  —  55 Event Tokens``` ```1x Demon Rang Gutschein  —  80 Event Tokens``` ```1x Reaper Rang Gutschein  —  120 Event Tokens``` ```1x DIVINE Rang Gutschein  —  200 Event Tokens```
+                        """, false)
+                .addField("— Spawn Eggs —", """
+                        ```1x Zombie Spawn Egg  —  5 Event Tokens``` ```1x Skeleton Spawn Egg  —  7 Event Tokens``` ```1x Blaze Spawn Egg  —  4 Event Tokens``` ```1x Creeper Spawn Egg  —  50 Event Tokens``` ```1x Shulker Spawn Egg  —  135 Event Tokens``` ```1x Enderman Spawn Egg  —  70 Event Tokens``` ```1x Iron Golem Spawn Egg  —  105 Event Tokens``` ```1x Spider Spawn Egg  —  7 Event Tokens``` ```1x Endermite Spawn Egg  —  3 Event Tokens``` ```1x Guardian Egg  —  16 Event Tokens``` ```1x Elder Guardian Spawn Egg  —  23 Event Tokens``` ```1x Slime Spawn Egg  —  17 Event Tokens``` ```1x Glow Squid Spawn Egg  —  3 Event Tokens``` ```1x Witch Spawn Egg  —  145 Event Tokens``` ```1x Drowned Spawn Egg  —  22 Event Tokens``` ```1x Mooshroom Spawn Egg  —  9 Event Tokens``` ```1x Cow Spawn Egg  —  7 Event Tokens``` ```1x Sheep Spawn Egg  —  11 Event Tokens``` ```1x Pig Spawn Egg  —  5 Event Tokens``` ```1x Panda Spawn Egg  —  3 Event Tokens```
+                        """, false)
+                .setColor(Color.GREEN)
+                .build(), ActionRow.of(eventTokenMenu.build()));
     }
 
     @NotNull
@@ -108,6 +138,17 @@ public class TicketModule extends Module {
                                 .setPlaceholder("Hallo liebes Varilx.DE Team, \n...")
                                 .setMinLength(15)
                                 .build());
+                    }
+                    case EVENT_TOKEN -> {
+                        inputs.add(TextInput.create("token-count", "Wie viele Tokens möchtest du einlösen", TextInputStyle.SHORT)
+                                .setPlaceholder("z.B. \"12\"")
+                                .setRequired(true)
+                                .build());
+                        inputs.add(TextInput.create("token-item", "Wie möchtest du bekommen?", TextInputStyle.SHORT)
+                                .setPlaceholder("z.B. \"64x Netherite Barren\"")
+                                .setRequired(true)
+                                .build());
+                        addIngameNameInput(inputs);
                     }
                     case HELP_AND_SUPPORT -> {
                         inputs.add(TextInput.create("issue", "Kurze Beschreibung deines Anliegens", TextInputStyle.PARAGRAPH)

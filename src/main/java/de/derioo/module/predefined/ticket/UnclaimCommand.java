@@ -52,7 +52,6 @@ public class UnclaimCommand {
 
         TextChannelManager manager = ((TextChannel) channel).getManager();
         for (Role role : bot.get(event.getGuild()).getRoleObjects(ticket.getType().getRole(), event.getGuild())) {
-            System.out.println(role.getName());
             manager = manager.putPermissionOverride(role, EnumSet.of(VIEW_CHANNEL), null);
         }
         manager.queue();

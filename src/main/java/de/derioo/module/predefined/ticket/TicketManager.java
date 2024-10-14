@@ -48,7 +48,6 @@ public class TicketManager {
         TextChannelManager manager = ticketChannel.getManager();
 
         for (Role role : roles) {
-            System.out.println(role.getName());
             manager.putPermissionOverride(role, EnumSet.of(VIEW_CHANNEL), null);
         }
         manager.putPermissionOverride(creator, EnumSet.of(VIEW_CHANNEL), null).queue();
@@ -56,6 +55,12 @@ public class TicketManager {
 
         Map<String, String> values = new HashMap<>();
         switch (type) {
+            case EVENT_TOKEN -> {
+                values.put("Token Anzahl", event.getValue("token-count").getAsString());
+                values.put("Token Einlösewert", event.getValue("token-item").getAsString());
+                values.put("Ingame Name", event.getValue("name").getAsString());
+            }
+
             case PARTNER -> {
                 values.put("Website/Discord", event.getValue("website").getAsString());
                 values.put("Kontakt", event.getValue("contact").getAsString());

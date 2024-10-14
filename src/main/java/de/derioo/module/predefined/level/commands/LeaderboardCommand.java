@@ -56,13 +56,13 @@ public class LeaderboardCommand {
             boolean isHe = currentData.equals(data);
             User user = event.getJDA().getUserById(currentData.getId().split(":")[0]);
             String voiceFormatting = type != Type.VOICE ? "``" : " ";
-            String string = (isHe ? "**" : "") +
+            String string =
                     (i + 1) + ". " +
-                    user.getEffectiveName() +
-                    ":" + voiceFormatting + switch (type) {
-                case VOICE -> currentData.getStats().getVoiceStats().getLifeTotalTimeFormatted();
-                case LEVEL -> "Level " + this.module.getLevelCount(currentData);
-            } + voiceFormatting;
+                            (isHe ? "**" : "") + user.getEffectiveName() +
+                            ": " + voiceFormatting + switch (type) {
+                        case VOICE -> currentData.getStats().getVoiceStats().getLifeTotalTimeFormatted();
+                        case LEVEL -> "Level " + this.module.getLevelCount(currentData);
+                    } + voiceFormatting + (isHe ? " **" : "");
             leaderboard.add(string);
         }
 

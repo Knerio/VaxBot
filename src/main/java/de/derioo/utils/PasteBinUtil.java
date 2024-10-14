@@ -28,7 +28,13 @@ public class PasteBinUtil {
         throwable.printStackTrace(pw);
 
         String name = throwable.getClass().getName() + ": " + throwable.getMessage();
-        return createPaste(name, sw.toString());
+        try {
+            return createPaste(name, sw.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throwable.printStackTrace();
+        }
+        return null;
     }
 
     public URI createPaste(String fileName, String text) {

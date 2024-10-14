@@ -84,7 +84,8 @@ public class Ticket {
         BUG(Config.Id.Role.BUG_REPORT_EDIT, Config.Id.Category.BUG_CATEGORY, "❌ Bugreport", "Du hast einen Fehler gefunden? Melde ihn hier!"),
         QUESTIONS(Config.Id.Role.TICKET_EDIT, Config.Id.Category.TICKET_CATEGORY, "❓Allgemeine Fragen", "Allgemeine Fragen"),
         PARTNER(Config.Id.Role.TICKET_EDIT, Config.Id.Category.TICKET_CATEGORY, Emote.HANDSHAKE.getData() + "Partner Anfrage", "Du willst Partner werden?"),
-        HELP_AND_SUPPORT(Config.Id.Role.TICKET_EDIT, Config.Id.Category.TICKET_CATEGORY, Emote.BUSTS.getData() + "Hilfe & Support", "Du brauchst allgemeine Hilfe?");
+        HELP_AND_SUPPORT(Config.Id.Role.TICKET_EDIT, Config.Id.Category.TICKET_CATEGORY, Emote.BUSTS.getData() + "Hilfe & Support", "Du brauchst allgemeine Hilfe?"),
+        EVENT_TOKEN(Config.Id.Role.TICKET_EDIT, Config.Id.Category.TICKET_CATEGORY, "\uD83C\uDF20 Event Token Anfrage", "Du willst Event Tokens einlösen?");
 
         private final Config.Id.Role role;
         private final Config.Id.Category category;

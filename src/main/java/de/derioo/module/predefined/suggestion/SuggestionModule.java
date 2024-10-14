@@ -171,8 +171,8 @@ public class SuggestionModule extends Module {
         suggestionChannel.sendMessageEmbeds(embed)
                 .queue(message -> {
                     suggestion.setMessageId(message.getIdLong());
-                    message.addReaction(Emote.THUMBS_UP.unicode()).queue();
-                    message.addReaction(Emote.THUMBS_DOWN.unicode()).queue();
+                    message.addReaction(Emote.UPVOTE.getFormatted()).queue();
+                    message.addReaction(Emote.DOWNVOTE.getFormatted()).queue();
                     repo.save(suggestion);
                 });
 

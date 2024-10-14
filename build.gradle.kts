@@ -16,6 +16,7 @@ repositories {
 }
 
 dependencies {
+
     /** Annotations **/
     implementation("org.projectlombok:lombok:1.18.34")
     annotationProcessor("org.projectlombok:lombok:1.18.34")
@@ -47,6 +48,9 @@ dependencies {
     implementation("io.javalin:javalin:6.3.0")
     implementation("org.slf4j:slf4j-simple:2.0.16")
     implementation("commons-io:commons-io:2.17.0")
+    implementation("com.github.twitch4j:twitch4j:1.8.0")
+    implementation("com.google.api-client:google-api-client:1.32.2")
+    implementation("com.google.apis:google-api-services-youtube:v3-rev20240926-2.0.0")
 }
 
 tasks.withType<JavaCompile> {

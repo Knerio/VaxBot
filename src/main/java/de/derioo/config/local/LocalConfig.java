@@ -33,6 +33,13 @@ public class LocalConfig {
     @Builder.Default
     String db = "discord-bot";
 
+
+    Twitch twitch;
+
+    Youtube youtube;
+
+    TikTok tiktok;
+
     public static LocalConfig load(File file) throws IOException {
         return new ObjectMapper().readValue(file, LocalConfig.class);
     }
@@ -46,5 +53,48 @@ public class LocalConfig {
     }
 
 
+    @Jacksonized
+    @Builder
+    @Getter
+    @Setter
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Twitch {
 
+        @JsonProperty("client-id")
+        String clientId;
+        @JsonProperty("client-secret")
+        String clientSecret;
+
+    }
+
+    @Jacksonized
+    @Builder
+    @Getter
+    @Setter
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Youtube {
+
+        String token;
+
+    }
+
+    @Jacksonized
+    @Builder
+    @Getter
+    @Setter
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class TikTok {
+
+        String token;
+
+    }
 }
