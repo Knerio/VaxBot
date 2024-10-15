@@ -96,7 +96,13 @@ public class TikTokNotifier {
     }
 
     private Response getNewVideos(String channelName) throws IOException {
-        OkHttpClient client = new OkHttpClient();
+        long start = System.currentTimeMillis();
+        System.out.println("Fetching new videos");
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(15, TimeUnit.SECONDS)
+                .writeTimeout(15, TimeUnit.SECONDS)
+                .readTimeout(40, TimeUnit.SECONDS)
+                .build();
 
         Request request = new Request.Builder()
                 .url("https://tiktok-api6.p.rapidapi.com/user/videos?username=" + channelName)
@@ -106,6 +112,7 @@ public class TikTokNotifier {
                 .build();
         try (okhttp3.Response response = client.newCall(request).execute();) {
             String string = response.body().string();
+            System.out.println("Body: " + string + " (" + (System.currentTimeMillis() - start) + "ms)");
             return new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false).readValue(string, Response.class);
         }
     }

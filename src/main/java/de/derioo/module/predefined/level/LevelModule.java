@@ -163,6 +163,7 @@ public class LevelModule extends Module {
                         .setColor(Color.GREEN)
                         .setTitle("Du bist nun Level " + newLevel + " auf " + guild.getName())
                         .setDescription("Nutze /level auf " + guild.getName() + " für mehr Infos")
+                        .setImage("https://cdn.discordapp.com/attachments/1067809862744019025/1295256040627245148/Level_p.png?ex=670dfcb0&is=670cab30&hm=fb09796c5d1dfcbc7607cbf4dafd4ef14b5b5eac08b77712fe4afa6bcc0bd403&")
                         .build()).queue();
     }
 
