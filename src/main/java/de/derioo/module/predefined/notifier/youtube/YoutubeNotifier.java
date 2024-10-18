@@ -42,7 +42,7 @@ public class YoutubeNotifier {
 
 
     private static final String APPLICATION_NAME = "Varilx";
-    private static final Long DELAY = TimeUnit.MINUTES.toMillis(30);
+    private static final Long DELAY = TimeUnit.MINUTES.toMillis(5);
 
     private final NotifierModule module;
     private final DiscordBot bot;
