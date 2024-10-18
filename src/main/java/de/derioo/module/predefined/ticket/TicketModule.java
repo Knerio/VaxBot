@@ -122,32 +122,32 @@ public class TicketModule extends Module {
         switch (event.getSelectMenu().getId()) {
             case "new-ticket" -> {
                 Ticket.Type choice = Ticket.Type.valueOf(event.getInteraction().getValues().getFirst());
-                List<TextInput> inputs = new ArrayList<>();
+                List<TextInput.Builder> inputs = new ArrayList<>();
                 switch (choice) {
                     case PARTNER -> {
                         inputs.add(TextInput.create("website", "Websiten oder Discord Link", TextInputStyle.SHORT)
                                 .setRequired(true)
                                 .setPlaceholder("\"discord.gg/varilx\"")
-                                .build());
+                        );
                         inputs.add(TextInput.create("contact", "Kontakt", TextInputStyle.SHORT)
                                 .setRequired(true)
                                 .setPlaceholder("\"email@example.com\"")
-                                .build());
+                        );
                         inputs.add(TextInput.create("text", "Bewerbung", TextInputStyle.PARAGRAPH)
                                 .setRequired(true)
                                 .setPlaceholder("Hallo liebes Varilx.DE Team, \n...")
                                 .setMinLength(15)
-                                .build());
+                        );
                     }
                     case EVENT_TOKEN -> {
                         inputs.add(TextInput.create("token-count", "Wie viele Tokens möchtest du einlösen", TextInputStyle.SHORT)
                                 .setPlaceholder("z.B. \"12\"")
                                 .setRequired(true)
-                                .build());
+                        );
                         inputs.add(TextInput.create("token-item", "Wie möchtest du bekommen?", TextInputStyle.SHORT)
                                 .setPlaceholder("z.B. \"64x Netherite Barren\"")
                                 .setRequired(true)
-                                .build());
+                        );
                         addIngameNameInput(inputs);
                     }
                     case HELP_AND_SUPPORT -> {
@@ -155,7 +155,7 @@ public class TicketModule extends Module {
                                 .setPlaceholder("z.B. \"Ich will das und das machen und habe deshalb ein Problem\"")
                                 .setRequired(true)
                                 .setMinLength(10)
-                                .build());
+                        );
                         addIngameNameInput(inputs);
                         addPictureInput(inputs);
                     }
@@ -164,12 +164,12 @@ public class TicketModule extends Module {
                                 .setPlaceholder("z.B. \"Du musst zuerst das machen, damit x Fehler passiert\"")
                                 .setRequired(true)
                                 .setMinLength(10)
-                                .build());
+                        );
                         inputs.add(TextInput.create("issue", "Kurze Beschreibung des Bugs / Problems", TextInputStyle.PARAGRAPH)
                                 .setPlaceholder("z.B. \"Ich habe eine Fehler im System x gefunden\"")
                                 .setRequired(true)
                                 .setMinLength(10)
-                                .build());
+                        );
                         addIngameNameInput(inputs);
                         addPictureInput(inputs);
                     }
@@ -178,10 +178,13 @@ public class TicketModule extends Module {
                                 .setPlaceholder("z.B. \"Ich habe eine Frage zum System x\"")
                                 .setRequired(true)
                                 .setMinLength(10)
-                                .build());
+                        );
                     }
                 }
-                Modal modal = Modal.create("new-ticket-" + choice, "Ticket").addComponents(inputs.stream().map(ActionRow::of).toList()).build();
+                inputs.forEach(textInput -> {
+                    textInput.setMaxLength(1000);
+                });
+                Modal modal = Modal.create("new-ticket-" + choice, "Ticket").addComponents(inputs.stream().map(TextInput.Builder::build).map(ActionRow::of).toList()).build();
                 event.replyModal(modal).queue();
             }
             case null, default -> {
@@ -189,19 +192,18 @@ public class TicketModule extends Module {
         }
     }
 
-    private static void addPictureInput(@NotNull List<TextInput> inputs) {
+    private static void addPictureInput(@NotNull List<TextInput.Builder> inputs) {
         inputs.add(TextInput.create("picture", "Bilder getrennt mit Leerzeichen (optional)", TextInputStyle.SHORT)
                 .setRequired(false)
-                .build());
+        );
     }
 
-    private static void addIngameNameInput(@NotNull List<TextInput> inputs) {
+    private static void addIngameNameInput(@NotNull List<TextInput.Builder> inputs) {
         inputs.add(TextInput.create("name", "Dein Ingame Name", TextInputStyle.SHORT)
                 .setPlaceholder("z.B. \"Knerio\"")
                 .setMinLength(3)
                 .setMaxLength(15)
-                .setRequired(true)
-                .build());
+                .setRequired(true));
     }
 
     @ModuleListener
