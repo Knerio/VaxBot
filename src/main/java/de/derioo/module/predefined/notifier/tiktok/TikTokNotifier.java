@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 
 public class TikTokNotifier {
 
-    private static final long DELAY = TimeUnit.MINUTES.toMillis(30);
+    private static final long DELAY = TimeUnit.HOURS.toMillis(30); // CHANGE
     private final NotifierModule module;
     private final DiscordBot bot;
 

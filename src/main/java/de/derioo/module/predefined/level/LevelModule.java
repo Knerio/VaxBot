@@ -42,8 +42,9 @@ public class LevelModule extends Module {
     }
 
     public LevelPlayerData getPlayerData(Guild guild, User user) {
-        if (!this.repo.existsById(user.getId() + ":" + guild.getId())) {
-            this.repo.save(LevelPlayerData.builder()
+        LevelPlayerData data = this.repo.findFirstById(user.getId() + ":" + guild.getId());
+        if (data == null) {
+            data = LevelPlayerData.builder()
                     .id(user.getId() + ":" + guild.getId())
                     .stats(LevelPlayerData.Stats.builder()
                             .xp(0)
@@ -52,9 +53,10 @@ public class LevelModule extends Module {
                                     .voiceChannelJoinTimestamp(-1)
                                     .build())
                             .build())
-                    .build());
+                    .build();
         }
-        return this.repo.findFirstById(user.getId() + ":" + guild.getId());
+        this.repo.save(data);
+        return data;
     }
 
     public Integer getVoiceRank(LevelPlayerData data, Guild guild) {
