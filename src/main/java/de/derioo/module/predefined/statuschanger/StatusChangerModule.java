@@ -25,7 +25,7 @@ public class StatusChangerModule extends Module {
 
     public void changeStatus() {
         Collections.shuffle(statuses);
-        bot.getJda().getPresence().setActivity(Activity.of(Activity.ActivityType.PLAYING, statuses.getFirst()));
+        bot.getJda().getPresence().setActivity(Activity.of(Activity.ActivityType.CUSTOM_STATUS, statuses.getFirst()));
     }
 
 

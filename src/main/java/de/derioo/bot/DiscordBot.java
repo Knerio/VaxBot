@@ -190,6 +190,12 @@ public class DiscordBot extends ListenerAdapter {
         return (Repository<E, ID>) this.repositories.get(repositoryClass);
     }
 
+    public void save(ConfigData config) {
+        Config configurationObject = Config.get(getRepo(ConfigRepo.class));
+        configurationObject.getData().put(config.getGuildId(), config);
+        getRepo(ConfigRepo.class).save(configurationObject);
+    }
+
 
     public static class Default {
 

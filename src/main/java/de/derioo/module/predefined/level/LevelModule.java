@@ -143,6 +143,7 @@ public class LevelModule extends Module {
 
 
     public void sendNewLevelMessage(Member member, Guild guild, int newLevel) {
+        if (member.equals(guild.getSelfMember())) return;
         if (newLevel > 20) {
             for (Role roleObject : bot.get(guild).getRoleObjects(Config.Id.Role.LEVEL_20_ROLE, guild)) {
                 guild.addRoleToMember(member, roleObject);

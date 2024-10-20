@@ -54,7 +54,7 @@ public class ConfigData {
     }
 
     public List<Role> getRoleObjects(Config.Id.Role role, Guild guild) {
-        return roles.get(role.name()).stream().map(id -> guild.getRoleById(id)).toList();
+        return roles.get(role.name()).stream().map(guild::getRoleById).toList();
     }
 
 

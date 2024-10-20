@@ -84,7 +84,7 @@ public class Config {
 
         public enum Data {
 
-            TWITCH_NOTIFIER, YOUTUBE_NOTIFIER, TIKTOK_NOTIFIER, TEAM_ROLE
+            TWITCH_NOTIFIER, YOUTUBE_NOTIFIER, TIKTOK_NOTIFIER, YOUTUBE_NOTIFIER_IDS, TEAM_ROLE
 
         }
     }

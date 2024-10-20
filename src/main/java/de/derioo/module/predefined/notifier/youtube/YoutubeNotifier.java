@@ -16,6 +16,7 @@ import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.SearchResult;
 import com.google.gson.JsonParser;
+import de.derioo.annotations.ModuleListener;
 import de.derioo.bot.DiscordBot;
 import de.derioo.config.Config;
 import de.derioo.config.ConfigData;
@@ -25,6 +26,7 @@ import kotlin.Pair;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -60,23 +62,25 @@ public class YoutubeNotifier {
         timer();
     }
 
+
+
     private void timer() {
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                for (Map.Entry<Guild, List<Pair<String, String>>> entry : getTrackedYoutuberIds().entrySet()) {
+                for (Map.Entry<Guild, List<YoutubeCreatorObject>> entry : getTrackedYoutuberIds().entrySet()) {
                     Guild guild = entry.getKey();
                     ConfigData config = bot.get(guild);
-                    for (Pair<String, String> pair : entry.getValue()) {
+                    for (YoutubeCreatorObject pair : entry.getValue()) {
                         try {
-                            for (SearchResult video : getNewVideos(pair.getSecond())) {
+                            for (SearchResult video : getNewVideos(pair.getId())) {
                                 TextChannel channel = guild.getTextChannelById(config.getChannels().get(Config.Id.Channel.YOUTUBE_NOTIFY_CHANNEL.name()));
                                 List<Role> roles = config.getRoleObjects(Config.Id.Role.YOUTUBE_PING_ROLES, guild);
                                 String videoUrl = getYoutubeVideoUrl(video.getId());
-                                channel.sendMessage("> **" + pair.getFirst() + "** hat ein neues Video hochgeladen, schaut vorbei! " +
+                                channel.sendMessage("> **" + pair.getName() + "** hat ein neues Video hochgeladen, schaut vorbei! " +
                                                 roles.stream().map(Role::getAsMention).collect(Collectors.joining(",")))
                                         .addEmbeds(DiscordBot.Default.builder()
-                                                .setAuthor("Youtube - " + pair.getFirst(), videoUrl)
+                                                .setAuthor("Youtube - " + pair.getName(), videoUrl)
                                                 .setTitle(video.getSnippet().getTitle(), videoUrl)
                                                 .setImage(video.getSnippet().getThumbnails().getHigh().getUrl())
                                                 .setColor(Color.RED)
@@ -98,21 +102,11 @@ public class YoutubeNotifier {
         return "https://youtube.com/watch?v=" + id.getVideoId();
     }
 
-    private @NotNull Map<Guild, List<Pair<String, String>>> getTrackedYoutuberIds() {
-        Map<Guild, List<Pair<String, String>>> map = new HashMap<>();
+    private @NotNull Map<Guild, List<YoutubeCreatorObject>> getTrackedYoutuberIds() {
+        Map<Guild, List<YoutubeCreatorObject>> map = new HashMap<>();
         for (Guild guild : bot.getJda().getGuilds()) {
-            List<String> data = bot.get(guild).getData(Config.Id.Data.YOUTUBE_NOTIFIER.name(), List.class);
-            List<Pair<String, String>> ids = new ArrayList<>();
-            for (String channelName : data) {
-                try {
-                    String id = getYoutuberId(channelName);
-                    if (id != null) ids.add(new Pair<>(channelName, id));
-                } catch (IOException e) {
-                    Module.logThrowable(this.bot, e);
-                }
-            }
-
-            map.put(guild, ids);
+            List<YoutubeCreatorObject> data = bot.get(guild).getData(Config.Id.Data.YOUTUBE_NOTIFIER_IDS.name(), List.class);
+            map.put(guild, data);
         }
         return map;
     }
