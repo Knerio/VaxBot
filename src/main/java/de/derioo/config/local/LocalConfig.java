@@ -40,6 +40,9 @@ public class LocalConfig {
 
     TikTok tiktok;
 
+    @JsonProperty("gpt")
+    ChatGPT chatgpt;
+
     public static LocalConfig load(File file) throws IOException {
         return new ObjectMapper().readValue(file, LocalConfig.class);
     }
@@ -93,6 +96,20 @@ public class LocalConfig {
     @NoArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class TikTok {
+
+        String token;
+
+    }
+
+    @Jacksonized
+    @Builder
+    @Getter
+    @Setter
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class ChatGPT {
 
         String token;
 

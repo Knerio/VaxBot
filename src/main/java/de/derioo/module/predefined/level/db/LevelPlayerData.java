@@ -29,6 +29,13 @@ public class LevelPlayerData {
         return Objects.equals(this.id, other.id);
     }
 
+    public String toString() {
+        return "LevelPlayerData{" +
+                "id='" + id + '\'' +
+                ", stats=" + stats +
+                '}';
+    }
+
     @AllArgsConstructor
     @NoArgsConstructor
     @Getter
@@ -41,6 +48,12 @@ public class LevelPlayerData {
 
         VoiceStats voiceStats;
 
+        public String toString() {
+            return "Stats{" +
+                    "xp=" + xp +
+                    ", voiceStats=" + voiceStats +
+                    '}';
+        }
 
 
         @AllArgsConstructor
@@ -70,6 +83,13 @@ public class LevelPlayerData {
                 long days = joinDiff / (1000 * 60 * 60 * 24);
 
                 return new Formatter().format("`%s` Tage, `%s` Stunden, `%s` Minuten, `%s` Sekunden", days, hours, minutes, seconds).toString();
+            }
+
+            public String toString() {
+                return "VoiceStats{" +
+                        "totalTime=" + totalTime +
+                        ", voiceChannelJoinTimestamp=" + voiceChannelJoinTimestamp +
+                        '}';
             }
         }
     }

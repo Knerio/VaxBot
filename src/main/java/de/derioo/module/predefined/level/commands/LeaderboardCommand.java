@@ -55,6 +55,13 @@ public class LeaderboardCommand {
             LevelPlayerData currentData = list.get(i);
             boolean isHe = currentData.equals(data);
             User user = event.getJDA().getUserById(currentData.getId().split(":")[0]);
+            System.out.println(user);
+            if (user == null) {
+                System.out.println("User is null, deleting " + currentData.getId());
+                System.out.println(currentData);
+                this.repo.delete(currentData);
+                continue;
+            }
             String voiceFormatting = type != Type.VOICE ? "``" : " ";
             String string =
                     (i + 1) + ". " +

@@ -8,9 +8,6 @@ import de.derioo.status.StatusHandler;
 import eu.koboo.en2do.Credentials;
 import eu.koboo.en2do.MongoManager;
 
-import javax.lang.model.util.Elements;
-import javax.swing.text.Document;
-import javax.swing.text.Element;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
