@@ -47,7 +47,7 @@ dependencies {
     implementation("org.slf4j:slf4j-simple:2.0.16")
     implementation("commons-io:commons-io:2.17.0")
     implementation("com.github.twitch4j:twitch4j:1.22.0")
-    implementation("com.google.api-client:google-api-client:1.35.2")
+    implementation("com.google.api-client:google-api-client:2.7.0")
     implementation("com.google.apis:google-api-services-youtube:v3-rev20241022-2.0.0")
 }
 
