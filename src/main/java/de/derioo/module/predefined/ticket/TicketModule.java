@@ -92,9 +92,9 @@ public class TicketModule extends Module {
                         ```1x Vote Crate Key  —  1 Event Token``` ```1x Nether Crate Key  —  2 Event Tokens``` ```1x End Crate Key  —  3 Event Tokens``` ```1x Warden Crate Key  —  4 Event Tokens``` ```1x Eternal Crate Key  —  5 Event Tokens```
                         """, false)
                 .addField("— Erze —", """
-                        ```16x Netherite Barren  —  4 Event Tokens``` ```32x Netherite Barren  —  7 Event Tokens``` ```48x Netherite Barren  —  10 Event Tokens``` ```64x Netherite Barren  —  12 Event Tokens```
-                        ```2x Netherite Block  —  4 Event Tokens``` ```4x Netherite Block  —  7 Event Tokens``` ```8x Netherite Block  —  13 Event Tokens``` ```16x Netherite Block  —  25 Event Tokens```
-                        ```2x Diamond Block  —  2 Event Tokens``` ```4x Diamond Block  —  3 Event Tokens``` ```8x Diamond Block  —  8 Event Tokens``` ```16x Diamond Block  —  14 Event Tokens``` ```32x Diamond Block  —  25 Event Tokens``` ```64x Diamond Block  —  40 Event Tokens```
+                        ```16x Netherite Barren  —  2 Event Tokens``` ```32x Netherite Barren  —  3 Event Tokens``` ```48x Netherite Barren  —  4 Event Tokens``` ```64x Netherite Barren  —  5 Event Tokens```
+                        ```2x Netherite Block  —  2 Event Tokens``` ```4x Netherite Block  —  3 Event Tokens``` ```8x Netherite Block  —  5 Event Tokens``` ```16x Netherite Block  —  9 Event Tokens```
+                        ```4x Diamond Block  —  1 Event Tokens``` ```8x Diamond Block  —  2 Event Tokens``` ```16x Diamond Block  —  3 Event Tokens``` ```32x Diamond Block  —  5 Event Tokens``` ```64x Diamond Block  —  8 Event Tokens```
                         """, false)
                 .addField("— Re:Create Shards —", """
                         ```1x Re:Create Shard  —  15 Event Tokens``` ```5x Re:Create Shard  —  70 Event Tokens``` ```10x Re:Create Shard  —  125 Event Tokens```
