@@ -5,8 +5,7 @@ import de.derioo.bot.DiscordBot;
 import de.derioo.config.Config;
 import de.derioo.config.repository.ConfigRepo;
 import de.derioo.javautils.common.MathUtility;
-import de.derioo.utils.PasteBinUtil;
-import net.dv8tion.jda.api.entities.Guild;
+import de.derioo.utils.PasteBinUtil;import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -22,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.net.URI;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -31,7 +31,7 @@ public abstract class Module {
 
     private final String name;
 
-    private final Map<Long, MathUtility.ThrowableRunnable> runnableMap = new HashMap<>();
+    private final HashMap<Long, MathUtility.ThrowableRunnable> runnableMap = new HashMap<>();
 
     protected Module(DiscordBot bot, String name) {
         this.bot = bot;
@@ -99,17 +99,22 @@ public abstract class Module {
         for (Guild guild : bot.getJda().getGuilds()) {
             Long l = config.get(guild).getChannels().getOrDefault(Config.Id.Channel.ERROR_CHANNEL.name(), null);
             if (l == null) continue;
-            try {
-                TextChannel textChannel = guild.getChannelById(TextChannel.class, l);
-                textChannel.sendMessageEmbeds(DiscordBot.Default.error(throwable, true)
-                                .setDescription("Siehe Link für Stacktrace")
-                                .build())
-                        .addActionRow(Button.link(PasteBinUtil.createPasteOfThrowable(throwable).toString(), "Paste.gg"))
-                        .queue();
-                throwable.printStackTrace();
-            } catch (Throwable t) {
-                t.printStackTrace();
+
+            TextChannel textChannel = guild.getChannelById(TextChannel.class, l);
+            URI url = PasteBinUtil.createPasteOfThrowable(throwable);
+            if (url == null) {
+                textChannel.sendMessage(new Formatter().format("""
+                        Ein Fehler ist beim Fehler loggen aufgetreten.
+                        Ehemaliger Fehler: %s
+                        """, PasteBinUtil.getStacktrace(throwable)).toString()).queue();
+                return;
             }
+            textChannel.sendMessageEmbeds(DiscordBot.Default.error(throwable, true)
+                            .setDescription("Siehe Link für Stacktrace")
+                            .build())
+                    .addActionRow(Button.link(url.toString(), "Paste.gg"))
+                    .queue();
+            throwable.printStackTrace();
         }
     }
 

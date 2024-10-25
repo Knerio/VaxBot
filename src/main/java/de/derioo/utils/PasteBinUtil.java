@@ -23,13 +23,9 @@ public class PasteBinUtil {
     private final String BASE_URL = "https://api.paste.gg/v1/";
 
     public URI createPasteOfThrowable(Throwable throwable) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        throwable.printStackTrace(pw);
-
         String name = throwable.getClass().getName() + ": " + throwable.getMessage();
         try {
-            return createPaste(name, sw.toString());
+            return createPaste(name, getStacktrace(throwable));
         } catch (Exception e) {
             e.printStackTrace();
             throwable.printStackTrace();
@@ -38,24 +34,44 @@ public class PasteBinUtil {
     }
 
     public URI createPaste(String fileName, String text) {
+        HttpRequest request;
         try {
             Request reqObject = new Request(new Request.RequestFile[]{new Request.RequestFile(fileName, new Request.RequestFile.Content("text", text))});
-            HttpRequest request = HttpRequest.newBuilder()
+            request = HttpRequest.newBuilder()
                     .uri(URI.create(BASE_URL + "pastes"))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(new ObjectMapper().writeValueAsString(reqObject))).build();
-
-
-            try (HttpClient client = HttpClient.newHttpClient()) {
-                String body = client.send(request, HttpResponse.BodyHandlers.ofString()).body();
-                PasteCreatedResponse response = new ObjectMapper()
-                        .readValue(body, PasteCreatedResponse.class);
-                if (response.result == null) throw new RuntimeException("Error: " + body);
-                return URI.create("https://paste.gg/" + response.result.id);
-            }
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            System.out.println("An error occurred while creating request");
+            e.printStackTrace();
+            return null;
         }
+        String body;
+        try (HttpClient client = HttpClient.newHttpClient()) {
+             body = client.send(request, HttpResponse.BodyHandlers.ofString()).body();
+        } catch (IOException | InterruptedException e) {
+            System.out.println("An error occurred while sending request");
+            e.printStackTrace();
+            return null;
+        }
+        try {
+            PasteCreatedResponse response = new ObjectMapper()
+                    .readValue(body, PasteCreatedResponse.class);
+            if (response.result == null) throw new RuntimeException("Error: " + body);
+            return URI.create("https://paste.gg/" + response.result.id);
+        } catch(Exception e) {
+            System.out.println("Error occurred while parsing response");
+            System.out.println("Response Body:" + body);
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public String getStacktrace(Throwable throwable) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        throwable.printStackTrace(pw);
+        return sw.toString();
     }
 
     @Getter
