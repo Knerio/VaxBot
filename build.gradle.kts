@@ -23,9 +23,9 @@ dependencies {
     implementation("org.jetbrains:annotations:26.0.1")
 
     /** Jackson **/
-    implementation("com.fasterxml.jackson.core:jackson-core:2.17.2")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.18.0")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.0")
-    implementation("com.fasterxml.jackson.core:jackson-annotations:2.17.2")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:2.18.0")
 
     /** JavaUtils **/
     implementation("de.derioo.javautils:common:2.7.2")
