@@ -38,10 +38,10 @@ dependencies {
     implementation("dev.rollczi:litecommands-jda:3.4.2")
 
     /** Mongo DB **/
-    implementation("org.mongodb:mongodb-driver-sync:4.11.1")
+    implementation("org.mongodb:mongodb-driver-sync:5.2.0")
 
     /** En2do **/
-    implementation("eu.koboo:en2do:1.0.1")
+    implementation("eu.koboo:en2do:1.0.3")
 
     implementation("io.javalin:javalin:6.3.0")
     implementation("org.slf4j:slf4j-simple:2.0.16")
