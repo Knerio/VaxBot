@@ -10,7 +10,6 @@ repositories {
     mavenCentral()
     maven("https://repo.derioo.de/releases")
     maven("https://repo.panda-lang.org/releases")
-    maven("https://reposilite.koboo.eu/releases")
     maven("https://m2.dv8tion.net/releases")
     maven("https://jitpack.io")
 }
@@ -29,8 +28,7 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.17.2")
 
     /** JavaUtils **/
-    implementation("de.derioo.javautils:common:2.7.1")
-    implementation("de.derioo.javautils:discord:2.7.1")
+    implementation("de.derioo.javautils:common:2.7.2")
 
     /** JDA **/
     implementation("net.dv8tion:JDA:5.0.0-beta.17")
@@ -43,7 +41,7 @@ dependencies {
     implementation("org.mongodb:mongodb-driver-sync:5.1.2")
 
     /** En2do **/
-    implementation("eu.koboo:en2do:2.3.9")
+    implementation("eu.koboo:en2do:1.0.2")
 
     implementation("io.javalin:javalin:6.3.0")
     implementation("org.slf4j:slf4j-simple:2.0.16")

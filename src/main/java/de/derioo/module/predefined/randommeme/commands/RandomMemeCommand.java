@@ -32,7 +32,7 @@ public class RandomMemeCommand {
     public void randomMeme(@Context SlashCommandInteractionEvent event) {
         event.deferReply().queue();
 
-        Pagination pagination = Pagination.of(1).page(new Random().nextInt((int) repo.countAll()));
+        Pagination pagination = Pagination.of(1).setPage(new Random().nextInt((int) repo.countAll()));
         List<RandomMeme> memes = repo.pageByGuildId(event.getGuild().getIdLong(), pagination);
         Collections.shuffle(memes);
 

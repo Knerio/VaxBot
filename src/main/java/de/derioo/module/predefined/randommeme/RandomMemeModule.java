@@ -123,7 +123,7 @@ public class RandomMemeModule extends Module {
             Message waitMessage = event.getMessage().reply("⚙️ Memes werden geladen ⚙️").complete();
             if (!hasPermission(event, guild)) continue;
             int page = getPage(event.getMessage());
-            List<RandomMeme> list = ((RandomMemeRepository) this.repo).pageByGuildId(guild.getIdLong(), Pagination.of(10).page(page));
+            List<RandomMeme> list = ((RandomMemeRepository) this.repo).pageByGuildId(guild.getIdLong(), Pagination.of(10).setPage(page));
 
             waitMessage.editMessage("Seite " + page + ": " + list.stream().map(RandomMeme::getId).map(ObjectId::toString)
                             .collect(Collectors.joining(" ")))
