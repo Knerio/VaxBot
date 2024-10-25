@@ -36,11 +36,13 @@ public class TwitchNotifier {
 
         for (Guild guild : bot.getJda().getGuilds()) {
             List<String> data = bot.get(guild).getData(Config.Id.Data.TWITCH_NOTIFIER.name(), List.class);
+            System.out.println("Enabling streamers: "+ data);
             client.getClientHelper().enableStreamEventListener(data);
         }
     }
 
     private void onGoLive(ChannelGoLiveEvent event) {
+        System.out.println(event.getChannel().getName() + " is now live");
         for (Guild guild : this.bot.getJda().getGuilds()) {
             ConfigData config = bot.get(guild);
             List<String> data = config.getData(Config.Id.Data.TWITCH_NOTIFIER.name(), List.class);
