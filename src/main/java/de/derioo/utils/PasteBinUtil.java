@@ -3,6 +3,7 @@ package de.derioo.utils;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.derioo.javautils.common.StringUtility;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.UtilityClass;
@@ -37,7 +38,7 @@ public class PasteBinUtil {
         HttpRequest request;
         String bodyString;
         try {
-            Request reqObject = new Request(new Request.RequestFile[]{new Request.RequestFile(fileName, new Request.RequestFile.Content("text", text))});
+            Request reqObject = new Request(new Request.RequestFile[]{new Request.RequestFile(StringUtility.capAtNCharacters(fileName, 255), new Request.RequestFile.Content("text", text))});
             bodyString = new ObjectMapper().writeValueAsString(reqObject);
             request = HttpRequest.newBuilder()
                     .uri(URI.create(BASE_URL + "pastes"))
