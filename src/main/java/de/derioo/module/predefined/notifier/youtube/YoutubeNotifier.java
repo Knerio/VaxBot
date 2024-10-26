@@ -44,7 +44,7 @@ public class YoutubeNotifier {
 
 
     private static final String APPLICATION_NAME = "Varilx";
-    private static final Long DELAY = TimeUnit.MINUTES.toMillis(30);
+    private static final Long DELAY = TimeUnit.MINUTES.toMillis(10);
 
     private final NotifierModule module;
     private final DiscordBot bot;
@@ -63,38 +63,59 @@ public class YoutubeNotifier {
     }
 
 
-
     private void timer() {
+        ConfigData globalConfig = this.bot.get().getGlobal();
+        long lastCheckedTimestamp = globalConfig.getData(Config.Id.Data.LAST_CHECKED_YOUTUBE_TIMESTAMP, Long.class, System.currentTimeMillis());
+        long relativeLastCheckedTime = System.currentTimeMillis() - lastCheckedTimestamp;
+
+        System.out.println("Running check in " + (DELAY - relativeLastCheckedTime) + "ms");
+        System.out.println("Checking till " + (new Date(lastCheckedTimestamp)));
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                runVideoCheck(lastCheckedTimestamp);
+            }
+        }, Math.max(0, DELAY - relativeLastCheckedTime));
+
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                for (Map.Entry<Guild, List<YoutubeCreatorObject>> entry : getTrackedYoutuberIds().entrySet()) {
-                    Guild guild = entry.getKey();
-                    ConfigData config = bot.get(guild);
-                    for (YoutubeCreatorObject pair : entry.getValue()) {
-                        try {
-                            for (SearchResult video : getNewVideos(pair.getId())) {
-                                TextChannel channel = guild.getTextChannelById(config.getChannels().get(Config.Id.Channel.YOUTUBE_NOTIFY_CHANNEL.name()));
-                                List<Role> roles = config.getRoleObjects(Config.Id.Role.YOUTUBE_PING_ROLES, guild);
-                                String videoUrl = getYoutubeVideoUrl(video.getId());
-                                channel.sendMessage("> **" + pair.getName() + "** hat ein neues Video hochgeladen, schaut vorbei! " +
-                                                roles.stream().map(Role::getAsMention).collect(Collectors.joining(",")))
-                                        .addEmbeds(DiscordBot.Default.builder()
-                                                .setAuthor("Youtube - " + pair.getName(), videoUrl)
-                                                .setTitle(video.getSnippet().getTitle(), videoUrl)
-                                                .setImage(video.getSnippet().getThumbnails().getHigh().getUrl())
-                                                .setColor(Color.RED)
-                                                .build())
-                                        .addActionRow(Button.link(videoUrl, "Schau vorbei!"))
-                                        .queue();
-                            }
-                        } catch (Exception e) {
-                            Module.logThrowable(bot, e);
-                        }
+                runVideoCheck(System.currentTimeMillis() - DELAY);
+            }
+        }, Math.max(0, DELAY + (DELAY - relativeLastCheckedTime)), DELAY);
+    }
+
+    private void runVideoCheck(Long delayTimeStamp) {
+        Config globalConfig = this.bot.get();
+        globalConfig.getGlobal().putData(Config.Id.Data.LAST_CHECKED_YOUTUBE_TIMESTAMP, System.currentTimeMillis());
+        this.bot.save(globalConfig);
+
+        for (Map.Entry<Guild, List<YoutubeCreatorObject>> entry : getTrackedYoutuberIds().entrySet()) {
+            Guild guild = entry.getKey();
+            ConfigData config = bot.get(guild);
+            for (YoutubeCreatorObject pair : entry.getValue()) {
+                try {
+                    for (SearchResult video : getNewVideos(pair.getId(), delayTimeStamp)) {
+                        TextChannel channel = guild.getTextChannelById(config.getChannels().get(Config.Id.Channel.YOUTUBE_NOTIFY_CHANNEL.name()));
+                        List<Role> roles = config.getRoleObjects(Config.Id.Role.YOUTUBE_PING_ROLES, guild);
+                        String videoUrl = getYoutubeVideoUrl(video.getId());
+                        channel.sendMessage("> **" + pair.getName() + "** hat ein neues Video hochgeladen, schaut vorbei! " +
+                                        roles.stream().map(Role::getAsMention).collect(Collectors.joining(",")))
+                                .addEmbeds(DiscordBot.Default.builder()
+                                        .setAuthor("Youtube - " + pair.getName(), videoUrl)
+                                        .setTitle(video.getSnippet().getTitle(), videoUrl)
+                                        .setImage(video.getSnippet().getThumbnails().getHigh().getUrl())
+                                        .setColor(Color.RED)
+                                        .build())
+                                .addActionRow(Button.link(videoUrl, "Schau vorbei!"))
+                                .queue();
                     }
+                } catch (Exception e) {
+                    Module.logThrowable(bot, e);
                 }
             }
-        }, DELAY, DELAY);
+        }
     }
 
     @Contract(pure = true)
@@ -129,20 +150,20 @@ public class YoutubeNotifier {
         }
     }
 
-    private List<SearchResult> getNewVideos(String channelId) throws IOException {
+    private List<SearchResult> getNewVideos(String channelId, Long checkTimeStamp) throws IOException {
         YouTube.Search.List search = service.search().list(Collections.singletonList("id,snippet"));
         search.setKey(getAPIKey());
         search.setChannelId(channelId);
         search.setType(Collections.singletonList("video"));
         search.setMaxResults(50L);
-        search.setPublishedAfter(new DateTime(System.currentTimeMillis() - DELAY).toString());
+        search.setPublishedAfter(new DateTime(checkTimeStamp).toString());
 
         SearchListResponse searchResponse = search.execute();
         List<SearchResult> searchResults = searchResponse.getItems();
 
         return searchResults.stream().filter(searchResult -> {
             long value = searchResult.getSnippet().getPublishedAt().getValue();
-            return (System.currentTimeMillis() - value) < DELAY;
+            return value < checkTimeStamp;
         }).toList();
     }
 

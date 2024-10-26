@@ -184,6 +184,9 @@ public class DiscordBot extends ListenerAdapter {
     public ConfigData get(Guild guild) {
         return Config.get(getRepo(ConfigRepo.class)).get(guild);
     }
+    public Config get() {
+        return Config.get(getRepo(ConfigRepo.class));
+    }
 
     @SuppressWarnings("unchecked")
     public <E, ID> Repository<E, ID> getRepo(Class<? extends Repository<E, ID>> repositoryClass) {
@@ -194,6 +197,10 @@ public class DiscordBot extends ListenerAdapter {
         Config configurationObject = Config.get(getRepo(ConfigRepo.class));
         configurationObject.getData().put(config.getGuildId(), config);
         getRepo(ConfigRepo.class).save(configurationObject);
+    }
+
+    public void save(Config config) {
+        getRepo(ConfigRepo.class).save(config);
     }
 
 

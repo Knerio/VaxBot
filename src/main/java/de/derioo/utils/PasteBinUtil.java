@@ -35,12 +35,14 @@ public class PasteBinUtil {
 
     public URI createPaste(String fileName, String text) {
         HttpRequest request;
+        String bodyString;
         try {
             Request reqObject = new Request(new Request.RequestFile[]{new Request.RequestFile(fileName, new Request.RequestFile.Content("text", text))});
+            bodyString = new ObjectMapper().writeValueAsString(reqObject);
             request = HttpRequest.newBuilder()
                     .uri(URI.create(BASE_URL + "pastes"))
                     .header("Content-Type", "application/json")
-                    .POST(HttpRequest.BodyPublishers.ofString(new ObjectMapper().writeValueAsString(reqObject))).build();
+                    .POST(HttpRequest.BodyPublishers.ofString(bodyString)).build();
         } catch (Exception e) {
             System.out.println("An error occurred while creating request");
             e.printStackTrace();
@@ -57,7 +59,7 @@ public class PasteBinUtil {
         try {
             PasteCreatedResponse response = new ObjectMapper()
                     .readValue(body, PasteCreatedResponse.class);
-            if (response.result == null) throw new RuntimeException("Error: " + body);
+            if (response.result == null) throw new RuntimeException("Error: " + body + "\nSent body: " + bodyString);
             return URI.create("https://paste.gg/" + response.result.id);
         } catch(Exception e) {
             System.out.println("Error occurred while parsing response");

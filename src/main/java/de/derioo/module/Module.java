@@ -107,6 +107,7 @@ public abstract class Module {
                         Ein Fehler ist beim Fehler loggen aufgetreten.
                         Ehemaliger Fehler: %s
                         """, PasteBinUtil.getStacktrace(throwable)).toString()).queue();
+                throwable.printStackTrace();
                 return;
             }
             textChannel.sendMessageEmbeds(DiscordBot.Default.error(throwable, true)

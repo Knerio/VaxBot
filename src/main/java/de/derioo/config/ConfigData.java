@@ -72,12 +72,27 @@ public class ConfigData {
         }
     }
 
+
+
+    public <T> T getData(Config.Id.Data id, Class<T> clazz) {
+        return getData(id.name(), clazz);
+    }
+
+    public <T> T getData(Config.Id.Data id, Class<T> clazz, T defaultValue) {
+        T value = getData(id.name(), clazz);
+        return value == null ? defaultValue : value;
+    }
+
     public void putData(String id, Object data) {
         try {
             this.data.put(id, new ObjectMapper().writeValueAsString(data));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void putData(Config.Id.Data id, Object data) {
+        putData(id.name(), data);
     }
 
 }

@@ -27,7 +27,7 @@ public class Config {
 
     @Contract(" -> new")
     public static @NotNull Config defaultConfig() {
-        return new Config(new ObjectId(), new HashMap<>());
+        return new Config(new ObjectId(), new HashMap<>(), ConfigData.defaultData(null));
     }
 
 
@@ -35,6 +35,8 @@ public class Config {
     ObjectId id;
 
     Map<String, ConfigData> data;
+
+    ConfigData global;
 
 
     public ConfigData get(@NotNull Guild guild) {
@@ -84,7 +86,7 @@ public class Config {
 
         public enum Data {
 
-            TWITCH_NOTIFIER, YOUTUBE_NOTIFIER, TIKTOK_NOTIFIER, YOUTUBE_NOTIFIER_IDS, TEAM_ROLE
+            TWITCH_NOTIFIER, YOUTUBE_NOTIFIER, TIKTOK_NOTIFIER, YOUTUBE_NOTIFIER_IDS, LAST_CHECKED_YOUTUBE_TIMESTAMP, TEAM_ROLE
 
         }
     }
