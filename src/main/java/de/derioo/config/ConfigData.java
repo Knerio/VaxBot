@@ -1,6 +1,7 @@
 package de.derioo.config;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -67,6 +68,16 @@ public class ConfigData {
         if (json == null) return null;
         try {
             return new ObjectMapper().readValue(json, clazz);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public <T> T getData(String id, TypeReference<T> reference) {
+        String json = data.getOrDefault(id, null);
+        if (json == null) return null;
+        try {
+            return new ObjectMapper().readValue(json, reference);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

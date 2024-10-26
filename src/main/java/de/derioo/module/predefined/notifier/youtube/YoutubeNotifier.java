@@ -1,6 +1,7 @@
 package de.derioo.module.predefined.notifier.youtube;
 
 import com.fasterxml.jackson.core.JsonFactoryBuilder;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.twitch4j.TwitchClient;
 import com.github.twitch4j.TwitchClientBuilder;
 import com.github.twitch4j.events.ChannelGoLiveEvent;
@@ -133,7 +134,7 @@ public class YoutubeNotifier {
     private @NotNull Map<Guild, List<YoutubeCreatorObject>> getTrackedYoutuberIds() {
         Map<Guild, List<YoutubeCreatorObject>> map = new HashMap<>();
         for (Guild guild : bot.getJda().getGuilds()) {
-            List<YoutubeCreatorObject> data = bot.get(guild).getData(Config.Id.Data.YOUTUBE_NOTIFIER_IDS.name(), List.class);
+            List<YoutubeCreatorObject> data = bot.get(guild).getData(Config.Id.Data.YOUTUBE_NOTIFIER_IDS.name(), new TypeReference<>() {});
             map.put(guild, data);
         }
         return map;
@@ -170,7 +171,7 @@ public class YoutubeNotifier {
 
         return searchResults.stream().filter(searchResult -> {
             long value = searchResult.getSnippet().getPublishedAt().getValue();
-            return value < checkTimeStamp;
+            return value > checkTimeStamp;
         }).toList();
     }
 
