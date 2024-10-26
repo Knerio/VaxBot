@@ -74,19 +74,27 @@ public class YoutubeNotifier {
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                runVideoCheck(lastCheckedTimestamp);
+                try {
+                    runVideoCheck(lastCheckedTimestamp);
+                } catch (Exception e) {
+                    Module.logThrowable(bot, e);
+                }
             }
         }, Math.max(0, DELAY - relativeLastCheckedTime));
 
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                runVideoCheck(System.currentTimeMillis() - DELAY);
+                try {
+                    runVideoCheck(System.currentTimeMillis() - DELAY);
+                } catch (Exception e) {
+                    Module.logThrowable(bot, e);
+                }
             }
-        }, Math.max(0, DELAY + (DELAY - relativeLastCheckedTime)), DELAY);
+        }, Math.max(0, DELAY - relativeLastCheckedTime) + DELAY, DELAY);
     }
 
-    private void runVideoCheck(Long delayTimeStamp) {
+    private void runVideoCheck(Long delayTimeStamp) throws Exception {
         Config globalConfig = this.bot.get();
         globalConfig.getGlobal().putData(Config.Id.Data.LAST_CHECKED_YOUTUBE_TIMESTAMP, System.currentTimeMillis());
         this.bot.save(globalConfig);
@@ -95,24 +103,23 @@ public class YoutubeNotifier {
             Guild guild = entry.getKey();
             ConfigData config = bot.get(guild);
             for (YoutubeCreatorObject pair : entry.getValue()) {
-                try {
-                    for (SearchResult video : getNewVideos(pair.getId(), delayTimeStamp)) {
-                        TextChannel channel = guild.getTextChannelById(config.getChannels().get(Config.Id.Channel.YOUTUBE_NOTIFY_CHANNEL.name()));
-                        List<Role> roles = config.getRoleObjects(Config.Id.Role.YOUTUBE_PING_ROLES, guild);
-                        String videoUrl = getYoutubeVideoUrl(video.getId());
-                        channel.sendMessage("> **" + pair.getName() + "** hat ein neues Video hochgeladen, schaut vorbei! " +
-                                        roles.stream().map(Role::getAsMention).collect(Collectors.joining(",")))
-                                .addEmbeds(DiscordBot.Default.builder()
-                                        .setAuthor("Youtube - " + pair.getName(), videoUrl)
-                                        .setTitle(video.getSnippet().getTitle(), videoUrl)
-                                        .setImage(video.getSnippet().getThumbnails().getHigh().getUrl())
-                                        .setColor(Color.RED)
-                                        .build())
-                                .addActionRow(Button.link(videoUrl, "Schau vorbei!"))
-                                .queue();
-                    }
-                } catch (Exception e) {
-                    Module.logThrowable(bot, e);
+                System.out.println("Checking videos of: " + pair.getName());
+                List<SearchResult> newVideos = getNewVideos(pair.getId(), delayTimeStamp);
+                System.out.println("Got " + newVideos.size() + " since " + new Date(delayTimeStamp));
+                for (SearchResult video : newVideos) {
+                    TextChannel channel = guild.getTextChannelById(config.getChannels().get(Config.Id.Channel.YOUTUBE_NOTIFY_CHANNEL.name()));
+                    List<Role> roles = config.getRoleObjects(Config.Id.Role.YOUTUBE_PING_ROLES, guild);
+                    String videoUrl = getYoutubeVideoUrl(video.getId());
+                    channel.sendMessage("> **" + pair.getName() + "** hat ein neues Video hochgeladen, schaut vorbei! " +
+                                    roles.stream().map(Role::getAsMention).collect(Collectors.joining(",")))
+                            .addEmbeds(DiscordBot.Default.builder()
+                                    .setAuthor("Youtube - " + pair.getName(), videoUrl)
+                                    .setTitle(video.getSnippet().getTitle(), videoUrl)
+                                    .setImage(video.getSnippet().getThumbnails().getHigh().getUrl())
+                                    .setColor(Color.RED)
+                                    .build())
+                            .addActionRow(Button.link(videoUrl, "Schau vorbei!"))
+                            .queue();
                 }
             }
         }
