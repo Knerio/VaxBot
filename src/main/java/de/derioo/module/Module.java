@@ -119,6 +119,10 @@ public abstract class Module {
         }
     }
 
+    public void logThrowable(Throwable throwable) {
+        Module.logThrowable(this.bot, throwable);
+    }
+
     public final void setTimers(Long duration, MathUtility.ThrowableRunnable runnable) {
         runnableMap.put(duration, runnable);
     }

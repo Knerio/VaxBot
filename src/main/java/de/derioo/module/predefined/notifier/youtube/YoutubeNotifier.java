@@ -1,35 +1,24 @@
 package de.derioo.module.predefined.notifier.youtube;
 
-import com.fasterxml.jackson.core.JsonFactoryBuilder;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.github.twitch4j.TwitchClient;
-import com.github.twitch4j.TwitchClientBuilder;
-import com.github.twitch4j.events.ChannelGoLiveEvent;
-import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
-import com.google.api.client.util.DateTime;
 import com.google.api.services.youtube.YouTube;
-import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.SearchResult;
-import com.google.gson.JsonParser;
-import de.derioo.annotations.ModuleListener;
 import de.derioo.bot.DiscordBot;
 import de.derioo.config.Config;
 import de.derioo.config.ConfigData;
 import de.derioo.module.Module;
 import de.derioo.module.predefined.notifier.NotifierModule;
-import kotlin.Pair;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import org.jetbrains.annotations.Contract;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -39,13 +28,12 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class YoutubeNotifier {
 
 
     private static final String APPLICATION_NAME = "Varilx";
-    private static final Long DELAY = TimeUnit.MINUTES.toMillis(10);
+    private static final Long DELAY = 20_000L;
 
     private final NotifierModule module;
     private final DiscordBot bot;
@@ -100,23 +88,27 @@ public class YoutubeNotifier {
         globalConfig.getGlobal().putData(Config.Id.Data.LAST_CHECKED_YOUTUBE_TIMESTAMP, System.currentTimeMillis());
         this.bot.save(globalConfig);
 
+
         for (Map.Entry<Guild, List<YoutubeCreatorObject>> entry : getTrackedYoutuberIds().entrySet()) {
             Guild guild = entry.getKey();
             ConfigData config = bot.get(guild);
             for (YoutubeCreatorObject pair : entry.getValue()) {
                 System.out.println("Checking videos of: " + pair.getName());
-                List<SearchResult> newVideos = getNewVideos(pair.getId(), delayTimeStamp);
-                System.out.println("Got " + newVideos.size() + " since " + new Date(delayTimeStamp));
-                for (SearchResult video : newVideos) {
+                YoutubeFeed feed = getCurrentFeed(pair.getId(), delayTimeStamp);
+                if (feed == null) continue;
+
+                System.out.println("Got " + feed.getEntries().size() + " since " + new Date(delayTimeStamp));
+                for (YoutubeFeed.Entry video : feed.getEntries()) {
                     TextChannel channel = guild.getTextChannelById(config.getChannels().get(Config.Id.Channel.YOUTUBE_NOTIFY_CHANNEL.name()));
                     List<Role> roles = config.getRoleObjects(Config.Id.Role.YOUTUBE_PING_ROLES, guild);
-                    String videoUrl = getYoutubeVideoUrl(video.getId());
+                    String videoUrl = video.getLink().getHref();
+
                     channel.sendMessage("> **" + pair.getName() + "** hat ein neues Video hochgeladen, schaut vorbei! " +
                                     roles.stream().map(Role::getAsMention).collect(Collectors.joining(",")))
                             .addEmbeds(DiscordBot.Default.builder()
                                     .setAuthor("Youtube - " + pair.getName(), videoUrl)
-                                    .setTitle(video.getSnippet().getTitle(), videoUrl)
-                                    .setImage(video.getSnippet().getThumbnails().getHigh().getUrl())
+                                    .setTitle(video.getTitle(), videoUrl)
+                                    .setImage(video.getMediaGroup().getThumbnail().getUrl())
                                     .setColor(Color.RED)
                                     .build())
                             .addActionRow(Button.link(videoUrl, "Schau vorbei!"))
@@ -124,11 +116,6 @@ public class YoutubeNotifier {
                 }
             }
         }
-    }
-
-    @Contract(pure = true)
-    private @NotNull String getYoutubeVideoUrl(@NotNull ResourceId id) {
-        return "https://youtube.com/watch?v=" + id.getVideoId();
     }
 
     private @NotNull Map<Guild, List<YoutubeCreatorObject>> getTrackedYoutuberIds() {
@@ -158,21 +145,32 @@ public class YoutubeNotifier {
         }
     }
 
-    private List<SearchResult> getNewVideos(String channelId, Long checkTimeStamp) throws IOException {
-        YouTube.Search.List search = service.search().list(Collections.singletonList("id,snippet"));
-        search.setKey(getAPIKey());
-        search.setChannelId(channelId);
-        search.setType(Collections.singletonList("video"));
-        search.setMaxResults(50L);
-        search.setPublishedAfter(new DateTime(checkTimeStamp).toString());
+    private YoutubeFeed getCurrentFeed(String channelId, Long checkTimeStamp) {
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(15, TimeUnit.SECONDS)
+                .writeTimeout(15, TimeUnit.SECONDS)
+                .readTimeout(40, TimeUnit.SECONDS)
+                .build();
 
-        SearchListResponse searchResponse = search.execute();
-        List<SearchResult> searchResults = searchResponse.getItems();
+        Request request = new Request.Builder()
+                .url("https://youtube.com/feeds/videos.xml?channel_id=" + channelId)
+                .get()
+                .build();
 
-        return searchResults.stream().filter(searchResult -> {
-            long value = searchResult.getSnippet().getPublishedAt().getValue();
-            return value > checkTimeStamp;
-        }).toList();
+        YoutubeFeed feed;
+        try (okhttp3.Response response = client.newCall(request).execute();) {
+            String string = response.body().string();
+            feed = new XmlMapper().readValue(string, YoutubeFeed.class);
+        } catch (Exception e) {
+            Module.logThrowable(bot, e);
+            return null;
+        }
+
+        for (YoutubeFeed.Entry entry : new ArrayList<>(feed.getEntries())) {
+            Date date = entry.getPublishedDate();
+            if (date.getTime() < checkTimeStamp) feed.getEntries().remove(entry);
+        }
+        return feed;
     }
 
 
