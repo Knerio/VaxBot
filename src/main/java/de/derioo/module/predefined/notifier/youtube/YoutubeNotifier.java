@@ -84,12 +84,7 @@ public class YoutubeNotifier {
     }
 
     private void runVideoCheck(Long delayTimeStamp) throws Exception {
-        Config globalConfig = this.bot.get();
-        globalConfig.getGlobal().putData(Config.Id.Data.LAST_CHECKED_YOUTUBE_TIMESTAMP, System.currentTimeMillis());
-        this.bot.save(globalConfig);
-
-
-        for (Map.Entry<Guild, List<YoutubeCreatorObject>> entry : getTrackedYoutuberIds().entrySet()) {
+         for (Map.Entry<Guild, List<YoutubeCreatorObject>> entry : getTrackedYoutuberIds().entrySet()) {
             Guild guild = entry.getKey();
             ConfigData config = bot.get(guild);
             for (YoutubeCreatorObject pair : entry.getValue()) {
@@ -116,6 +111,10 @@ public class YoutubeNotifier {
                 }
             }
         }
+
+        Config globalConfig = this.bot.get();
+        globalConfig.getGlobal().putData(Config.Id.Data.LAST_CHECKED_YOUTUBE_TIMESTAMP, System.currentTimeMillis());
+        this.bot.save(globalConfig);
     }
 
     private @NotNull Map<Guild, List<YoutubeCreatorObject>> getTrackedYoutuberIds() {
