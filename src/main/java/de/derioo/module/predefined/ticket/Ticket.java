@@ -42,8 +42,8 @@ public class Ticket {
 
     public Set<User> getParticipantUsers(Guild guild) {
         Set<User> participants = new HashSet<>();
-        participants.add(guild.getJDA().getUserById(this.userId));
-        participants.add(guild.getJDA().getUserById(claimerId));
+        if (this.userId != null) participants.add(guild.getJDA().getUserById(this.userId));
+        if (this.claimerId != null) participants.add(guild.getJDA().getUserById(this.claimerId));
         for (HistoryItem item : this.history) {
            try {
                 if (item == null || item.getSenderId() == null) continue;

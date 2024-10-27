@@ -2,6 +2,7 @@ package de.derioo.module.predefined.ticket;
 
 import de.derioo.bot.DiscordBot;
 import de.derioo.config.Config;
+import de.derioo.module.Module;
 import de.derioo.utils.Emote;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -74,7 +75,7 @@ public class TicketManager {
                     values.put("Bilder", picture.getAsString());
                 }
             }
-            case BUG ->  {
+            case BUG -> {
                 values.put("Problembeschreibung", event.getValue("issue").getAsString());
                 values.put("Schritte zum Reproduzieren", event.getValue("reproduce").getAsString());
                 values.put("Ingame Name", event.getValue("name").getAsString());
@@ -209,30 +210,34 @@ public class TicketManager {
         }
 
         ScheduledFuture<?> deleteTask = scheduler.schedule(() -> {
-            channel.delete().queue();
-            bot.getRepo(TicketRepo.class).delete(ticket);
-            Guild guild = event.getGuild();
-            TextChannel logs = guild.getTextChannelById(bot.get(guild).getChannels().get(Config.Id.Channel.TICKET_LOGS_CHANNEL.name()));
-            if (logs == null) return;
-            MessageEmbed embed = DiscordBot.Default.builder()
-                    .setColor(Color.GREEN)
-                    .setTitle("Varilx.de | Ticket")
-                    .addField(new MessageEmbed.Field("Ticket Informationen", ticket.getInformations(guild), false))
-                    .addField(new MessageEmbed.Field(Emote.TEXT_CHANNEL.getData() + "Ticket Name", channel.getName(), false))
-                    .addField(new MessageEmbed.Field(Emote.CALENDAR.getData() + "Geschlossen von:", getMention(event.getUser()), true))
-                    .addField(new MessageEmbed.Field(Emote.USER.getData() + "Claimer:", ticket.getClaimerId() == null ? "**Nicht geclaimed**" : (getMention(guild.getMemberById(ticket.getClaimerId()))), true))
-                    .addField(new MessageEmbed.Field(Emote.USER.getData() + "Teilnehmer:", ticket.getParticipants(guild), true))
-                    .build();
-            logs.sendMessageEmbeds(embed).queue();
-            Set<User> transcriptions = new HashSet<>();
-            transcriptions.add(event.getJDA().getUserById(ticket.getUserId()));
-            transcriptions.add(event.getUser());
-            transcriptions.add(event.getJDA().getUserById(ticket.getClaimerId()));
-            transcriptions.addAll(ticket.getParticipantUsers(guild));
-            for (User user : transcriptions) {
-                user.openPrivateChannel().queue(pc -> {
-                    pc.sendMessageEmbeds(embed).queue();
-                });
+            try {
+                channel.delete().queue();
+                bot.getRepo(TicketRepo.class).delete(ticket);
+                Guild guild = event.getGuild();
+                TextChannel logs = guild.getTextChannelById(bot.get(guild).getChannels().get(Config.Id.Channel.TICKET_LOGS_CHANNEL.name()));
+                if (logs == null) return;
+                MessageEmbed embed = DiscordBot.Default.builder()
+                        .setColor(Color.GREEN)
+                        .setTitle("Varilx.de | Ticket")
+                        .addField(new MessageEmbed.Field("Ticket Informationen", ticket.getInformations(guild), false))
+                        .addField(new MessageEmbed.Field(Emote.TEXT_CHANNEL.getData() + "Ticket Name", channel.getName(), false))
+                        .addField(new MessageEmbed.Field(Emote.CALENDAR.getData() + "Geschlossen von:", getMention(event.getUser()), true))
+                        .addField(new MessageEmbed.Field(Emote.USER.getData() + "Claimer:", ticket.getClaimerId() == null ? "**Nicht geclaimed**" : (getMention(guild.getMemberById(ticket.getClaimerId()))), true))
+                        .addField(new MessageEmbed.Field(Emote.USER.getData() + "Teilnehmer:", ticket.getParticipants(guild), true))
+                        .build();
+                logs.sendMessageEmbeds(embed).queue();
+                Set<User> transcriptions = new HashSet<>();
+                transcriptions.add(event.getJDA().getUserById(ticket.getUserId()));
+                transcriptions.add(event.getUser());
+                transcriptions.add(event.getJDA().getUserById(ticket.getClaimerId()));
+                transcriptions.addAll(ticket.getParticipantUsers(guild));
+                for (User user : transcriptions) {
+                    user.openPrivateChannel().queue(pc -> {
+                        pc.sendMessageEmbeds(embed).queue();
+                    });
+                }
+            } catch (Exception e) {
+                Module.logThrowable(bot, e);
             }
         }, 11, TimeUnit.SECONDS);
         scheduledTasks.get(ticket.getId()).add(deleteTask);
