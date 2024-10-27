@@ -88,11 +88,9 @@ public class YoutubeNotifier {
             Guild guild = entry.getKey();
             ConfigData config = bot.get(guild);
             for (YoutubeCreatorObject pair : entry.getValue()) {
-                System.out.println("Checking videos of: " + pair.getName());
                 YoutubeFeed feed = getCurrentFeed(pair.getId(), delayTimeStamp);
                 if (feed == null) continue;
 
-                System.out.println("Got " + feed.getEntries().size() + " since " + new Date(delayTimeStamp));
                 for (YoutubeFeed.Entry video : feed.getEntries()) {
                     TextChannel channel = guild.getTextChannelById(config.getChannels().get(Config.Id.Channel.YOUTUBE_NOTIFY_CHANNEL.name()));
                     List<Role> roles = config.getRoleObjects(Config.Id.Role.YOUTUBE_PING_ROLES, guild);
