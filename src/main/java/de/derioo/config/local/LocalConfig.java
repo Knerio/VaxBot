@@ -45,13 +45,6 @@ public class LocalConfig {
         return new ObjectMapper().readValue(file, LocalConfig.class);
     }
 
-    public static LocalConfig loadByENV() throws IOException {
-        Map<String, String> envs = System.getenv();
-        ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper
-                .disable(JsonGenerator.Feature.IGNORE_UNKNOWN)
-                .readValue(objectMapper.writeValueAsString(envs), LocalConfig.class);
-    }
 
 
     @Jacksonized
