@@ -62,7 +62,8 @@ public class TwitchNotifier {
 
     private void notify(Stream stream, TextChannel channel, List<Role> roles) {
         notifyCache.putIfAbsent(stream.getUserName(), System.currentTimeMillis());
-        if (System.currentTimeMillis() - notifyCache.get(stream.getUserName()) < TimeUnit.SECONDS.toMillis(120)) {
+        if (System.currentTimeMillis() - notifyCache.get(stream.getUserName()) > TimeUnit.SECONDS.toMillis(120)) {
+            System.out.println("Skipping notification for " + stream.getUserName() + " because of cache");
             return;
         }
         notifyCache.put(stream.getUserName(), System.currentTimeMillis());
