@@ -94,6 +94,7 @@ public abstract class Module {
     public static void logThrowable(DiscordBot bot, Throwable throwable) {
         Config config = Config.get(bot.getRepo(ConfigRepo.class));
         for (Guild guild : bot.getJda().getGuilds()) {
+            String errorMentions = config.get(guild).getMentions(Config.Id.Role.ERROR_ROLE, guild);
             Long l = config.get(guild).getChannels().getOrDefault(Config.Id.Channel.ERROR_CHANNEL.name(), null);
             if (l == null) continue;
 
@@ -101,13 +102,15 @@ public abstract class Module {
             URI url = PasteBinUtil.createPasteOfThrowable(throwable);
             if (url == null) {
                 textChannel.sendMessage(new Formatter().format("""
+                        %s
                         Ein Fehler ist beim Fehler loggen aufgetreten.
                         Ehemaliger Fehler: %s
-                        """, PasteBinUtil.getStacktrace(throwable)).toString()).queue();
+                        """, errorMentions, PasteBinUtil.getStacktrace(throwable)).toString()).queue();
                 throwable.printStackTrace();
                 return;
             }
-            textChannel.sendMessageEmbeds(DiscordBot.Default.error(throwable, true)
+            textChannel.sendMessage(errorMentions)
+                    .addEmbeds(DiscordBot.Default.error(throwable, true)
                             .setDescription("Siehe Link für Stacktrace")
                             .build())
                     .addActionRow(Button.link(url.toString(), "Paste.gg"))

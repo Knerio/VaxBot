@@ -42,20 +42,21 @@ public class LevelModule extends Module {
     }
 
     public LevelPlayerData getPlayerData(Guild guild, User user) {
-        LevelPlayerData data = this.repo.findFirstById(user.getId() + ":" + guild.getId());
-        if (data == null) {
-            data = LevelPlayerData.builder()
-                    .id(user.getId() + ":" + guild.getId())
-                    .stats(LevelPlayerData.Stats.builder()
-                            .xp(0)
-                            .voiceStats(LevelPlayerData.Stats.VoiceStats.builder()
-                                    .totalTime(0)
-                                    .voiceChannelJoinTimestamp(-1)
-                                    .build())
-                            .build())
-                    .build();
+        if (this.repo.existsById(user.getId() + ":" + guild.getId())) {
+            return this.repo.findFirstById(user.getId() + ":" + guild.getId());
         }
+        LevelPlayerData data = LevelPlayerData.builder()
+                .id(user.getId() + ":" + guild.getId())
+                .stats(LevelPlayerData.Stats.builder()
+                        .xp(0)
+                        .voiceStats(LevelPlayerData.Stats.VoiceStats.builder()
+                                .totalTime(0)
+                                .voiceChannelJoinTimestamp(-1)
+                                .build())
+                        .build())
+                .build();
         this.repo.save(data);
+
         return data;
     }
 
