@@ -1,5 +1,5 @@
 # Use an official Gradle image with Java 21 for building the application
-FROM gradle:8.2-jdk21 AS builder
+FROM gradle:8.10-jdk21 AS builder
 
 # Set the working directory
 WORKDIR /app
