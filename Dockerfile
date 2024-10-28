@@ -12,7 +12,7 @@ COPY src /app/src
 
 RUN gradle shadowJar --no-daemon
 
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:21.0.5_11-jre
 
 WORKDIR /app
 
