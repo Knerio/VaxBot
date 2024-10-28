@@ -11,6 +11,7 @@ import de.derioo.config.repository.ConfigRepo;
 import de.derioo.javautils.common.DateUtility;
 import de.derioo.javautils.common.StringUtility;
 import de.derioo.module.Module;
+import de.derioo.module.ModuleManager;
 import de.derioo.module.predefined.apply.ApplyModule;
 import de.derioo.module.predefined.boost.BoostModule;
 import de.derioo.module.predefined.clear.ClearCommand;
@@ -98,27 +99,27 @@ public class DiscordBot extends ListenerAdapter {
         this.repositories.put(LevelPlayerDataRepo.class, this.mongoManager.create(LevelPlayerDataRepo.class));
         this.repositories.put(RandomMemeRepository.class, this.mongoManager.create(RandomMemeRepository.class));
 
-        new JoinModule(this).start();
-        new StafflistModule(this).start();
-        new StatusChangerModule(this).start();
-        new TicketModule(this, langConfig).start();
-        new SuggestionModule(this).start();
-        new UserCountModule(this).start();
-        new SupportModule(this).start();
-        new FeedbackModule(this).start();
-        new BoostModule(this).start();
-        new ApplyModule(this).start();
-        new RulesModule(this).start();
-        new RandomMemeModule(this).start();
-        new LogModule(this).start();
-        new NotifierModule(this).start();
-        LevelModule levelModule = new LevelModule(this);
-        levelModule.start();
-        GiveAwayModule giveAwayModule = new GiveAwayModule(this);
-        giveAwayModule.start();
+        ModuleManager manager = new ModuleManager(this, langConfig);
+
+        manager.enableAllModules();
 
         LiteJDAFactory.builder(jda)
-                .commands(new WarnCommand(this), new TimeoutCommand(), new BanCommand(), new KickCommand(), new ClearCommand(), new UserInfoCommand(), new MoveallCommand(), new GiveAwayCommand(this, giveAwayModule), new ConfigCommand(this), new UnclaimCommand(this), new TicketCommand(this), new TeamCommand(this), new EightballCommand(), new LeaderboardCommand(this, levelModule), new LevelCommand(this, levelModule), new RandomMemeCommand(this))
+                .commands(new WarnCommand(this),
+                        new TimeoutCommand(),
+                        new BanCommand(),
+                        new KickCommand(),
+                        new ClearCommand(),
+                        new UserInfoCommand(),
+                        new MoveallCommand(),
+                        new GiveAwayCommand(this, manager.getModule(GiveAwayModule.class)),
+                        new ConfigCommand(this),
+                        new UnclaimCommand(this),
+                        new TicketCommand(this),
+                        new TeamCommand(this),
+                        new EightballCommand(),
+                        new LeaderboardCommand(this, manager.getModule(LevelModule.class)),
+                        new LevelCommand(this, manager.getModule(LevelModule.class)),
+                        new RandomMemeCommand(this))
                 .exceptionUnexpected((invocation, throwable, resultHandlerChain) -> {
                     Module.logThrowable(this, throwable);
                 })

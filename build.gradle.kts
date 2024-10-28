@@ -50,6 +50,8 @@ dependencies {
     implementation("com.github.twitch4j:twitch4j:1.22.0")
     implementation("com.google.api-client:google-api-client:1.35.2")
     implementation("com.google.apis:google-api-services-youtube:v3-rev20241022-2.0.0")
+
+    implementation("org.reflections:reflections:0.10.2")
 }
 
 tasks.withType<JavaCompile> {

@@ -130,7 +130,7 @@ public abstract class Module {
     }
 
 
-    public void updateOrSendEmbed(Config.Id.Channel channelConfig, MessageEmbed embed, ActionRow... rows) {
+    public final void updateOrSendEmbed(Config.Id.Channel channelConfig, MessageEmbed embed, ActionRow... rows) {
         Config config = Config.get(bot.getRepo(ConfigRepo.class));
         for (Guild guild : bot.getJda().getGuilds()) {
             if (!config.getData().get(guild.getId()).getChannels().containsKey(channelConfig.name()))
