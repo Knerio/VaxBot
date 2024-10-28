@@ -1,6 +1,7 @@
 package de.derioo;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.derioo.bot.DiscordBot;
 import de.derioo.config.local.LangConfig;
 import de.derioo.config.local.LocalConfig;
