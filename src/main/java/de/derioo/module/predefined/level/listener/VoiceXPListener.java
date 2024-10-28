@@ -30,8 +30,8 @@ public class VoiceXPListener {
             @Override
             public void run() {
                 for (LevelPlayerData data : repo.findAll()) {
-                    Guild guild = module.getBot().getJda().getGuildById(data.getId().split(":")[1]);
-                    Member member = guild.getMemberById(data.getId().split(":")[0]);
+                    Guild guild = module.getBot().getJda().getGuildById(data.getGuildId());
+                    Member member = guild.getMemberById(data.getUserId());
                     if (member == null) return;
                     GuildVoiceState state = member.getVoiceState();
                     if (!state.inAudioChannel() || state.isDeafened() || state.isMuted()) {

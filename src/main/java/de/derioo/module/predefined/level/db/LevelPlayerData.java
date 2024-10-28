@@ -14,12 +14,15 @@ import java.util.Objects;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
+@ToString
 public class LevelPlayerData {
 
-    // UserID + ":" + guildId
-    @Id
-    String id;
 
+    @Id
+    ObjectId id;
+
+    String guildId;
+    String userId;
 
     Stats stats;
 
@@ -29,12 +32,6 @@ public class LevelPlayerData {
         return Objects.equals(this.id, other.id);
     }
 
-    public String toString() {
-        return "LevelPlayerData{" +
-                "id='" + id + '\'' +
-                ", stats=" + stats +
-                '}';
-    }
 
     @AllArgsConstructor
     @NoArgsConstructor
@@ -42,18 +39,14 @@ public class LevelPlayerData {
     @Setter
     @FieldDefaults(level = AccessLevel.PRIVATE)
     @Builder
+    @ToString
     public static class Stats {
 
         int xp;
 
         VoiceStats voiceStats;
 
-        public String toString() {
-            return "Stats{" +
-                    "xp=" + xp +
-                    ", voiceStats=" + voiceStats +
-                    '}';
-        }
+
 
 
         @AllArgsConstructor
@@ -62,6 +55,7 @@ public class LevelPlayerData {
         @Setter
         @FieldDefaults(level = AccessLevel.PRIVATE)
         @Builder
+        @ToString
         public static class VoiceStats {
 
             // In ms
@@ -85,12 +79,7 @@ public class LevelPlayerData {
                 return new Formatter().format("`%s` Tage, `%s` Stunden, `%s` Minuten, `%s` Sekunden", days, hours, minutes, seconds).toString();
             }
 
-            public String toString() {
-                return "VoiceStats{" +
-                        "totalTime=" + totalTime +
-                        ", voiceChannelJoinTimestamp=" + voiceChannelJoinTimestamp +
-                        '}';
-            }
+
         }
     }
 

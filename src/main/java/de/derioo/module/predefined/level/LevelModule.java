@@ -9,10 +9,12 @@ import de.derioo.module.predefined.level.db.LevelPlayerDataRepo;
 import de.derioo.module.predefined.level.listener.MessageXPListener;
 import de.derioo.module.predefined.level.listener.VoiceXPListener;
 import de.derioo.utils.Emote;
+import eu.koboo.en2do.repository.methods.sort.Sort;
 import lombok.Getter;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.guild.voice.GenericGuildVoiceEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
+import org.bson.types.ObjectId;
 
 import java.awt.*;
 import java.util.Comparator;
@@ -42,11 +44,13 @@ public class LevelModule extends Module {
     }
 
     public LevelPlayerData getPlayerData(Guild guild, User user) {
-        if (this.repo.existsById(user.getId() + ":" + guild.getId())) {
-            return this.repo.findFirstById(user.getId() + ":" + guild.getId());
+        if (this.repo.existsByUserIdAndGuildId(user.getId(), guild.getId())) {
+            return this.repo.findFirstByUserIdAndGuildId(user.getId(), guild.getId());
         }
         LevelPlayerData data = LevelPlayerData.builder()
-                .id(user.getId() + ":" + guild.getId())
+                .id(new ObjectId())
+                .userId(user.getId())
+                .guildId(guild.getId())
                 .stats(LevelPlayerData.Stats.builder()
                         .xp(0)
                         .voiceStats(LevelPlayerData.Stats.VoiceStats.builder()
@@ -61,8 +65,8 @@ public class LevelModule extends Module {
     }
 
     public Integer getVoiceRank(LevelPlayerData data, Guild guild) {
-        List<LevelPlayerData> list = this.repo.findAll()
-                .stream().filter(obj -> obj.getId().split(":")[1].equalsIgnoreCase(guild.getId()))
+        List<LevelPlayerData> list = this.repo.findManyByGuildId(guild.getId())
+                .stream()
                 .sorted(Comparator.comparingLong(o -> ((LevelPlayerData) o).getStats().getVoiceStats().getLifeTotalTime()).reversed())
                 .toList();
 
@@ -70,8 +74,8 @@ public class LevelModule extends Module {
     }
 
     public Integer getMessageRank(LevelPlayerData data, Guild guild) {
-        List<LevelPlayerData> list = this.repo.findAll()
-                .stream().filter(obj -> obj.getId().split(":")[1].equalsIgnoreCase(guild.getId()))
+        List<LevelPlayerData> list = this.repo.findManyByGuildId(guild.getId())
+                .stream()
                 .sorted(Comparator.comparingLong(o -> ((LevelPlayerData) o).getStats().getXp()).reversed())
                 .toList();
 

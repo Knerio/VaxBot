@@ -37,9 +37,9 @@ public class LeaderboardCommand {
 
     @Execute
     public void leaderboard(@Arg("type") @Description("Der Typ des Leaderboards") Type type, @Context SlashCommandInteractionEvent event) {
-        LevelPlayerData data = this.repo.findFirstById(event.getUser().getId() + ":" + event.getGuild().getId());
-        List<LevelPlayerData> list = this.repo.findAll()
-                .stream().filter(obj -> obj.getId().split(":")[1].equalsIgnoreCase(event.getGuild().getId()))
+        LevelPlayerData data = this.repo.findFirstByUserIdAndGuildId(event.getUser().getId(), event.getGuild().getId());
+        List<LevelPlayerData> list = this.repo.findManyByGuildId(event.getGuild().getId())
+                .stream()
                 .sorted(Comparator.comparingLong(o -> switch (type) {
                     case VOICE -> ((LevelPlayerData) o).getStats().getVoiceStats().getLifeTotalTime();
                     case LEVEL -> ((LevelPlayerData) o).getStats().getXp();
@@ -54,7 +54,7 @@ public class LeaderboardCommand {
         for (int i = 0; i < 10; i++) {
             LevelPlayerData currentData = list.get(i);
             boolean isHe = currentData.equals(data);
-            User user = event.getJDA().retrieveUserById(currentData.getId().split(":")[0]).complete();
+            User user = event.getJDA().retrieveUserById(currentData.getUserId()).complete();
             if (user == null) {
                 System.out.println("User is null");
                 System.out.println(currentData);
