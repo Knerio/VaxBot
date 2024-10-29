@@ -46,10 +46,6 @@ public class RandomMemeModule extends Module {
                 list(event);
                 return;
             }
-            case "find" -> {
-                find(event);
-                return;
-            }
         }
         if (event.getMessage().getAttachments().isEmpty()) return;
 
@@ -81,41 +77,6 @@ public class RandomMemeModule extends Module {
             }
         }
         FileUtils.deleteDirectory(new File("./temp"));
-    }
-
-    private void find(MessageReceivedEvent event) throws IOException, ExecutionException, InterruptedException {
-        if (event.getMessage().getAttachments().size() != 1) return;
-
-        byte[] data = getBytes(event.getMessage().getAttachments().getFirst());
-
-        for (Guild guild : this.bot.getJda().getGuilds()) {
-            Message waitMessage = event.getMessage().reply("⚙️ Meme wird gesucht ⚙️").complete();
-            if (!hasPermission(event, guild)) continue;
-
-            for (RandomMeme randomMeme : ((RandomMemeRepository) this.repo).findManyByData(new Binary(data))) {
-                if (!Arrays.equals(randomMeme.getData().getData(), data)) continue;
-                waitMessage.editMessage("Das Meme wurde gefunden (" + randomMeme.getId() + ")")
-                        .setFiles(FileUpload.fromData(randomMeme.getData().getData(), "image." + randomMeme.getFileExtension()))
-                        .queue();
-                return;
-            }
-        }
-    }
-
-    private byte[] getBytes(Message.Attachment attachment) throws IOException, ExecutionException, InterruptedException {
-        File dir = new File("./temp");
-        File file = new File("./temp/" + attachment.getId() + ".png");
-        dir.mkdirs();
-        file.createNewFile();
-        attachment.getProxy().downloadToFile(file).get();
-
-        compress(file, attachment.getFileExtension());
-
-        byte[] bytes = Files.readAllBytes(file.toPath());
-
-        FileUtils.deleteDirectory(new File("./temp"));
-
-        return bytes;
     }
 
     private void list(MessageReceivedEvent event) {

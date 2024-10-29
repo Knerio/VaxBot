@@ -14,5 +14,4 @@ public interface RandomMemeRepository extends Repository<RandomMeme, ObjectId> {
 
     List<RandomMeme> pageByGuildId(Long guildId, Pagination pagination);
 
-    List<RandomMeme> findManyByData(Binary data);
 }
