@@ -227,9 +227,9 @@ public class TicketManager {
                         .build();
                 logs.sendMessageEmbeds(embed).queue();
                 Set<User> transcriptions = new HashSet<>();
-                transcriptions.add(event.getJDA().getUserById(ticket.getUserId()));
+                transcriptions.add(event.getJDA().retrieveUserById(ticket.getUserId()).complete());
                 transcriptions.add(event.getUser());
-                transcriptions.add(event.getJDA().getUserById(ticket.getClaimerId()));
+                if (ticket.getClaimerId() != null) transcriptions.add(event.getJDA().retrieveUserById(ticket.getClaimerId()).complete());
                 transcriptions.addAll(ticket.getParticipantUsers(guild));
                 for (User user : transcriptions) {
                     user.openPrivateChannel().queue(pc -> {
