@@ -216,24 +216,36 @@ public class TicketManager {
                 Guild guild = event.getGuild();
                 TextChannel logs = guild.getTextChannelById(bot.get(guild).getChannels().get(Config.Id.Channel.TICKET_LOGS_CHANNEL.name()));
                 if (logs == null) return;
-                MessageEmbed embed = DiscordBot.Default.builder()
+                boolean raw;
+                String informations = ticket.getInformations(guild);
+                EmbedBuilder embed = DiscordBot.Default.builder()
                         .setColor(Color.GREEN)
                         .setTitle("Varilx.de | Ticket")
-                        .addField(new MessageEmbed.Field("Ticket Informationen", ticket.getInformations(guild), false))
                         .addField(new MessageEmbed.Field(Emote.TEXT_CHANNEL.getData() + "Ticket Name", channel.getName(), false))
                         .addField(new MessageEmbed.Field(Emote.CALENDAR.getData() + "Geschlossen von:", getMention(event.getUser()), true))
                         .addField(new MessageEmbed.Field(Emote.USER.getData() + "Claimer:", ticket.getClaimerId() == null ? "**Nicht geclaimed**" : (getMention(guild.getMemberById(ticket.getClaimerId()))), true))
-                        .addField(new MessageEmbed.Field(Emote.USER.getData() + "Teilnehmer:", ticket.getParticipants(guild), true))
-                        .build();
-                logs.sendMessageEmbeds(embed).queue();
+                        .addField(new MessageEmbed.Field(Emote.USER.getData() + "Teilnehmer:", ticket.getParticipants(guild), true));
+
+                if (informations.length() < 1024) {
+                    raw = false;
+                    embed.addField(new MessageEmbed.Field("Ticket Informationen", informations, false));
+                } else if (informations.length() > 1024 && informations.length() < 4095) {
+                    raw = false;
+                    embed.setDescription(informations);
+                } else {
+                    raw = true;
+                }
+
+                logs.sendMessage(raw ? informations : "").addEmbeds(embed.build()).queue();
                 Set<User> transcriptions = new HashSet<>();
                 transcriptions.add(event.getJDA().retrieveUserById(ticket.getUserId()).complete());
                 transcriptions.add(event.getUser());
-                if (ticket.getClaimerId() != null) transcriptions.add(event.getJDA().retrieveUserById(ticket.getClaimerId()).complete());
+                if (ticket.getClaimerId() != null)
+                    transcriptions.add(event.getJDA().retrieveUserById(ticket.getClaimerId()).complete());
                 transcriptions.addAll(ticket.getParticipantUsers(guild));
                 for (User user : transcriptions) {
                     user.openPrivateChannel().queue(pc -> {
-                        pc.sendMessageEmbeds(embed).queue();
+                        pc.sendMessage(raw ? informations : "").addEmbeds(embed.build()).queue();
                     });
                 }
             } catch (Exception e) {

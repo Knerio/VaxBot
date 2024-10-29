@@ -126,15 +126,15 @@ public class TicketModule extends Module {
                 switch (choice) {
                     case PARTNER -> {
                         inputs.add(TextInput.create("website", "Websiten oder Discord Link", TextInputStyle.SHORT)
-                                .setRequired(true)
+                                .setRequired(true).setMaxLength(1000)
                                 .setPlaceholder("\"discord.gg/varilx\"")
                         );
                         inputs.add(TextInput.create("contact", "Kontakt", TextInputStyle.SHORT)
-                                .setRequired(true)
+                                .setRequired(true).setMaxLength(1000)
                                 .setPlaceholder("\"email@example.com\"")
                         );
                         inputs.add(TextInput.create("text", "Bewerbung", TextInputStyle.PARAGRAPH)
-                                .setRequired(true)
+                                .setRequired(true).setMaxLength(1000)
                                 .setPlaceholder("Hallo liebes Varilx.DE Team, \n...")
                                 .setMinLength(15)
                         );
@@ -142,18 +142,18 @@ public class TicketModule extends Module {
                     case EVENT_TOKEN -> {
                         inputs.add(TextInput.create("token-count", "Wie viele Tokens möchtest du einlösen", TextInputStyle.SHORT)
                                 .setPlaceholder("z.B. \"12\"")
-                                .setRequired(true)
+                                .setRequired(true).setMaxLength(1000)
                         );
                         inputs.add(TextInput.create("token-item", "Wie möchtest du bekommen?", TextInputStyle.SHORT)
                                 .setPlaceholder("z.B. \"64x Netherite Barren\"")
-                                .setRequired(true)
+                                .setRequired(true).setMaxLength(1000)
                         );
                         addIngameNameInput(inputs);
                     }
                     case HELP_AND_SUPPORT -> {
                         inputs.add(TextInput.create("issue", "Kurze Beschreibung deines Anliegens", TextInputStyle.PARAGRAPH)
                                 .setPlaceholder("z.B. \"Ich will das und das machen und habe deshalb ein Problem\"")
-                                .setRequired(true)
+                                .setRequired(true).setMaxLength(1000)
                                 .setMinLength(10)
                         );
                         addIngameNameInput(inputs);
@@ -162,12 +162,12 @@ public class TicketModule extends Module {
                     case BUG -> {
                         inputs.add(TextInput.create("reproduce", "Schritte zum Reproduzieren", TextInputStyle.PARAGRAPH)
                                 .setPlaceholder("z.B. \"Du musst zuerst das machen, damit x Fehler passiert\"")
-                                .setRequired(true)
+                                .setRequired(true).setMaxLength(1000)
                                 .setMinLength(10)
                         );
                         inputs.add(TextInput.create("issue", "Kurze Beschreibung des Bugs / Problems", TextInputStyle.PARAGRAPH)
                                 .setPlaceholder("z.B. \"Ich habe eine Fehler im System x gefunden\"")
-                                .setRequired(true)
+                                .setRequired(true).setMaxLength(1000)
                                 .setMinLength(10)
                         );
                         addIngameNameInput(inputs);
@@ -176,7 +176,7 @@ public class TicketModule extends Module {
                     case QUESTIONS -> {
                         inputs.add(TextInput.create("question", "Kurze Beschreibung deiner Frage", TextInputStyle.PARAGRAPH)
                                 .setPlaceholder("z.B. \"Ich habe eine Frage zum System x\"")
-                                .setRequired(true)
+                                .setRequired(true).setMaxLength(1000)
                                 .setMinLength(10)
                         );
                     }
@@ -203,7 +203,7 @@ public class TicketModule extends Module {
                 .setPlaceholder("z.B. \"Knerio\"")
                 .setMinLength(3)
                 .setMaxLength(15)
-                .setRequired(true));
+                .setRequired(true).setMaxLength(1000));
     }
 
     @ModuleListener
