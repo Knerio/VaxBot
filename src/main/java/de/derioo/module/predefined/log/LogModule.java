@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.events.guild.GuildBanEvent;
 import net.dv8tion.jda.api.events.guild.GuildTimeoutEvent;
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameEvent;
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateTimeOutEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateNameEvent;
@@ -32,6 +33,15 @@ public class LogModule extends Module {
         super(bot, "log");
     }
 
+    @ModuleListener
+    public void onButton(ButtonInteractionEvent event) {
+        if (event.getButton().getId() == null) return;
+        switch (event.getButton().getId()) {
+            case "delete-message" -> {
+                event.getMessage().delete().queue();
+            }
+        }
+    }
 
     @ModuleListener
     public void onUsernameChange(UserUpdateNameEvent event) {

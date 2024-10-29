@@ -5,6 +5,7 @@ import de.derioo.bot.DiscordBot;
 import de.derioo.config.Config;
 import de.derioo.config.repository.ConfigRepo;
 import de.derioo.javautils.common.MathUtility;
+import de.derioo.utils.Emote;
 import de.derioo.utils.PasteBinUtil;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -113,7 +114,7 @@ public abstract class Module {
                     .addEmbeds(DiscordBot.Default.error(throwable, true)
                             .setDescription("Siehe Link für Stacktrace")
                             .build())
-                    .addActionRow(Button.link(url.toString(), "Paste.gg"))
+                    .addActionRow(Button.link(url.toString(), "Paste.gg"), Button.success("delete-message", "Fehler gelöst?").withEmoji(Emote.TRASH.getFormatted()))
                     .queue();
             throwable.printStackTrace();
         }
