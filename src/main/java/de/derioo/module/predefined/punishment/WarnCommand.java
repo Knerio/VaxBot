@@ -8,6 +8,7 @@ import dev.rollczi.litecommands.annotations.command.Command;
 import dev.rollczi.litecommands.annotations.context.Context;
 import dev.rollczi.litecommands.annotations.description.Description;
 import dev.rollczi.litecommands.annotations.execute.Execute;
+import dev.rollczi.litecommands.annotations.join.Join;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -32,7 +33,7 @@ public class WarnCommand {
 
     @NeedsRole(Config.Id.Role.WARN_USER)
     @Execute
-    public void execute(@Arg("user") @Description("Der User der gewarned werden soll") User user, @Arg("grund") @Description("Der Grund für den timeout") String reason, @Context SlashCommandInteractionEvent event) {
+    public void execute(@Arg("user") @Description("Der User der gewarned werden soll") User user, @Join("grund") @Description("Der Grund für den timeout") String reason, @Context SlashCommandInteractionEvent event) {
         Member member = event.getGuild().getMember(user);
 
         Warn warn = this.repo.findFirstById(user.getIdLong());

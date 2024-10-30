@@ -36,7 +36,7 @@ dependencies {
     implementation("com.github.walkyst:lavaplayer-fork:1.4.3")
 
     /** CommandFramework **/
-    implementation("dev.rollczi:litecommands-jda:3.4.2")
+    implementation("dev.rollczi:litecommands-jda:3.8.0")
 
     /** Mongo DB **/
     implementation("org.mongodb:mongodb-driver-sync:5.2.0")

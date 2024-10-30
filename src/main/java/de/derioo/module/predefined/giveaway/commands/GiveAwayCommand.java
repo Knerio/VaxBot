@@ -13,6 +13,7 @@ import dev.rollczi.litecommands.annotations.command.Command;
 import dev.rollczi.litecommands.annotations.context.Context;
 import dev.rollczi.litecommands.annotations.description.Description;
 import dev.rollczi.litecommands.annotations.execute.Execute;
+import dev.rollczi.litecommands.annotations.join.Join;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -39,9 +40,9 @@ public class GiveAwayCommand {
 
     @Execute
     @NeedsRole(Config.Id.Role.GIVEAWAY_CREATE_ROLE)
-    public void execute(@Arg("preis") @Description("Der Preis, welcher verlost wird") String price,
+    public void execute(@Join("preis") @Description("Der Preis, welcher verlost wird") String price,
                         @Arg("gewinner") @Description("Wie viele Gewinner soll es geben") Integer winner,
-                        @Arg("länge") @Description("Wie lange soll das Giveaway dauern (zb. 12:00 oder 12.03.2024, 12:00)") String duration,
+                        @Join("länge") @Description("Wie lange soll das Giveaway dauern (zb. 12:00 oder 12.03.2024, 12:00)") String duration,
                         @Context SlashCommandInteractionEvent event) throws ParseException {
         Date durationDate = DateUtility.parseDynamic(duration);
         GiveAway giveAway =
