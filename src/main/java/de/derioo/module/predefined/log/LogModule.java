@@ -71,7 +71,7 @@ public class LogModule extends Module {
                 .type(ActionType.BAN).queueAfter(1, TimeUnit.SECONDS, entries -> {
                     for (AuditLogEntry entry : entries) {
                         if (!entry.getTargetId().equals(event.getUser().getId())) continue;
-                        log((Member) null, DiscordBot.Default.builder()
+                        log((User) null, DiscordBot.Default.builder()
                                 .setTitle("User gebannt")
                                 .addField("Beschreibung",
                                         UserUtils.getMention(event.getUser()) + " wurde von " +
