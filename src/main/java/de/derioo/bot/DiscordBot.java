@@ -2,6 +2,8 @@ package de.derioo.bot;
 
 import de.derioo.annotations.NeedsAdmin;
 import de.derioo.annotations.NeedsRole;
+import de.derioo.bot.args.MemberArgument;
+import de.derioo.bot.args.UserArgument;
 import de.derioo.config.Config;
 import de.derioo.config.ConfigData;
 import de.derioo.config.commands.ConfigCommand;
@@ -33,6 +35,8 @@ import de.derioo.module.predefined.randommeme.RandomMemeModule;
 import de.derioo.module.predefined.randommeme.commands.RandomMemeCommand;
 import de.derioo.module.predefined.randommeme.db.RandomMemeRepository;
 import de.derioo.module.predefined.rules.RulesModule;
+import de.derioo.module.predefined.spoof.SpoofCommand;
+import de.derioo.module.predefined.spoof.SpoofModule;
 import de.derioo.module.predefined.stafflist.StafflistModule;
 import de.derioo.module.predefined.stafflist.TeamCommand;
 import de.derioo.module.predefined.statuschanger.StatusChangerModule;
@@ -104,6 +108,8 @@ public class DiscordBot extends ListenerAdapter {
         manager.enableAllModules();
 
         LiteJDAFactory.builder(jda)
+                .argument(User.class, new UserArgument())
+                .argument(Member.class, new MemberArgument())
                 .commands(new WarnCommand(this),
                         new TimeoutCommand(),
                         new BanCommand(),
@@ -119,6 +125,7 @@ public class DiscordBot extends ListenerAdapter {
                         new EightballCommand(),
                         new LeaderboardCommand(this, manager.getModule(LevelModule.class)),
                         new LevelCommand(this, manager.getModule(LevelModule.class)),
+                        new SpoofCommand(manager.getModule(SpoofModule.class)),
                         new RandomMemeCommand(this))
                 .exceptionUnexpected((invocation, throwable, resultHandlerChain) -> {
                     Module.logThrowable(this, throwable);
