@@ -38,6 +38,7 @@ public class LogModule extends Module {
         if (event.getButton().getId() == null) return;
         switch (event.getButton().getId()) {
             case "delete-message" -> {
+                event.reply("Wird gelöscht").setEphemeral(true).queue();
                 event.getMessage().delete().queue();
             }
         }
