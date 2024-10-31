@@ -26,7 +26,7 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-core:2.18.0")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.0")
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.18.0")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.18.0")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.18.1")
 
     /** JavaUtils **/
     implementation("de.derioo.javautils:common:2.7.2")
