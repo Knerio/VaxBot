@@ -56,7 +56,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.3")
     testImplementation("org.assertj:assertj-core:3.26.3")
     testImplementation("org.mockito:mockito-core:5.5.0")
-    testImplementation("uk.org.webcompere:system-stubs-jupiter:2.0.1")
+    testImplementation("uk.org.webcompere:system-stubs-jupiter:2.1.7")
 }
 
 tasks.withType<JavaCompile> {
