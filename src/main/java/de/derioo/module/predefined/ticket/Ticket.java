@@ -68,7 +68,8 @@ public class Ticket {
                 builder.append("*").append(historyItem.getContent()).append("*").append("\n");
                 continue;
             }
-            Member member = Objects.requireNonNull(guild.getMemberById(historyItem.getSenderId()));
+            Member member = guild.getMemberById(historyItem.getSenderId());
+            if (member == null) continue;
             builder.append(getMention(member))
                     .append(" -> ")
                     .append(historyItem.getContent())
