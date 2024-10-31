@@ -7,6 +7,7 @@ public class StatusHandler {
 
     public StatusHandler(DiscordBot bot) {
         new Thread(() -> {
+            String port = System.getenv("API_PORT");
             Javalin.create()
                     .get("/ping", ctx -> {
                         if (bot == null) {
@@ -16,7 +17,7 @@ public class StatusHandler {
                         Long time = bot.getJda().getRestPing().complete();
                         ctx.result("Pong! (" + time + "ms)");
                     })
-                    .start(8080);
+                    .start(port != null ? Integer.parseInt(port) : 8080);
         }).start();
     }
 }

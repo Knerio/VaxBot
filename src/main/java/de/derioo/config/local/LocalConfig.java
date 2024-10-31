@@ -45,6 +45,24 @@ public class LocalConfig {
         return new ObjectMapper().readValue(file, LocalConfig.class);
     }
 
+    public static LocalConfig loadByENV() {
+        return LocalConfig.builder()
+                .token(System.getenv("DISCORD_BOT_TOKEN"))
+                .connectionString(System.getenv("DB_CONNECTION_STRING"))
+                .db(System.getenv().getOrDefault("DB_NAME", "discord-bot"))
+                .twitch(Twitch.builder()
+                        .clientId(System.getenv("TWITCH_CLIENT_ID"))
+                        .clientSecret(System.getenv("TWITCH_CLIENT_SECRET"))
+                        .build())
+                .youtube(Youtube.builder()
+                        .token(System.getenv("YOUTUBE_TOKEN"))
+                        .build())
+                .tiktok(TikTok.builder()
+                        .token(System.getenv("TIKTOK_TOKEN"))
+                        .build())
+                .build();
+    }
+
 
 
     @Jacksonized

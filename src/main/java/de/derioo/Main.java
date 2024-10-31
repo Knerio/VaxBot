@@ -39,7 +39,7 @@ public class Main {
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/Berlin"));
         File configFile = new File(".", "credentials.json");
         File langFile = new File(".", "lang.json");
-        LocalConfig config = configFile.exists() ? LocalConfig.load(configFile) : null;
+        LocalConfig config = configFile.exists() ? LocalConfig.load(configFile) : LocalConfig.loadByENV();
         LangConfig langConfig = langFile.exists() ? LangConfig.load(langFile) : LangConfig.load(ClassLoader.getSystemClassLoader().getResourceAsStream("lang.json"));
         MongoManager mongoManager = new MongoManager(Credentials.of(config.getConnectionString(), config.getDb()));
 
