@@ -33,7 +33,7 @@ public class SpoofCommand {
     @Execute
     @Description("Du willst das wirklich wissen?")
     @NeedsAdmin
-    public void exec(@Arg("user") @Description("...") User user, @Join("message") @Description("...") String message, @Arg("reply") @Description("...") Optional<Integer> optionalReplyId, @Context SlashCommandInteractionEvent event) throws IOException, ExecutionException, InterruptedException {
+    public void exec(@Arg("user") @Description("...") User user, @Join("message") @Description("...") String message, @Arg("reply") @Description("...") Optional<String> optionalReplyId, @Context SlashCommandInteractionEvent event) throws IOException, ExecutionException, InterruptedException {
         if (user.equals(event.getJDA().getSelfUser())) {
             if (optionalReplyId.isPresent()) {
                 Message replyMessage = event.getChannel().retrieveMessageById(optionalReplyId.get()).complete();
