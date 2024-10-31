@@ -24,8 +24,8 @@ jobs:
       uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
     - name: Run tests with Gradle Wrapper
-      with:
-        - TEST_CONNECTION_STRING:  ${{ secrets.TEST_CONNECTION_STRING }}
-        - TEST_BOT_TOKEN:  ${{ secrets.TEST_BOT_TOKEN }}
       run: gradle test
+      with:
+        - TEST_CONNECTION_STRING: ${{ secrets.TEST_CONNECTION_STRING }}
+        - TEST_BOT_TOKEN: ${{ secrets.TEST_BOT_TOKEN }}
 
