@@ -272,10 +272,7 @@ public class TicketManager {
     }
 
     private Ticket getTicket(Long channelId) {
-        for (Ticket ticket : bot.getRepo(TicketRepo.class).findAll()) {
-            if (Objects.equals(ticket.getChannelId(), channelId)) return ticket;
-        }
-        return null;
+        return ((TicketRepo) this.bot.getRepo(TicketRepo.class)).findFirstByChannelId(channelId);
     }
 
 
