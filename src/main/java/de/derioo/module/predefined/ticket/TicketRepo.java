@@ -7,4 +7,7 @@ import org.bson.types.ObjectId;
 
 @Collection("tickets")
 public interface TicketRepo extends Repository<Ticket, ObjectId>, AsyncRepository<Ticket, ObjectId> {
+
+    Ticket findFirstByChannelId(Long channelId);
+
 }

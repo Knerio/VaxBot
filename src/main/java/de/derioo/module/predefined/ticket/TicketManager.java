@@ -7,6 +7,7 @@ import de.derioo.utils.Emote;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
@@ -216,27 +217,8 @@ public class TicketManager {
                 Guild guild = event.getGuild();
                 TextChannel logs = guild.getTextChannelById(bot.get(guild).getChannels().get(Config.Id.Channel.TICKET_LOGS_CHANNEL.name()));
                 if (logs == null) return;
-                boolean raw;
-                String informations = ticket.getInformations(guild);
-                EmbedBuilder embed = DiscordBot.Default.builder()
-                        .setColor(Color.GREEN)
-                        .setTitle("Varilx.de | Ticket")
-                        .addField(new MessageEmbed.Field(Emote.TEXT_CHANNEL.getData() + "Ticket Name", channel.getName(), false))
-                        .addField(new MessageEmbed.Field(Emote.CALENDAR.getData() + "Geschlossen von:", getMention(event.getUser()), true))
-                        .addField(new MessageEmbed.Field(Emote.USER.getData() + "Claimer:", ticket.getClaimerId() == null ? "**Nicht geclaimed**" : (getMention(guild.getMemberById(ticket.getClaimerId()))), true))
-                        .addField(new MessageEmbed.Field(Emote.USER.getData() + "Teilnehmer:", ticket.getParticipants(guild), true));
+                sendLog(logs, ticket, event);
 
-                if (informations.length() < 1024) {
-                    raw = false;
-                    embed.addField(new MessageEmbed.Field("Ticket Informationen", informations, false));
-                } else if (informations.length() > 1024 && informations.length() < 4095) {
-                    raw = false;
-                    embed.setDescription(informations);
-                } else {
-                    raw = true;
-                }
-
-                logs.sendMessage(raw ? informations : "").addEmbeds(embed.build()).queue();
                 Set<User> transcriptions = new HashSet<>();
                 transcriptions.add(event.getJDA().retrieveUserById(ticket.getUserId()).complete());
                 transcriptions.add(event.getUser());
@@ -245,9 +227,10 @@ public class TicketManager {
                 transcriptions.addAll(ticket.getParticipantUsers(guild));
                 for (User user : transcriptions) {
                     user.openPrivateChannel().queue(pc -> {
-                        pc.sendMessage(raw ? informations : "").addEmbeds(embed.build()).queue();
+                        sendLog(pc, ticket, event);
                     });
                 }
+
             } catch (Exception e) {
                 Module.logThrowable(bot, e);
             }
@@ -257,11 +240,39 @@ public class TicketManager {
 
     }
 
-    private Ticket getTicket(Long channelId) {
-        for (Ticket ticket : bot.getRepo(TicketRepo.class).findAll()) {
-            if (Objects.equals(ticket.getChannelId(), channelId)) return ticket;
+    public void sendLog(MessageChannel channel, Ticket ticket, ButtonInteractionEvent event) {
+        final Guild guild = event.getGuild();
+        final String informations = ticket.getInformations(guild);
+        final int length = informations.length();
+
+        EmbedBuilder embed = DiscordBot.Default.builder()
+                .setColor(Color.GREEN)
+                .setTitle("Varilx.de | Ticket")
+                .addField(new MessageEmbed.Field(Emote.TEXT_CHANNEL.getData() + "Ticket Name", channel.getName(), false))
+                .addField(new MessageEmbed.Field(Emote.CALENDAR.getData() + "Geschlossen von:", getMention(event.getUser()), true))
+                .addField(new MessageEmbed.Field(Emote.USER.getData() + "Claimer:", ticket.getClaimerId() == null ? "**Nicht geclaimed**" : (getMention(guild.getMemberById(ticket.getClaimerId()))), true))
+                .addField(new MessageEmbed.Field(Emote.USER.getData() + "Teilnehmer:", ticket.getParticipants(guild), true));
+
+        if (length < MessageEmbed.VALUE_MAX_LENGTH) {
+            embed.addField(new MessageEmbed.Field("Ticket Informationen", informations, false));
+            channel.sendMessageEmbeds(embed.build()).queue();
+            return;
+        } else if (length < MessageEmbed.DESCRIPTION_MAX_LENGTH) {
+            embed.setDescription(informations);
+            channel.sendMessageEmbeds(embed.build()).queue();
+            return;
         }
-        return null;
+        int messages = length / Message.MAX_CONTENT_LENGTH + 1;
+        for (int i = 0; i < messages; i++) {
+            String currentMessage = informations.substring(i == 0 ? 0 : (i - 1) * Message.MAX_CONTENT_LENGTH, i * Message.MAX_CONTENT_LENGTH);
+            channel.sendMessage(currentMessage).queue();
+        }
+
+
+    }
+
+    private Ticket getTicket(Long channelId) {
+        return ((TicketRepo) this.bot.getRepo(TicketRepo.class)).findFirstByChannelId(channelId);
     }
 
 
