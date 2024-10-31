@@ -60,8 +60,8 @@ public abstract class BaseTest {
         mockStatic(LocalConfig.class);
         when(LocalConfig.loadByENV()).then(new Returns(
                 new LocalConfig(
-                        "",
-                        "",
+                        System.getenv("TEST_BOT_TOKEN"),
+                        System.getenv("TEST_CONNECTION_STRING"),
                         "test",
                         null,
                         null,
