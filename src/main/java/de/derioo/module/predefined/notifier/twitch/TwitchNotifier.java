@@ -24,13 +24,16 @@ public class TwitchNotifier {
 
     private final NotifierModule module;
     private final DiscordBot bot;
-    private final TwitchClient client;
+    private TwitchClient client = null;
 
     private final Map<String, Long> notifyCache = new HashMap<>();
 
     public TwitchNotifier(NotifierModule module, DiscordBot bot) {
         this.module = module;
         this.bot = bot;
+        if (bot.getConfig().getTwitch() == null || bot.getConfig().getTwitch().getClientId() == null || bot.getConfig().getTwitch().getClientSecret() == null) {
+            return;
+        };
         client = TwitchClientBuilder.builder()
                 .withEnableHelix(true)
                 .withClientId(bot.getConfig().getTwitch().getClientId())

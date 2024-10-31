@@ -47,15 +47,15 @@ public class ConfigData {
 
 
     public boolean isRoleValid(Config.Id.Role role, Long id) {
-        return roles.get(role.name()).contains(id);
+        return roles.getOrDefault(role.name(), List.of()).contains(id);
     }
 
     public String getMentions(Config.Id.Role role, Guild guild) {
-        return roles.get(role.name()).stream().map(id -> guild.getRoleById(id).getAsMention()).collect(Collectors.joining(","));
+        return roles.getOrDefault(role.name(), List.of()).stream().map(id -> guild.getRoleById(id).getAsMention()).collect(Collectors.joining(","));
     }
 
     public List<Role> getRoleObjects(Config.Id.Role role, Guild guild) {
-        return roles.get(role.name()).stream().map(guild::getRoleById).toList();
+        return roles.getOrDefault(role.name(), List.of()).stream().map(guild::getRoleById).toList();
     }
 
 

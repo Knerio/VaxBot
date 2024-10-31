@@ -8,6 +8,7 @@ import de.derioo.config.local.LocalConfig;
 import de.derioo.status.StatusHandler;
 import eu.koboo.en2do.Credentials;
 import eu.koboo.en2do.MongoManager;
+import lombok.Getter;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -15,7 +16,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.TimeZone;
 
+@Getter
 public class Main {
+
+    @Getter
+    private static DiscordBot bot;
+    @Getter
+    private static StatusHandler statusHandler;
+
     public static void main(String[] args) throws IOException, InterruptedException {
         if (args.length == 1 && args[0].equalsIgnoreCase("apionly")) {
             System.out.println("Launching API ONLY");
@@ -44,7 +52,7 @@ public class Main {
         MongoManager mongoManager = new MongoManager(Credentials.of(config.getConnectionString(), config.getDb()));
 
 
-        DiscordBot bot = new DiscordBot(config, mongoManager, langConfig);
-        new StatusHandler(bot);
+        bot = new DiscordBot(config, mongoManager, langConfig);
+        statusHandler = new StatusHandler(bot);
     }
 }

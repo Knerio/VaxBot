@@ -2,6 +2,7 @@ package de.derioo.module;
 
 import de.derioo.bot.DiscordBot;
 import de.derioo.config.local.LangConfig;
+import lombok.Getter;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
@@ -14,6 +15,8 @@ public class ModuleManager {
 
     private final DiscordBot bot;
     private final LangConfig config;
+
+    @Getter
     private final Map<Class<? extends Module>, Module> enabledModules = new HashMap<>();
 
     public ModuleManager(DiscordBot bot, LangConfig config) {

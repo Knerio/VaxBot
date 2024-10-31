@@ -69,13 +69,13 @@ import java.util.*;
 import static net.dv8tion.jda.api.requests.GatewayIntent.*;
 
 @Log
+@Getter
 public class DiscordBot extends ListenerAdapter {
 
 
-    @Getter
     private final JDA jda;
 
-    @Getter
+    private final ModuleManager moduleManager;
     private final LocalConfig config;
     private final MongoManager mongoManager;
     private final LangConfig langConfig;
@@ -88,8 +88,9 @@ public class DiscordBot extends ListenerAdapter {
         this.config = config;
         this.mongoManager = mongoManager;
 
-        this.jda = JDABuilder
-                .create(config.getToken(), EnumSet.of(GUILD_MEMBERS, GUILD_MESSAGES, GUILD_VOICE_STATES, GUILD_MODERATION, GUILD_MESSAGE_REACTIONS, MESSAGE_CONTENT, DIRECT_MESSAGES))
+        JDABuilder jdaBuilder = JDABuilder
+                .create(config.getToken(), EnumSet.of(GUILD_MEMBERS, GUILD_MESSAGES, GUILD_VOICE_STATES, GUILD_MODERATION, GUILD_MESSAGE_REACTIONS, MESSAGE_CONTENT, DIRECT_MESSAGES));
+        this.jda = jdaBuilder
                 .setStatus(OnlineStatus.ONLINE)
                 .addEventListeners(this)
                 .build();
@@ -103,9 +104,9 @@ public class DiscordBot extends ListenerAdapter {
         this.repositories.put(LevelPlayerDataRepo.class, this.mongoManager.create(LevelPlayerDataRepo.class));
         this.repositories.put(RandomMemeRepository.class, this.mongoManager.create(RandomMemeRepository.class));
 
-        ModuleManager manager = new ModuleManager(this, langConfig);
+        this.moduleManager = new ModuleManager(this, langConfig);
 
-        manager.enableAllModules();
+        moduleManager.enableAllModules();
 
         LiteJDAFactory.builder(jda)
                 .argument(User.class, new UserArgument())
@@ -117,15 +118,15 @@ public class DiscordBot extends ListenerAdapter {
                         new ClearCommand(),
                         new UserInfoCommand(),
                         new MoveallCommand(),
-                        new GiveAwayCommand(this, manager.getModule(GiveAwayModule.class)),
+                        new GiveAwayCommand(this, moduleManager.getModule(GiveAwayModule.class)),
                         new ConfigCommand(this),
                         new UnclaimCommand(this),
                         new TicketCommand(this),
                         new TeamCommand(this),
                         new EightballCommand(),
-                        new LeaderboardCommand(this, manager.getModule(LevelModule.class)),
-                        new LevelCommand(this, manager.getModule(LevelModule.class)),
-                        new SpoofCommand(manager.getModule(SpoofModule.class)),
+                        new LeaderboardCommand(this, moduleManager.getModule(LevelModule.class)),
+                        new LevelCommand(this, moduleManager.getModule(LevelModule.class)),
+                        new SpoofCommand(moduleManager.getModule(SpoofModule.class)),
                         new RandomMemeCommand(this))
                 .exceptionUnexpected((invocation, throwable, resultHandlerChain) -> {
                     Module.logThrowable(this, throwable);
