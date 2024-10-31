@@ -52,6 +52,11 @@ dependencies {
     implementation("com.google.apis:google-api-services-youtube:v3-rev20241022-2.0.0")
 
     implementation("org.reflections:reflections:0.10.2")
+
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testImplementation("org.assertj:assertj-core:3.24.2")
+    testImplementation("org.mockito:mockito-core:5.5.0")
+    testImplementation("uk.org.webcompere:system-stubs-jupiter:2.0.1")
 }
 
 tasks.withType<JavaCompile> {
