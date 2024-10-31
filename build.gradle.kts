@@ -23,7 +23,7 @@ dependencies {
     implementation("org.jetbrains:annotations:26.0.1")
 
     /** Jackson **/
-    implementation("com.fasterxml.jackson.core:jackson-core:2.18.0")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.18.1")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.1")
     implementation("com.fasterxml.jackson.core:jackson-annotations:2.18.1")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.18.1")
