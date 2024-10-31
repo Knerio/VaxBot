@@ -2,6 +2,8 @@ name: Run Tests
 
 on:
   push:
+    branch:
+      - "*"
 
 jobs:
   test:
