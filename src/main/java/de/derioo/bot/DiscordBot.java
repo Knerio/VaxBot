@@ -130,6 +130,10 @@ public class DiscordBot extends ListenerAdapter {
                 .exceptionUnexpected((invocation, throwable, resultHandlerChain) -> {
                     Module.logThrowable(this, throwable);
                 })
+                .invalidUsage((invocation, result, chain) -> {
+                    System.out.println(result.getCause());
+                    System.out.println(result.getLastCommand());
+                })
                 .annotations(configuration -> {
                     configuration.methodValidator(context -> {
                         User sender = context.getInvocation().sender();
