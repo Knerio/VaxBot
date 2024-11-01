@@ -133,6 +133,10 @@ public class DiscordBot extends ListenerAdapter {
                 .invalidUsage((invocation, result, chain) -> {
                     System.out.println(result.getCause());
                     System.out.println(result.getLastCommand());
+                    System.out.println(result.getSchematic());
+                    System.out.println(result);
+                    System.out.println(chain);
+                    System.out.println(invocation);
                 })
                 .annotations(configuration -> {
                     configuration.methodValidator(context -> {
