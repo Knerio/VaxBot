@@ -3,6 +3,7 @@ package de.derioo.module;
 import de.derioo.annotations.ModuleListener;
 import de.derioo.bot.DiscordBot;
 import de.derioo.config.Config;
+import de.derioo.config.ConfigData;
 import de.derioo.config.repository.ConfigRepo;
 import de.derioo.javautils.common.MathUtility;
 import de.derioo.utils.Emote;
@@ -93,6 +94,8 @@ public abstract class Module {
     }
 
     public static void logThrowable(DiscordBot bot, Throwable throwable) {
+        throwable.printStackTrace();
+
         Config config = Config.get(bot.getRepo(ConfigRepo.class));
         for (Guild guild : bot.getJda().getGuilds()) {
             String errorMentions = config.get(guild).getMentions(Config.Id.Role.ERROR_ROLE, guild);
@@ -137,7 +140,7 @@ public abstract class Module {
     public final void updateOrSendEmbed(Config.Id.Channel channelConfig, MessageEmbed embed, ActionRow... rows) {
         Config config = Config.get(bot.getRepo(ConfigRepo.class));
         for (Guild guild : bot.getJda().getGuilds()) {
-            if (!config.getData().get(guild.getId()).getChannels().containsKey(channelConfig.name()))
+            if (!config.getData().getOrDefault(guild.getId(), ConfigData.defaultData(guild.getId())).getChannels().containsKey(channelConfig.name()))
                 continue;
             Long channelId = config.getData().get(guild.getId()).getChannels().get(channelConfig.name());
             TextChannel channel = guild.getChannelById(TextChannel.class, channelId);
