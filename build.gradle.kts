@@ -58,7 +58,7 @@ dependencies {
     testImplementation("org.assertj:assertj-core:3.26.3")
     testImplementation("org.mockito:mockito-core:5.14.2")
     testImplementation("uk.org.webcompere:system-stubs-jupiter:2.1.7")
-    testImplementation( "org.mockito:mockito-inline:4.0.0")
+    testImplementation( "org.mockito:mockito-inline:4.11.0")
 
     testImplementation("org.projectlombok:lombok:1.18.34")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.34")
