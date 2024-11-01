@@ -42,7 +42,7 @@ dependencies {
     implementation("org.mongodb:mongodb-driver-sync:5.2.0")
 
     /** En2do **/
-    implementation("eu.koboo:en2do:1.0.3")
+    implementation("eu.koboo:en2do:1.0.1")
 
     implementation("io.javalin:javalin:6.3.0")
     implementation("org.slf4j:slf4j-simple:2.0.16")
