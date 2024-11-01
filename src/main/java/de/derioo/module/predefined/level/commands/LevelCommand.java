@@ -36,12 +36,12 @@ public class LevelCommand {
     }
 
     @Execute
-    public void getLevel(@Arg("nutzer") @Description("Nutzer (oder du)") Optional<User> optionalUser,
+    public void getLevel(@Arg("nutzer") @Description("Nutzer (oder du)") Optional<Member> optionalMember,
                          @Context SlashCommandInteractionEvent event) {
         Timer timer = new Timer();
 
-        if (optionalUser.isEmpty()) optionalUser = Optional.of(event.getUser());
-        Member member = event.getGuild().getMember(optionalUser.get());
+        if (optionalMember.isEmpty()) optionalMember = Optional.of(event.getMember());
+        Member member = optionalMember.get();
         event.replyEmbeds(generateLevelEmbed(member))
                 .setEphemeral(true).queue(hook -> {
                     timer.schedule(new TimerTask() {

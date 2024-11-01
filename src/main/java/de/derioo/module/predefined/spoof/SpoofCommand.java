@@ -10,12 +10,14 @@ import dev.rollczi.litecommands.annotations.join.Join;
 import dev.rollczi.litecommands.jda.permission.DiscordPermission;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.Webhook;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 @Command(name = "spoof")
@@ -31,9 +33,15 @@ public class SpoofCommand {
     @Execute
     @Description("Du willst das wirklich wissen?")
     @NeedsAdmin
-    public void exec(@Arg("user") @Description("...") User user, @Join("message") @Description("...") String message, @Context SlashCommandInteractionEvent event) throws IOException, ExecutionException, InterruptedException {
+    public void exec(@Arg("user") @Description("...") User user, @Join("message") @Description("...") String message, @Arg("reply") @Description("...") Optional<String> optionalReplyId, @Context SlashCommandInteractionEvent event) throws IOException, ExecutionException, InterruptedException {
         if (user.equals(event.getJDA().getSelfUser())) {
-            event.getChannel().sendMessage(message).queue();
+            if (optionalReplyId.isPresent()) {
+                Message replyMessage = event.getChannel().retrieveMessageById(optionalReplyId.get()).complete();
+                replyMessage.reply(message).queue();
+            } else {
+                event.getChannel().sendMessage(message).queue();
+            }
+
         } else {
             Webhook webhook = module.createWebhook(event.getGuild().getMember(user), event.getChannel().asTextChannel());
             webhook.sendMessage(message).queue();

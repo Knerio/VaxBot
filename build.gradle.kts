@@ -36,13 +36,13 @@ dependencies {
     implementation("com.github.walkyst:lavaplayer-fork:1.4.3")
 
     /** CommandFramework **/
-    implementation("dev.rollczi:litecommands-jda:3.8.0")
+    implementation("dev.rollczi:litecommands-jda:3.5.0")
 
     /** Mongo DB **/
     implementation("org.mongodb:mongodb-driver-sync:5.2.0")
 
     /** En2do **/
-    implementation("eu.koboo:en2do:1.0.3")
+    implementation("eu.koboo:en2do:1.0.1")
 
     implementation("io.javalin:javalin:6.3.0")
     implementation("org.slf4j:slf4j-simple:2.0.16")
@@ -56,14 +56,15 @@ dependencies {
     /** TEST **/
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.3")
     testImplementation("org.assertj:assertj-core:3.26.3")
-    testImplementation("org.mockito:mockito-core:5.5.0")
-    testImplementation("uk.org.webcompere:system-stubs-jupiter:2.0.1")
+    testImplementation("org.mockito:mockito-core:5.14.2")
+    testImplementation("uk.org.webcompere:system-stubs-jupiter:2.1.7")
     testImplementation( "org.mockito:mockito-inline:4.0.0")
 
     testImplementation("org.projectlombok:lombok:1.18.34")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.34")
     testImplementation("org.jetbrains:annotations:26.0.1")
     testImplementation("org.jetbrains:annotations:26.0.1")
+
 }
 
 tasks.withType<JavaCompile> {
