@@ -10,7 +10,6 @@ import dev.rollczi.litecommands.annotations.command.Command;
 import dev.rollczi.litecommands.annotations.context.Context;
 import dev.rollczi.litecommands.annotations.description.Description;
 import dev.rollczi.litecommands.annotations.execute.Execute;
-import dev.rollczi.litecommands.annotations.optional.OptionalArg;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -37,12 +36,12 @@ public class LevelCommand {
     }
 
     @Execute
-    public void getLevel(@OptionalArg("nutzer") @Description("Nutzer (oder du)") User optionalUser,
+    public void getLevel(@Arg("nutzer") @Description("Nutzer (oder du)") Optional<Member> optionalMember,
                          @Context SlashCommandInteractionEvent event) {
         Timer timer = new Timer();
 
-        if (optionalUser == null) optionalUser = event.getUser();
-        Member member = event.getGuild().getMember(optionalUser);
+        if (optionalMember.isEmpty()) optionalMember = Optional.of(event.getMember());
+        Member member = optionalMember.get();
         event.replyEmbeds(generateLevelEmbed(member))
                 .setEphemeral(true).queue(hook -> {
                     timer.schedule(new TimerTask() {
