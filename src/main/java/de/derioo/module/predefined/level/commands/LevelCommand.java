@@ -36,7 +36,7 @@ public class LevelCommand {
     }
 
     @Execute
-    public void getLevel(@Arg(value = "nutzer", nullable = true) @Description("Nutzer (oder du)") Optional<Member> optionalMember,
+    public void getLevel(@Arg("nutzer") @Description("Nutzer (oder du)") Optional<Member> optionalMember,
                          @Context SlashCommandInteractionEvent event) {
         Timer timer = new Timer();
 
